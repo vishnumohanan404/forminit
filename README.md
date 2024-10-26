@@ -39,5 +39,6 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 
 Feel free to reach out:
 
-Email: vishnumohan1996nov@gmail.com
-GitHub: @vishnumohanan404
+
+Email: *vishnumohan1996nov@gmail.com*  
+GitHub: *@vishnumohanan404*
