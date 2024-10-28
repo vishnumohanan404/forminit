@@ -1,9 +1,9 @@
 import { PropsWithChildren, useEffect } from "react";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 
-type ProtecctedRouteProps = PropsWithChildren;
-export default function ProtectedRoute({ children }: ProtecctedRouteProps) {
+type ProtectedRouteProps = PropsWithChildren;
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const user = useAuth(); // Check the user's authentication status here
   const navigate = useNavigate();
 

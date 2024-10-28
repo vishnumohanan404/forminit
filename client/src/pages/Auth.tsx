@@ -36,7 +36,7 @@ const Auth = () => {
   const {
     register,
     handleSubmit,
-    setError,
+    // setError,
     formState: { errors, isSubmitting },
   } = useForm<AuthFormFields>();
 
