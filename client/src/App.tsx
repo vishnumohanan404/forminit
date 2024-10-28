@@ -1,20 +1,52 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
+import DashboardPage from "./pages/Dashboard";
+import ProfilePage from "./pages/Profile";
+import NotFoundPage from "./pages/NotFound";
+import Layout from "./layouts/layout";
+import AuthProvider from "./components/auth/AuthProvider";
+import ProtectedRoute from "./components/auth/ProtectedRoutes";
+import Auth from "./pages/Auth";
 
+// TODO: explore Data API from
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to="/dashboard" replace />,
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: "/auth",
+    element: <Auth />,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <ProfilePage />
+      </ProtectedRoute>
+    ),
+  },
+]);
 function App() {
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/about">
-            <div></div>{" "}
-          </Route>
-          <Route path="/">
-            <></>
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+    <Layout>
+      <AuthProvider isSignedIn={false}>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </Layout>
   );
 }
 
