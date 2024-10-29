@@ -8,9 +8,13 @@ import DashboardPage from "./pages/Dashboard";
 import ProfilePage from "./pages/Profile";
 import NotFoundPage from "./pages/NotFound";
 import Layout from "./layouts/layout";
-import AuthProvider from "./components/auth/AuthProvider";
+import AuthProvider from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoutes";
 import Auth from "./pages/Auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const queryClient = new QueryClient();
 
 // TODO: explore Data API from
 const router = createBrowserRouter([
@@ -42,11 +46,15 @@ const router = createBrowserRouter([
 ]);
 function App() {
   return (
-    <Layout>
-      <AuthProvider isSignedIn={false}>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </Layout>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <Layout>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
+        </QueryClientProvider>
+      </Layout>
+    </GoogleOAuthProvider>
   );
 }
 

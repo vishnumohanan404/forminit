@@ -39,6 +39,11 @@ export const verifyToken = async (
     next(); // Call next middleware
   } catch (error) {
     console.error("Token error", error);
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Set secure flag in production
+      sameSite: "strict", // Adjust based on your needs
+    });
     res.status(401).json({ message: "Invalid token" });
   }
 };

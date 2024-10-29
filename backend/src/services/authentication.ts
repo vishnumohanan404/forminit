@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { NotFoundError } from "../errors/common";
 import Dashboard from "../models/dashboard";
 import mongoose from "mongoose";
+import { OAuth2Client } from "google-auth-library";
 
 interface UserInput {
   fullName: string;
@@ -45,7 +46,12 @@ export const registerNewUser = async ({
   });
   const savedDashboard = await newDashboard.save();
   console.log("User workspaces created:", savedDashboard);
-  return user;
+  const token = jwt.sign(
+    { _id: user._id, email: user.email }, // Payload
+    JWT_SECRET,
+    { expiresIn: "1h" } // Token expiration
+  );
+  return { user, token };
 };
 
 interface LoginInput {
@@ -62,7 +68,9 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   if (!user) {
     throw new NotFoundError("NOT_FOUND_ERROR");
   }
-
+  if (!user.password) {
+    throw new UnauthorizedError("USER_NOT_AUTHORIZED"); // If password is not set (Google login)
+  }
   // Compare the provided password with the stored hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
@@ -77,4 +85,60 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   );
 
   return { token, user };
+};
+const oAuth2Client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "postmessage"
+);
+export const registerGoogleUser = async (code: string) => {
+  const { tokens } = await oAuth2Client.getToken(code); // exchange code for tokens
+
+  if (!tokens.id_token) {
+    throw new UnauthorizedError("USER_NOT_AUTHORIZED");
+  }
+  const googleUser = await oAuth2Client.verifyIdToken({
+    idToken: tokens.id_token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const { email, name, sub } = googleUser.getPayload() || {};
+  if (!email) {
+    throw new UnauthorizedError("USER_NOT_AUTHORIZED");
+  }
+  // Check if the user already exists (e.g., by email)
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    const token = jwt.sign(
+      { _id: existingUser._id, email: existingUser.email }, // Payload
+      JWT_SECRET,
+      { expiresIn: "1h" } // Token expiration
+    );
+    return { user: existingUser, token };
+  } else {
+    const newUser = new User({
+      fullName: name,
+      email,
+      password: null,
+      googleId: sub,
+    });
+    const user = await newUser.save();
+    const newDashboard = new Dashboard({
+      user_id: user._id,
+      workspaces: [
+        {
+          name: "My Workspace",
+          id: new mongoose.Types.ObjectId(),
+          forms: [],
+        },
+      ],
+    });
+    const savedDashboard = await newDashboard.save();
+    console.log("User workspaces created:", savedDashboard);
+    const token = jwt.sign(
+      { _id: user._id, email: user.email }, // Payload
+      JWT_SECRET,
+      { expiresIn: "1h" } // Token expiration
+    );
+    return { user, token };
+  }
 };

@@ -11,9 +11,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import FormError from "@/components/auth/FormError";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthProvider";
+import { googleSignIn, login, signup } from "@/services/auth";
+import { AxiosError } from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 
 interface LoginFormFields {
   email: string;
@@ -29,38 +34,83 @@ interface SignupFormFields {
 type AuthFormFields = LoginFormFields & Partial<SignupFormFields>;
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [searchParams, setSearchParams] = useSearchParams(); // Initialize searchParams
+  const isLogin = searchParams.get("mode") !== "signup";
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const { user, setUser } = useAuth();
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, user]);
 
   const {
     register,
     handleSubmit,
-    // setError,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm<AuthFormFields>();
-
-  const onSubmit: SubmitHandler<AuthFormFields> = async (data) => {
+    getValues,
+  } = useForm<AuthFormFields>({ mode: "onBlur" });
+  const onSubmitLogin: SubmitHandler<AuthFormFields> = async (data) => {
     try {
-        
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
-        console.log("data", data);
+      const response = await login(data);
+      setUser(response.user);
+      navigate("/");
     } catch (error) {
-        // todo: setError from api in case of error
+      if (error instanceof Error) {
+        setError("root", { message: error.message });
+      }
+    }
+  };
+  const onSubmitSignUp: SubmitHandler<AuthFormFields> = async (data) => {
+    try {
+      const response = await signup({
+        fullName: data.fullName!,
+        email: data.email!,
+        password: data.password!,
+      });
+      setUser(response.user);
+      navigate("/");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error("Error message:", error);
+        setError("root", {
+          message: error.response?.data.message || "Something went wrong",
+        });
+        // Access other properties like error.name, error.stack, etc.
+      }
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    // Implement Google Sign-In logic here
-    // This would typically involve calling your backend to initiate the OAuth flow
-    console.log("Initiating Google Sign-In");
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
-    setIsLoading(false);
-    // router.push('/dashboard')
+  const handleGoogleSignIn = useGoogleLogin({
+    flow: "auth-code",
+    onSuccess: async (codeResponse) => {
+      console.log(codeResponse);
+      setIsLoading(true);
+      const response = await googleSignIn(codeResponse);
+      setUser(response.user);
+      setIsLoading(false);
+      navigate("/");
+    },
+    onError: (tokenResponse) => {
+      console.log(tokenResponse.error_description);
+      setError("root", {
+        message: tokenResponse.error_description || "Something went wrong",
+      });
+      setIsLoading(false);
+    },
+  });
+
+  const toggleMode = () => {
+    const newMode = isLogin ? "signup" : "login";
+    setSearchParams({ mode: newMode }); // Update URL parameter
   };
 
-  return (
+  return user ? (
+    <Navigate to="/dashboard" />
+  ) : (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -72,7 +122,10 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(isLogin ? onSubmitLogin : onSubmitSignUp)}
+            className="space-y-4"
+          >
             {!isLogin && (
               <div className="space-y-1">
                 <Label htmlFor="fullname">Full Name</Label>
@@ -123,8 +176,8 @@ const Auth = () => {
                       message: "Please enter a password",
                     },
                     minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters long",
+                      value: 6,
+                      message: "Password must be at least 6 characters long",
                     },
                     maxLength: {
                       value: 30,
@@ -166,6 +219,12 @@ const Auth = () => {
                       value: true,
                       message: "Please confirm your password",
                     },
+                    validate: (value) => {
+                      return (
+                        value === getValues().password ||
+                        "Passwords should match"
+                      );
+                    },
                     minLength: {
                       value: 8,
                       message: "Password must be at least 8 characters long",
@@ -184,8 +243,11 @@ const Auth = () => {
                 )}
               </div>
             )}
+            {errors.root && <FormError>{errors.root.message}</FormError>}
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {isLogin ? "Login" : "Register"}
             </Button>
           </form>
@@ -241,7 +303,7 @@ const Auth = () => {
               type="button"
               variant="link"
               className="p-0 h-auto font-normal"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => toggleMode()}
             >
               {isLogin ? "Register" : "Login"}
             </Button>

@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { loginUser, registerNewUser } from "../services/authentication";
+import {
+  loginUser,
+  registerGoogleUser,
+  registerNewUser,
+} from "../services/authentication";
 import { errorResponse, validate } from "../helpers";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
@@ -8,11 +12,21 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     validate(req, res);
 
     // Call the service to register the user
-    const user = await registerNewUser({ fullName, email, password });
+    const { user, token } = await registerNewUser({
+      fullName,
+      email,
+      password,
+    });
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
+      sameSite: "strict", // Protects against CSRF attacks
+      maxAge: 3600000, //ms = 1 hour
+    });
 
     res.status(201).json({
       message: "User registered successfully",
-      data: user,
+      user,
     });
   } catch (error) {
     errorResponse(error, res);
@@ -28,10 +42,10 @@ export const login = async (req: Request, res: Response) => {
 
     // Set the token in an HTTP-only cookie
     res.cookie("jwt", token, {
-      httpOnly: true, // Cookie can't be accessed via JavaScript
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
       sameSite: "strict", // Protects against CSRF attacks
-      maxAge: 3600000, // 1 hour
+      maxAge: 3600000, //ms = 1 hour
     });
 
     // Return the JWT token and user information
@@ -40,6 +54,27 @@ export const login = async (req: Request, res: Response) => {
       user: { email: user.email, fullName: user.fullName },
     });
   } catch (error: any) {
+    errorResponse(error, res);
+  }
+};
+
+export const google = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // If user doesn't exist, register them
+    const { user, token } = await registerGoogleUser(
+      req.body.code // Store Google user ID for future logins
+    );
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
+      sameSite: "strict", // Protects against CSRF attacks
+      maxAge: 3600000, //ms = 1 hour
+    });
+    res.status(200).json({
+      message: "Login successful",
+      user,
+    });
+  } catch (error) {
     errorResponse(error, res);
   }
 };

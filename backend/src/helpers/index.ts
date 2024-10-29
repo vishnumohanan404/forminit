@@ -27,6 +27,7 @@ export const errorResponse = (error: unknown, res: Response) => {
   console.error(error);
   if (error instanceof ErrorBase) {
     res.status(error.statusCode).json({ message: error.message });
+    console.error("err", error.message);
   } else {
     // If no proper message, send a generic Internal Server Error
     res.status(500).json({
