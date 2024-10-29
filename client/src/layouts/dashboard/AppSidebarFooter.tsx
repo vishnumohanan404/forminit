@@ -30,10 +30,15 @@ const AppSidebarFooter = () => {
               side="top"
               className="w-[--radix-popper-anchor-width]"
             >
-              <DropdownMenuItem>
-                <span>Account</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setUser(null)}>
+              <a href="/profile">
+                <DropdownMenuItem className="cursor-pointer">
+                  <span>Account</span>
+                </DropdownMenuItem>
+              </a>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => setUser(null)}
+              >
                 <span>Sign out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

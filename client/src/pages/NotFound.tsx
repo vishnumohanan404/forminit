@@ -14,12 +14,13 @@ const NotFoundPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center justify-center text-4xl font-extrabold">
-            <AlertCircle className="mr-2 h-12 w-12 text-destructive" />
-            404
+            Oops!
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-2xl font-semibold mb-2">Page Not Found</p>
+          <p className="text-2xl font-semibold mb-2">
+            Looks like you wandered off
+          </p>
           <p className="text-muted-foreground">
             Oops! The page you're looking for doesn't exist or has been moved.
           </p>

@@ -1,12 +1,12 @@
 import PageTitle from "@/components/common/PageTitle";
 
-const DashboardPage = () => {
+const WorkspacesPage = () => {
   return (
     <div className="mx-auto container">
-      <PageTitle>Home</PageTitle>
+      <PageTitle>Workspaces</PageTitle>
       <div className=""></div>
     </div>
   );
 };
 
-export default DashboardPage;
+export default WorkspacesPage;

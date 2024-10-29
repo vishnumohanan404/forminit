@@ -7,13 +7,19 @@ import {
 import DashboardPage from "./pages/Dashboard";
 import ProfilePage from "./pages/Profile";
 import NotFoundPage from "./pages/NotFound";
-import Layout from "./layouts/layout";
+
 import AuthProvider from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoutes";
 import Auth from "./pages/Auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SettingsPage from "./pages/Settings";
+import SupportPage from "./pages/Support";
+import ChangelogsPage from "./pages/Changelogs";
+import FormPage from "./pages/Form";
+import Layout from "./layouts/layout";
+import WorkspacesPage from "./pages/Workspaces";
+import WorkspacePage from "./pages/Workspace";
 
 const queryClient = new QueryClient();
 
@@ -37,10 +43,42 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/workspaces/:id",
+    element: (
+      <ProtectedRoute>
+        <WorkspacePage/>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/forms/:id",
+    element: (
+      <ProtectedRoute>
+        <FormPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/settings",
     element: (
       <ProtectedRoute>
         <SettingsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/support",
+    element: (
+      <ProtectedRoute>
+        <SupportPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/changelogs",
+    element: (
+      <ProtectedRoute>
+        <ChangelogsPage />
       </ProtectedRoute>
     ),
   },

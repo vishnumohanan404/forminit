@@ -1,8 +1,14 @@
+import PageTitle from "@/components/common/PageTitle";
+import { useSearchParams } from "react-router-dom";
 
-const Workspaces = () => {
+const WorkspacePage = () => {
+  const [searchParams] = useSearchParams();
   return (
-    <div>Workspaces</div>
-  )
-}
+    <div className="mx-auto container">
+      <PageTitle>{searchParams.get("name")}</PageTitle>
+      <div className=""></div>
+    </div>
+  );
+};
 
-export default Workspaces
+export default WorkspacePage;
