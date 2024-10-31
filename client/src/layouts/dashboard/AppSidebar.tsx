@@ -9,18 +9,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
   SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Home,
-  Layers3Icon,
-  LayoutDashboard,
-  MessageCircleQuestion,
-  Search,
-  Settings,
-} from "lucide-react";
 import AppSidebarHeader from "./AppSidebarHeader";
 import AppSidebarFooter from "./AppSidebarFooter";
 import {
@@ -28,38 +20,21 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Link } from "react-router-dom";
 
-const applicationItems = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Workspaces",
-    url: "/workspaces",
-    icon: LayoutDashboard,
-    type: "collapsible",
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-];
-const productItems = [
-  {
-    title: "Changelog",
-    url: "/changelogs",
-    icon: Layers3Icon,
-  },
-  {
-    title: "Support",
-    url: "/support",
-    icon: MessageCircleQuestion,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { fetchDashboard } from "@/services/dashboard";
+import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
+import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
+
 export function AppSidebar() {
+  const { data: dashboard } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: fetchDashboard,
+    staleTime: 10000,
+  });
+  const { open } = useSidebar();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -67,42 +42,64 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          {open && <SidebarGroupLabel>Application</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {applicationItems.map((item) => (
+              {sidebarApplicationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   {item.type === "collapsible" ? (
                     <Collapsible defaultOpen className="group/collapsible">
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
+                      <>
+                        <div className="flex">
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton>
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CreateWorkspaceDialog />
+                        </div>
                         <CollapsibleContent>
                           <SidebarMenuSub>
-                            <SidebarMenuButton asChild>
-                              <a href="/workspaces/abc?name=Hello world">
-                                <span>Hello world</span>
-                              </a>
-                            </SidebarMenuButton>
-                            <SidebarMenuButton asChild>
-                              <a href="/workspaces/xyz?name=School Project">
-                                <span>School Project</span>
-                              </a>
-                            </SidebarMenuButton>
+                            {dashboard ? (
+                              dashboard.workspaces?.map(
+                                (workspace: {
+                                  name: string;
+                                  _id: string;
+                                  forms: Array<string>;
+                                }) => (
+                                  <SidebarMenuButton
+                                    asChild
+                                    key={workspace._id}
+                                  >
+                                    <Link
+                                      to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                                    >
+                                      <span>{workspace.name}</span>
+                                    </Link>
+                                  </SidebarMenuButton>
+                                )
+                              )
+                            ) : (
+                              <>
+                                <SidebarMenuButton asChild>
+                                  <SidebarMenuSkeleton className="h-8 w-[150px]" />
+                                </SidebarMenuButton>
+                                <SidebarMenuButton asChild>
+                                  <SidebarMenuSkeleton className="h-8 w-[150px]" />
+                                </SidebarMenuButton>
+                              </>
+                            )}
                           </SidebarMenuSub>
                         </CollapsibleContent>
-                      </SidebarMenuItem>
+                      </>
                     </Collapsible>
                   ) : (
                     <SidebarMenuButton asChild>
-                      <a href={item.url}>
+                      <Link to={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>
@@ -111,16 +108,16 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Product</SidebarGroupLabel>
+          {open && <SidebarGroupLabel>Product</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {productItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

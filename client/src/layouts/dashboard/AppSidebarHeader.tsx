@@ -1,4 +1,4 @@
-import Title from "@/components/common/Title";
+
 import Logo from "@/components/svg/Logo";
 import {
   SidebarHeader,
@@ -18,7 +18,6 @@ const AppSidebarHeader = () => {
           <div className={open ? "h-9 w-9" : "h-6 w-6"}>
             <Logo />
           </div>
-          {open && <Title />}
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>

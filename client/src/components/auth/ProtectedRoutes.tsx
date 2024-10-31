@@ -1,19 +1,18 @@
 import { PropsWithChildren, useEffect } from "react";
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthProvider";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "@/layouts/dashboard/AppSidebar";
 import { Separator } from "../ui/separator";
+import { DarkModeToggle } from "../common/DarkModeToggle";
+import DashboardBreadcrumb from "../dashboard/DashboardBreadcrumb";
 
 type ProtectedRouteProps = PropsWithChildren;
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user } = useAuth(); // Check the user's authentication status here
   const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     if (user === null) {
       navigate("/auth");
@@ -23,14 +22,19 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   return user ? (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex flex-col min-h-screen min-w-[calc(100%-12rem)] bg-background text-foreground">
-        <div className="overflow-y-auto h-full">
-          <SidebarTrigger />
-          <Separator />
-          <div className="container mx-auto  overflow-y-auto my-auto">
-            {children}
+      <main className="flex flex-col col-span-1 min-h-screen overflow-y-auto w-full">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
+            <DashboardBreadcrumb>
+              {location.pathname.split("/")[1]}
+            </DashboardBreadcrumb>
           </div>
+          <DarkModeToggle />
         </div>
+
+        <Separator />
+        {children}
       </main>
     </SidebarProvider>
   ) : (

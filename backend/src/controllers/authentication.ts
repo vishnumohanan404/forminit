@@ -23,7 +23,6 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       sameSite: "strict", // Protects against CSRF attacks
       maxAge: 3600000, //ms = 1 hour
     });
-
     res.status(201).json({
       message: "User registered successfully",
       user,
@@ -47,11 +46,10 @@ export const login = async (req: Request, res: Response) => {
       sameSite: "strict", // Protects against CSRF attacks
       maxAge: 3600000, //ms = 1 hour
     });
-
     // Return the JWT token and user information
     res.status(200).json({
       message: "Login successful",
-      user: { email: user.email, fullName: user.fullName },
+      user,
     });
   } catch (error: any) {
     errorResponse(error, res);

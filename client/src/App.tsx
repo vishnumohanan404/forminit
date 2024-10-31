@@ -17,9 +17,10 @@ import SettingsPage from "./pages/Settings";
 import SupportPage from "./pages/Support";
 import ChangelogsPage from "./pages/Changelogs";
 import FormPage from "./pages/Form";
-import Layout from "./layouts/layout";
-import WorkspacesPage from "./pages/Workspaces";
+import Layout from "./layouts/Layout";
 import WorkspacePage from "./pages/Workspace";
+import { ThemeProvider } from "./contexts/ThemeProvider";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
     path: "/workspaces/:id",
     element: (
       <ProtectedRoute>
-        <WorkspacePage/>
+        <WorkspacePage />
       </ProtectedRoute>
     ),
   },
@@ -93,15 +94,18 @@ const router = createBrowserRouter([
 ]);
 function App() {
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <Layout>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <RouterProvider router={router} />
-          </AuthProvider>
-        </QueryClientProvider>
-      </Layout>
-    </GoogleOAuthProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <Layout>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </Layout>
+      </GoogleOAuthProvider>
+    </ThemeProvider>
   );
 }
 

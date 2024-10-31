@@ -13,6 +13,7 @@ import {
 import { User2 } from "lucide-react";
 import { ChevronUpIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/AuthProvider";
+import { Link } from "react-router-dom";
 const AppSidebarFooter = () => {
   const { setUser, user } = useAuth();
   return (
@@ -30,11 +31,11 @@ const AppSidebarFooter = () => {
               side="top"
               className="w-[--radix-popper-anchor-width]"
             >
-              <a href="/profile">
+              <Link to="/profile">
                 <DropdownMenuItem className="cursor-pointer">
                   <span>Account</span>
                 </DropdownMenuItem>
-              </a>
+              </Link>
               <DropdownMenuItem
                 className="cursor-pointer"
                 onClick={() => setUser(null)}

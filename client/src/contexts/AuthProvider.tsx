@@ -39,4 +39,12 @@ export const useAuth = () => {
   return context;
 };
 
+export const getUserFromContext = () => {
+  const context: AuthProviderProps | null = useContext(AuthContext);
+  if (!context) {
+    throw new Error("Context must be used within a Provider");
+  }
+  return context.setUser;
+};
+
 export default AuthProvider;

@@ -5,7 +5,6 @@ import cors from "cors";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
 import router from "./routes";
 import connectDB from "./config/db";
 
@@ -15,6 +14,7 @@ const app: Application = express();
 app.use(
   cors({
     credentials: true,
+    origin: 'http://localhost:5173'
   })
 );
 app.use(compression());

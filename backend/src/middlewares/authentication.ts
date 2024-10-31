@@ -19,7 +19,6 @@ export const verifyToken = async (
   next: NextFunction
 ): Promise<void> => {
   const token = req.cookies.jwt; // Get the token from the HTTP-only cookie
-
   if (!token) {
     res.status(401).json({ message: "Unauthorized" });
     return;
@@ -39,11 +38,11 @@ export const verifyToken = async (
     next(); // Call next middleware
   } catch (error) {
     console.error("Token error", error);
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure flag in production
-      sameSite: "strict", // Adjust based on your needs
-    });
+    // res.clearCookie("jwt", {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production", // Set secure flag in production
+    //   sameSite: "strict", // Adjust based on your needs
+    // });
     res.status(401).json({ message: "Invalid token" });
   }
 };

@@ -6,8 +6,6 @@ COPY ./package.json .
 COPY ./package-lock.json .
 
 RUN npm install
-RUN npm install -D tailwindcss postcss autoprefixer
-RUN npx tailwindcss init -p
 
 COPY . .
 

@@ -13,6 +13,8 @@ interface UserInput {
   password: string;
 }
 
+const tokenExpiry = { expiresIn: "1h" };
+
 // Service function for registering a new user
 export const registerNewUser = async ({
   fullName,
@@ -49,7 +51,7 @@ export const registerNewUser = async ({
   const token = jwt.sign(
     { _id: user._id, email: user.email }, // Payload
     JWT_SECRET,
-    { expiresIn: "1h" } // Token expiration
+    tokenExpiry // Token expiration
   );
   return { user, token };
 };
@@ -81,7 +83,7 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   const token = jwt.sign(
     { _id: user._id, email: user.email }, // Payload
     JWT_SECRET,
-    { expiresIn: "1h" } // Token expiration
+    tokenExpiry // Token expiration
   );
 
   return { token, user };
@@ -111,7 +113,7 @@ export const registerGoogleUser = async (code: string) => {
     const token = jwt.sign(
       { _id: existingUser._id, email: existingUser.email }, // Payload
       JWT_SECRET,
-      { expiresIn: "1h" } // Token expiration
+      tokenExpiry // Token expiration
     );
     return { user: existingUser, token };
   } else {
@@ -137,7 +139,7 @@ export const registerGoogleUser = async (code: string) => {
     const token = jwt.sign(
       { _id: user._id, email: user.email }, // Payload
       JWT_SECRET,
-      { expiresIn: "1h" } // Token expiration
+      tokenExpiry // Token expiration
     );
     return { user, token };
   }
