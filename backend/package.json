@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/express-validator": "^3.0.2",
+    "@types/morgan": "^1.9.9",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "compression": "^1.7.4",
@@ -23,7 +24,9 @@
     "express-validator": "^7.2.0",
     "google-auth-library": "^9.14.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.7.3"
+    "mongoose": "^8.7.3",
+    "morgan": "^1.10.0",
+    "winston": "^3.16.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

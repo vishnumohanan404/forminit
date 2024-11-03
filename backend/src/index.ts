@@ -7,14 +7,23 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import router from "./routes";
 import connectDB from "./config/db";
+import morgan from "morgan";
+import logger from "./logger";
 
 const port: number = Number(process.env.PORT) || 3000;
 const app: Application = express();
-
+// Morgan middleware for logging HTTP requests
+app.use(
+  morgan(":method :url :status :response-time ms", {
+    stream: {
+      write: (message: string) => logger.info(message.trim()), // Redirect Morgan logs to Winston
+    },
+  })
+);
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173'
+    origin: "http://localhost:5173",
   })
 );
 app.use(compression());
