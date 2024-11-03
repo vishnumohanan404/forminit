@@ -52,7 +52,15 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/forms/:id",
+    path: "/form/:id/:name",
+    element: (
+      <ProtectedRoute>
+        <FormPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/form",
     element: (
       <ProtectedRoute>
         <FormPage />

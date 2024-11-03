@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   return user ? (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex flex-col col-span-1 min-h-screen overflow-y-auto w-full">
+      <main className="flex flex-col col-span-1 min-h-screen max-h-screen overflow-hidden w-full">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
@@ -30,7 +30,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
               {location.pathname.split("/")[1]}
             </DashboardBreadcrumb>
           </div>
-          <DarkModeToggle />
         </div>
 
         <Separator />

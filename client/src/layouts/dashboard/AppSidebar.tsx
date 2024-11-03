@@ -26,6 +26,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
 import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
+import { Button } from "@/components/ui/button";
+import { DeleteIcon, Trash2Icon } from "lucide-react";
 
 export function AppSidebar() {
   const { data: dashboard } = useQuery({
@@ -72,11 +74,13 @@ export function AppSidebar() {
                                     asChild
                                     key={workspace._id}
                                   >
-                                    <Link
-                                      to={`/workspaces/${workspace._id}?name=${workspace.name}`}
-                                    >
-                                      <span>{workspace.name}</span>
-                                    </Link>
+                                    <div className="flex truncate justify-between">
+                                      <Link
+                                        to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                                      >
+                                        <span>{workspace.name}</span>
+                                      </Link>
+                                    </div>
                                   </SidebarMenuButton>
                                 )
                               )
