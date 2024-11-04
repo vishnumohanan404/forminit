@@ -21,10 +21,29 @@ export default class MultipleChoiceOptionBlock {
 
     const onInput = (value: string): void => {
       console.log("onInput", value);
-      this.data.optionValue = value || "";
+      this.data.optionValue = value;
     };
     const onKeydown = (): void => {
-      this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+      const currentIndex = this.api.blocks.getCurrentBlockIndex();
+      // Delete the current block
+      this.api.blocks.delete(currentIndex);
+
+      // Move the focus to the previous block (if any)
+      // if (currentIndex > 0) {
+      //   const previousIndex = currentIndex - 1;
+      //   setTimeout(() => {
+      //     // Get the previous block's content
+      //     const previousBlock = this.api.blocks.getBlockByIndex(previousIndex);
+      //     if (previousBlock) {
+      //       // Set caret to the end of the previous block's input
+      //       this.api.caret.setToBlock(previousIndex, "end");
+      //     }
+      //   }, 0); // Small timeout to ensure block deletion happens first
+
+      //   console.log("Moved focus to block index: ", previousIndex);
+      // } else {
+      //   console.log("No previous block to move to.");
+      // }
     };
 
     const root = ReactDOMClient.createRoot(this.wrapper);
@@ -45,7 +64,7 @@ export default class MultipleChoiceOptionBlock {
         "multipleChoiceOptionBlock",
         { optionValue: "", optionMarker: optionMarker },
         undefined,
-        this.api.blocks.getCurrentBlockIndex() + 2,
+        this.api.blocks.getCurrentBlockIndex() + 1,
         true
       );
     };
@@ -56,7 +75,7 @@ export default class MultipleChoiceOptionBlock {
         onKeyDown={onKeydown}
         onHandleAddNextOption={handleAddNextOption}
         data={{
-          optionValue: this.data.optionValue || "",
+          optionValue: this.data.optionValue,
           optionMarker: this.data.optionMarker || "a",
         }}
       />
