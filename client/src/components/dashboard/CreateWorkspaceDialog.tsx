@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, PlusIcon } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSidebar } from "../ui/sidebar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createWorkspace } from "@/services/workspace";

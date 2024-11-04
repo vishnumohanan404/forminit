@@ -3,12 +3,7 @@ import WorkspaceFormList from "@/components/workspace/WorkspaceFormList";
 import { Button } from "@/components/ui/button";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 const WorkspacePage = () => {
   const [searchParams] = useSearchParams();
@@ -20,7 +15,7 @@ const WorkspacePage = () => {
   });
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate("/form"); // Replace with your desired route
+    navigate(`/form?workspaceId=${id}`); // Replace with your desired route
   };
 
   return (

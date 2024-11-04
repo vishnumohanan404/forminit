@@ -15,6 +15,7 @@ export default class MultipleChoiceOptionBlock {
     this.data = data || { optionValue: "", optionMarker: "" };
     this.wrapper = undefined;
   }
+
   render() {
     this.wrapper = document.createElement("div");
     this.wrapper.classList.add("mc-option-block");
@@ -27,27 +28,16 @@ export default class MultipleChoiceOptionBlock {
       const currentIndex = this.api.blocks.getCurrentBlockIndex();
       // Delete the current block
       this.api.blocks.delete(currentIndex);
-
-      // Move the focus to the previous block (if any)
-      // if (currentIndex > 0) {
-      //   const previousIndex = currentIndex - 1;
-      //   setTimeout(() => {
-      //     // Get the previous block's content
-      //     const previousBlock = this.api.blocks.getBlockByIndex(previousIndex);
-      //     if (previousBlock) {
-      //       // Set caret to the end of the previous block's input
-      //       this.api.caret.setToBlock(previousIndex, "end");
-      //     }
-      //   }, 0); // Small timeout to ensure block deletion happens first
-
-      //   console.log("Moved focus to block index: ", previousIndex);
-      // } else {
-      //   console.log("No previous block to move to.");
-      // }
+      setTimeout(() => {
+        if (currentIndex > 0) {
+          const previousIndex = currentIndex - 1;
+          console.log("Moving focus to previous block index: ", previousIndex);
+          this.api.caret.setToBlock(previousIndex, "end");
+        } else {
+          console.log("No previous block to move to.");
+        }
+      }, 0);
     };
-
-    const root = ReactDOMClient.createRoot(this.wrapper);
-
     const handleAddNextOption = (): void => {
       const currentIndex = this.api.blocks.getCurrentBlockIndex();
       const currentBlock = this.api.blocks.getBlockByIndex(currentIndex);
@@ -69,6 +59,8 @@ export default class MultipleChoiceOptionBlock {
       );
     };
 
+    const root = ReactDOMClient.createRoot(this.wrapper);
+
     root.render(
       <MultipleChoiceOption
         onInputChange={onInput}
@@ -78,6 +70,7 @@ export default class MultipleChoiceOptionBlock {
           optionValue: this.data.optionValue,
           optionMarker: this.data.optionMarker || "a",
         }}
+        api={this.api}
       />
     );
 

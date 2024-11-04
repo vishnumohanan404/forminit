@@ -20,7 +20,17 @@ export default class QuestionTitleBlock {
     this.wrapper = document.createElement("div");
     this.wrapper.classList.add("title-block");
     const onKeydown = (): void => {
-      this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+      const currentIndex = this.api.blocks.getCurrentBlockIndex();
+      this.api.blocks.delete(currentIndex);
+      setTimeout(() => {
+        if (currentIndex > 0) {
+          const previousIndex = currentIndex - 1;
+          console.log("Moving focus to previous block index: ", previousIndex);
+          this.api.caret.setToBlock(previousIndex, "end");
+        } else {
+          console.log("No previous block to move to.");
+        }
+      }, 0);
     };
     const root = ReactDOMClient.createRoot(this.wrapper);
     root.render(
@@ -30,15 +40,19 @@ export default class QuestionTitleBlock {
           this.data.title = value;
         }}
         onKeyDown={onKeydown}
+        question={this.data.title}
       />
     );
+    this.api.selection.removeFakeBackground();
     return this.wrapper;
   }
 
   save(blockContent: HTMLElement) {
-    const target = blockContent.querySelector(".title-field") as HTMLDivElement;
+    const target = blockContent.querySelector(
+      ".question-title-field"
+    ) as HTMLDivElement;
     return {
-      title: target?.innerText,
+      title: target?.innerText.trim(),
     };
   }
 }

@@ -6,6 +6,11 @@ const formSchema = new mongoose.Schema({
   created: { type: Date, default: Date.now },
   modified: { type: Date, default: Date.now },
   url: { type: String, required: true },
+  form_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Form",
+    required: true,
+  },
 });
 
 const workspaceSchema = new mongoose.Schema({

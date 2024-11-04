@@ -21,7 +21,6 @@ body {
   margin: 0;
 }
 
-
 /* shadcn theme */
 @layer base {
   :root {
@@ -102,4 +101,8 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.ce-block--selected .ce-block__content {
+  background: none;
 }

@@ -33,6 +33,9 @@ export default class LongAnswerTool {
 
     return document.createElement("div"); // This block itself doesn't need content
   }
+  validate() {
+    return false;
+  }
 
   save(blockContent: HTMLElement): {} {
     console.log({ blockContent });

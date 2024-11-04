@@ -15,7 +15,6 @@ export default class MultipleChoiceTool {
   api: API;
   data: MultipleChoiceData;
   constructor({ api, data }: { api: API; data: MultipleChoiceData }) {
-    console.log("data :>> ", data);
     this.api = api;
     this.data = data;
   }
@@ -29,10 +28,6 @@ export default class MultipleChoiceTool {
       this.api.blocks.getCurrentBlockIndex() + 1,
       true
     );
-    console.log("this.data :>> ", this.data);
-    // Insert Input Block
-
-    console.log("else :>> ");
     this.api.blocks.insert(
       "multipleChoiceOptionBlock",
       {
@@ -41,12 +36,14 @@ export default class MultipleChoiceTool {
       },
       undefined,
       this.api.blocks.getCurrentBlockIndex() + 2,
-      true
+      false
     );
 
     return document.createElement("div"); // This block itself doesn't need content
   }
-
+  validate() {
+    return false;
+  }
   save(blockContent: HTMLElement): {} {
     console.log({ blockContent });
     // No need to save anything for the parent tool

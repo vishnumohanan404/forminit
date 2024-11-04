@@ -20,7 +20,9 @@ import FormPage from "./pages/Form";
 import Layout from "./layouts/Layout";
 import WorkspacePage from "./pages/Workspace";
 import { ThemeProvider } from "./contexts/ThemeProvider";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { FormProvider } from "./contexts/FormContext";
+import { Toaster } from "./components/ui/sonner";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +54,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/form/:id/:name",
+    path: "/form/:id",
     element: (
       <ProtectedRoute>
         <FormPage />
@@ -104,14 +106,17 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <Layout>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <RouterProvider router={router} />
-            </AuthProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </QueryClientProvider>
-        </Layout>
+        <FormProvider>
+          <Layout>
+            <QueryClientProvider client={queryClient}>
+              <AuthProvider>
+                <RouterProvider router={router} />
+              </AuthProvider>
+              <ReactQueryDevtools initialIsOpen={false} />
+              <Toaster />
+            </QueryClientProvider>
+          </Layout>
+        </FormProvider>
       </GoogleOAuthProvider>
     </ThemeProvider>
   );

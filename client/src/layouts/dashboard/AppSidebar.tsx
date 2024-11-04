@@ -26,8 +26,6 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
 import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
-import { Button } from "@/components/ui/button";
-import { DeleteIcon, Trash2Icon } from "lucide-react";
 
 export function AppSidebar() {
   const { data: dashboard } = useQuery({

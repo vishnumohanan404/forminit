@@ -24,7 +24,17 @@ export default class LongAnswerInputBlock {
       this.data.inputValue = value || "";
     };
     const onKeydown = (): void => {
-      this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+      const currentIndex = this.api.blocks.getCurrentBlockIndex();
+      this.api.blocks.delete(currentIndex);
+      setTimeout(() => {
+        if (currentIndex > 0) {
+          const previousIndex = currentIndex - 1;
+          console.log("Moving focus to previous block index: ", previousIndex);
+          this.api.caret.setToBlock(previousIndex, "end");
+        } else {
+          console.log("No previous block to move to.");
+        }
+      }, 0);
     };
 
     const root = ReactDOMClient.createRoot(this.wrapper);

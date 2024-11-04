@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Link2Icon } from "lucide-react";
 import {
@@ -11,23 +11,23 @@ import {
 interface ComponentProps {
   _id: string;
   forms: Array<{
-    _id: string;
     name: string;
     submissions: number;
     created: Date;
     modified: Date;
     url: string;
+    form_id: string;
   }>;
 }
 
 const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
   const navigate = useNavigate();
-
+  const { id } = useParams();
   return (
     <div>
       {item.forms?.map((form) => (
         <div
-          key={form._id}
+          key={form.form_id}
           className="flex justify-between items-center px-3 py-2 rounded-md hover:bg-slate-200 hover:cursor-pointer"
         >
           <div className="flex-col col-span-1">
@@ -59,7 +59,9 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
               variant="ghost"
               size="sm"
               className="w-auto h-6 px-3 font-semibold text-muted-foreground"
-              onClick={() => navigate(`/form/${form._id}/${form.name}`)}
+              onClick={() =>
+                navigate(`/form/${form.form_id}?workspaceId=${id}`)
+              }
             >
               EDIT
             </Button>

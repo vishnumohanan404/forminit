@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { Button } from "../ui/button";
 import {
@@ -14,24 +14,40 @@ import LongAnswerInputBlock from "./custom-blocks/LongAnswerInputBlock.tsx";
 import LongAnswerTool from "./tools/LongAnswer.ts";
 import MultipleChoiceOptionBlock from "./custom-blocks/MultipleChoiceOptionBlock.tsx";
 import MultipleChoiceTool from "./tools/MultipleChoice.ts";
-const Editor = () => {
-  const editorInstance = useRef<EditorJS | null>(null);
+import CustomParagraph from "./custom-blocks/CustomParagraph.tsx";
+import { throttle } from "@/lib/utils.ts";
+import { useFormContext } from "@/contexts/FormContext.tsx"; // Import the context
+import { fetchForm } from "@/services/form.ts";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
+const Editor = () => {
+  const { id } = useParams();
+  const editorInstance = useRef<EditorJS | null>(null);
+  const { dispatch } = useFormContext();
+  const { data, isFetched } = useQuery({
+    queryKey: ["form", id],
+    queryFn: () => fetchForm(id),
+    staleTime: 10000,
+    enabled: !!id,
+  });
   useEffect(() => {
-    if (!editorInstance.current) {
+    if ((isFetched || !id) && !editorInstance.current) {
+      console.log("data :>> ", data);
       editorInstance.current = new EditorJS({
         placeholder: "Type '/' to add blocks",
-
         holder: "editorjs",
-        autofocus: true,
+        autofocus: !!!data,
+        data: data,
         minHeight: 30,
         tools: {
-          // paragraph: {
-          //   class: Paragraph,
-          //   inlineToolbar: true,
-          // },
+          paragraph: { class: CustomParagraph, inlineToolbar: true },
+
           // custom blocks - used to make custom tools
-          questionTitleBlock: QuestionTitleBlock,
+          questionTitleBlock: {
+            class: QuestionTitleBlock,
+            inlineToolbar: true,
+          },
           shortAnswerInputBlock: ShortAnswerInputBlock,
           longAnswerInputBlock: LongAnswerInputBlock,
           multipleChoiceOptionBlock: MultipleChoiceOptionBlock,
@@ -40,9 +56,23 @@ const Editor = () => {
           longAnswerTool: LongAnswerTool,
           multipleChoiceTool: MultipleChoiceTool,
         },
+        onChange: throttle(() => {
+          const data = editorInstance.current
+            ?.save()
+            .then((savedData) => {
+              console.log({ savedData });
+              dispatch({
+                type: "SET_FORM_DATA",
+                payload: savedData,
+              });
+            })
+            .catch((error) => {
+              console.error("Saving failed: ", error);
+            });
+          return data;
+        }, 2),
       });
     }
-
     return () => {
       if (
         editorInstance.current &&
@@ -52,19 +82,7 @@ const Editor = () => {
         editorInstance.current = null;
       }
     };
-  }, []);
-
-  const handleSave = () => {
-    editorInstance.current
-      ?.save()
-      .then((savedData) => {
-        console.log(savedData);
-        alert(JSON.stringify(savedData, null, 4));
-      })
-      .catch((error) => {
-        console.error("Saving failed: ", error);
-      });
-  };
+  }, [data, isFetched, id]);
 
   return (
     <div className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto">
