@@ -11,19 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, PlusIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useState } from "react";
-import { useSidebar } from "../ui/sidebar";
+import { ReactNode, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createWorkspace } from "@/services/workspace";
 
-const CreateWorkspaceDialog = () => {
+const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
   const [fields, setFields] = useState({
     workspace_description: "",
     workspace_name: "",
   });
-  const { open } = useSidebar();
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFields((prev) => ({ ...prev, workspace_name: value }));
@@ -73,14 +71,8 @@ const CreateWorkspaceDialog = () => {
       }}
       open={isOpen}
     >
-      <DialogTrigger asChild>
-        {open && (
-          <Button className="" variant={"ghost"} size="sm" onClick={() => {}}>
-            <PlusIcon className="" />
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
           <DialogTitle>Create workspace</DialogTitle>
           <DialogDescription>Click save once you're done.</DialogDescription>
@@ -110,6 +102,7 @@ const CreateWorkspaceDialog = () => {
               className="col-span-3 max-h-24"
               onChange={handleTextAreaChange}
               maxLength={100}
+              rows={5}
             />
           </div>
         </div>

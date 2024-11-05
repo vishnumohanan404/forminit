@@ -4,9 +4,7 @@ import { useAuth } from "../../contexts/AuthProvider";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "@/layouts/dashboard/AppSidebar";
 import { Separator } from "../ui/separator";
-import { DarkModeToggle } from "../common/DarkModeToggle";
 import DashboardBreadcrumb from "../dashboard/DashboardBreadcrumb";
-import { Footer } from "../common/Footer";
 import AnimatedGradientText from "../ui/animated-gradient-text";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +46,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
         <Separator />
         {children}
-        <Footer />
       </main>
     </SidebarProvider>
   ) : (

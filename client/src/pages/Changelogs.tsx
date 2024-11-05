@@ -153,9 +153,9 @@ const ChangelogsPage = () => {
     }
   };
   return (
-    <div className="overflow-y-auto px-5">
+    <div className="overflow-y-scroll px-5">
       <PageTitle>Changelogs</PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <Select
             onValueChange={(value) =>

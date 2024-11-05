@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, MessageSquarePlus, Upload, X } from "lucide-react";
-import { Footer } from "@/components/common/Footer";
 interface FAQ {
   question: string;
   answer: string;
@@ -92,9 +91,9 @@ const SupportPage = () => {
   };
 
   return (
-    <div className="overflow-y-auto px-5">
+    <div className="overflow-y-scroll px-5">
       <PageTitle>Support</PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container">
+      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
         <Tabs defaultValue="faq" className="space-y-4">
           <TabsList>
             <TabsTrigger value="faq">FAQs</TabsTrigger>

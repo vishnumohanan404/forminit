@@ -1,4 +1,5 @@
 import PageTitle from "@/components/common/PageTitle";
+import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,25 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  BarChart3,
-  FileText,
-  Layout,
-  Plus,
-  Settings,
-  User,
-} from "lucide-react";
+import { FormType, WorkspaceType } from "@/lib/types";
+import { fetchDashboard } from "@/services/dashboard";
+import { useQuery } from "@tanstack/react-query";
+import { FileText, Plus, Settings, User } from "lucide-react";
 import { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Footer } from "@/components/common/Footer";
+
 interface Workspace {
   id: string;
   name: string;
@@ -68,104 +58,126 @@ const DashboardPage = () => {
       { id: 7, title: "Satisfaction Survey", status: "draft", responses: 0 },
     ],
   });
-  const currentWorkspace = workspaces.find((w) => w.id === selectedWorkspace);
-  const currentForms = forms[selectedWorkspace] || [];
-  return (
-    <div className="overflow-y-auto px-5">
-      <PageTitle>Home</PageTitle>
 
-      {/* <div className="">
-          <Label htmlFor="workspace-select">Workspace</Label>
-          <Select
-            value={selectedWorkspace}
-            onValueChange={setSelectedWorkspace}
-          >
-            <SelectTrigger id="workspace-select" className="w-full mt-1">
-              <SelectValue placeholder="Select a workspace" />
-            </SelectTrigger>
-            <SelectContent>
-              {workspaces.map((workspace) => (
-                <SelectItem key={workspace.id} value={workspace.id}>
-                  {workspace.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div> */}
-      <main className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container mb-28">
+  const { data: dashboard, isLoading } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: fetchDashboard,
+    staleTime: 10000,
+  });
+  console.log("dashboard :>> ", dashboard);
+  const publishedForms: FormType[] = dashboard?.workspaces?.flatMap(
+    (workspace: WorkspaceType) =>
+      workspace.forms.filter((form) => form.published)
+  );
+  const allForms: FormType[] = dashboard?.workspaces?.flatMap(
+    (workspace: WorkspaceType) => workspace.forms
+  );
+  const draftedForms: FormType[] = dashboard?.workspaces.flatMap(
+    (workspace: WorkspaceType) =>
+      workspace.forms.filter((form) => !form.published) // Only include forms that are not published
+  );
+
+  return (
+    <div className="overflow-y-scroll px-5 pr-[8px]">
+      <PageTitle>Home</PageTitle>
+      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
-            <CardHeader>
-              <CardTitle>Workspace: {currentWorkspace?.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="flex justify-between items-center">
-                <span>Forms: {currentForms.length}</span>
-                <span>Members: {currentWorkspace?.members}</span>
-              </div>
-              <Button className="w-full">
-                <Plus className="mr-2 h-4 w-4" /> Create New Form
-              </Button>
-              <Button variant="outline" className="w-full">
-                <User className="mr-2 h-4 w-4" /> Manage Members
-              </Button>
-            </CardContent>
+            {isLoading ? (
+              <>
+                <CardHeader>
+                  <CardTitle>
+                    <Skeleton className="h-6 w-[150px]" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <Skeleton className="h-8 w-[250px] rounded-xl" />
+                </CardContent>
+              </>
+            ) : (
+              <>
+                <CardHeader>
+                  <CardTitle>
+                    Workspaces &nbsp;&nbsp;{dashboard?.workspaces?.length}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <CreateWorkspaceDialog>
+                    <Button className="w-full">
+                      <Plus className="mr-2 h-4 w-4" /> Create New Workspace
+                    </Button>
+                  </CreateWorkspaceDialog>
+                </CardContent>
+              </>
+            )}
           </Card>
           <Card>
-            <CardHeader>
-              <CardTitle>Workspace Stats</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-2xl font-bold">
-                    {forms[selectedWorkspace].length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total Forms</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {
-                      forms[selectedWorkspace].filter(
-                        (f) => f.status === "published"
-                      ).length
-                    }
-                  </p>
-                  <p className="text-sm text-muted-foreground">Published</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {forms[selectedWorkspace].reduce(
-                      (acc, form) => acc + form.responses,
-                      0
-                    )}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Total Responses
-                  </p>
-                </div>
-              </div>
-            </CardContent>
+            {isLoading ? (
+              <>
+                <CardHeader>
+                  <CardTitle>
+                    <Skeleton className="h-6 w-[150px]" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <Skeleton className="h-8 w-[250px] rounded-xl" />
+                </CardContent>
+              </>
+            ) : (
+              <>
+                <CardHeader className="pb-3">
+                  <CardTitle>Stats</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {dashboard.workspaces.reduce(
+                          (sum: number, workspace: WorkspaceType) =>
+                            sum + workspace.forms.length,
+                          0
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Forms</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {dashboard.workspaces.reduce(
+                          (sum: number, workspace: WorkspaceType) => {
+                            return (
+                              sum +
+                              workspace.forms.filter(
+                                (form) => form.published === true
+                              ).length
+                            );
+                          },
+                          0
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Published</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {dashboard.workspaces.reduce(
+                          (sum: string, workspace: WorkspaceType) => {
+                            return (
+                              sum +
+                              workspace.forms.reduce(
+                                (formSum, form) => formSum + form.submissions,
+                                0
+                              )
+                            );
+                          },
+                          0
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Responses</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </>
+            )}
           </Card>
-          {/* <Card>
-              <CardHeader>
-                <CardTitle>EditorJS Integration</CardTitle>
-                <CardDescription>Build rich, interactive forms</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted p-4 rounded-md">
-                  <p className="text-sm">
-                    Use our powerful EditorJS integration to create dynamic form
-                    fields, add rich text, images, and more.
-                  </p>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  Learn More
-                </Button>
-              </CardFooter>
-            </Card> */}
         </div>
         <Tabs defaultValue="all" className="mt-12">
           <TabsList>
@@ -175,75 +187,54 @@ const DashboardPage = () => {
           </TabsList>
           <TabsContent value="all" className="mt-4">
             <div className="grid gap-4">
-              {currentForms.map((form) => (
-                <Card key={form.id}>
-                  <CardHeader>
-                    <CardTitle>{form.title}</CardTitle>
-                    <CardDescription>
-                      Status: <span className="capitalize">{form.status}</span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p>Responses: {form.responses}</p>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline">
-                      <FileText className="mr-2 h-4 w-4" /> View
-                    </Button>
-                    <div className="flex align-middle gap-5">
-                      <Button variant="outline">
-                        <Settings className="mr-2 h-4 w-4" /> Edit
-                      </Button>
-                      {form.status === "draft" && <Button>Publish</Button>}
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-          <TabsContent value="published" className="mt-4">
-            <div className="grid gap-4">
-              {currentForms
-                .filter((form) => form.status === "published")
-                .map((form) => (
-                  <Card key={form.id}>
+              {allForms?.length > 0 ? (
+                allForms.map((form) => (
+                  <Card key={form._id}>
                     <CardHeader>
-                      <CardTitle>{form.title}</CardTitle>
+                      <CardTitle>{form.name}</CardTitle>
                       <CardDescription>
                         Status:{" "}
-                        <span className="capitalize">{form.status}</span>
+                        <span className="capitalize">
+                          {form.published ? "published" : "drafted"}
+                        </span>
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>Responses: {form.responses}</p>
+                      <p>Responses: {form.submissions}</p>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline">
                         <FileText className="mr-2 h-4 w-4" /> View
                       </Button>
-                      <Button variant="outline">
-                        <Settings className="mr-2 h-4 w-4" /> Edit
-                      </Button>
+                      <div className="flex align-middle gap-5">
+                        <Button variant="outline">
+                          <Settings className="mr-2 h-4 w-4" /> Edit
+                        </Button>
+                        {form.published && <Button>Publish</Button>}
+                      </div>
                     </CardFooter>
                   </Card>
-                ))}
+                ))
+              ) : (
+                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
+                  No published forms available
+                </p>
+              )}
             </div>
           </TabsContent>
-          <TabsContent value="drafts" className="mt-4">
+          <TabsContent value="published" className="mt-4">
             <div className="grid gap-4">
-              {currentForms
-                .filter((form) => form.status === "draft")
-                .map((form) => (
-                  <Card key={form.id}>
+              {publishedForms?.length > 0 ? (
+                publishedForms.map((form) => (
+                  <Card key={form._id}>
                     <CardHeader>
-                      <CardTitle>{form.title}</CardTitle>
+                      <CardTitle>{form.name}</CardTitle>
                       <CardDescription>
-                        Status:{" "}
-                        <span className="capitalize">{form.status}</span>
+                        Status: <span className="capitalize">published</span>
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>Responses: {form.responses}</p>
+                      <p>Responses: {form.submissions}</p>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline">
@@ -257,7 +248,47 @@ const DashboardPage = () => {
                       </div>
                     </CardFooter>
                   </Card>
-                ))}
+                ))
+              ) : (
+                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
+                  No published forms available
+                </p>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="drafts" className="mt-4">
+            <div className="grid gap-4">
+              {draftedForms?.length > 0 ? (
+                draftedForms.map((form) => (
+                  <Card key={form._id}>
+                    <CardHeader>
+                      <CardTitle>{form.name}</CardTitle>
+                      <CardDescription>
+                        Status: <span className="capitalize">drafted</span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p>Responses: {form.submissions}</p>
+                    </CardContent>
+                    <CardFooter className="flex justify-between">
+                      <Button variant="outline">
+                        <FileText className="mr-2 h-4 w-4" /> View
+                      </Button>
+                      <div className="flex align-middle gap-5">
+                        <Button variant="outline">
+                          <Settings className="mr-2 h-4 w-4" /> Edit
+                        </Button>
+                        <Button>Publish</Button>{" "}
+                        {/* Option to publish the form */}
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
+                  No published forms available
+                </p>
+              )}
             </div>
           </TabsContent>
         </Tabs>

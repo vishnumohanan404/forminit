@@ -26,6 +26,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
 import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
 
 export function AppSidebar() {
   const { data: dashboard } = useQuery({
@@ -57,7 +59,18 @@ export function AppSidebar() {
                               <span>{item.title}</span>
                             </SidebarMenuButton>
                           </CollapsibleTrigger>
-                          <CreateWorkspaceDialog />
+                          <CreateWorkspaceDialog>
+                            {open && (
+                              <Button
+                                className=""
+                                variant={"ghost"}
+                                size="sm"
+                                onClick={() => {}}
+                              >
+                                <PlusIcon className="" />
+                              </Button>
+                            )}
+                          </CreateWorkspaceDialog>
                         </div>
                         <CollapsibleContent>
                           <SidebarMenuSub>
