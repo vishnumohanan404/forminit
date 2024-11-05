@@ -4,7 +4,7 @@ import { Layers3Icon, MessageCircleQuestion } from "lucide-react";
 export const sidebarApplicationItems = [
   {
     title: "Home",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
   },
   {

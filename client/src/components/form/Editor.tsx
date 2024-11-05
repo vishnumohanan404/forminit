@@ -85,7 +85,7 @@ const Editor = () => {
   }, [data, isFetched, id]);
 
   return (
-    <div className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto">
+    <div className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container mb-28">
       <div id="editorjs" className="pb-0 "></div>
       <div className="ce-block__content items-start">
         <TooltipProvider>

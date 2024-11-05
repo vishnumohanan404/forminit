@@ -4,7 +4,7 @@ import { Separator } from "../ui/separator";
 const PageTitle = ({ children }: { children: ReactNode }) => {
   return (
     <>
-      <div className="pt-14 pb-12">
+      <div className="pt-14 pb-12 mx-auto max-w-[1100px]">
         <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight  pb-6 text-slate-600">
           {children}
         </h1>

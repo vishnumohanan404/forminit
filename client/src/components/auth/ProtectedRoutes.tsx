@@ -6,6 +6,7 @@ import { AppSidebar } from "@/layouts/dashboard/AppSidebar";
 import { Separator } from "../ui/separator";
 import { DarkModeToggle } from "../common/DarkModeToggle";
 import DashboardBreadcrumb from "../dashboard/DashboardBreadcrumb";
+import { Footer } from "../common/Footer";
 
 type ProtectedRouteProps = PropsWithChildren;
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -34,6 +35,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
         <Separator />
         {children}
+        <Footer />
       </main>
     </SidebarProvider>
   ) : (

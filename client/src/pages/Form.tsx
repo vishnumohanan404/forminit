@@ -80,7 +80,7 @@ const FormPage = () => {
     // Update the form title using the mutation
   };
   return (
-    <div className=" overflow-y-auto px-5">
+    <div className="overflow-y-auto px-5">
       <PageTitle>
         <div className="flex justify-between items-center">
           <div

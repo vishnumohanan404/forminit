@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
 const WorkspacePage = () => {
   const [searchParams] = useSearchParams();
@@ -19,7 +20,7 @@ const WorkspacePage = () => {
   };
 
   return (
-    <div className="mx-auto container max-w-[1100px] overflow-hidden px-5">
+    <div className="overflow-y-auto px-5">
       <PageTitle>
         <div className="flex items-center justify-between">
           {searchParams.get("name")}
@@ -32,7 +33,7 @@ const WorkspacePage = () => {
           </Button>
         </div>
       </PageTitle>
-      <div className="">
+      <main className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container mb-28">
         {!!dashboard?.workspaces?.filter(
           (item: { _id: string }) => item._id === id
         )[0].forms.length ? (
@@ -51,14 +52,14 @@ const WorkspacePage = () => {
             />
           </>
         ) : (
-          <div className="flex flex-col items-center gap-12 w-full justify-center py-20">
+          <div className="flex items-center align-middle gap-12 w-full justify-center py-20">
             <h4 className="scroll-m-20 text-xl font-semibold text-muted-foreground">
               Looks like it's empty here. Create your first form!
             </h4>
             {/* <img src="/box.png" alt="" className="w-1/4" /> */}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
