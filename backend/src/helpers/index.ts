@@ -3,6 +3,7 @@ import { Request, Response } from "express-serve-static-core";
 import { validationResult } from "express-validator";
 import { RequestValidationError } from "../errors/common";
 import { ErrorBase } from "../errors/base";
+import mongoose from "mongoose";
 
 // authentication
 export const random = () => crypto.randomBytes(128).toString("base64");
@@ -28,10 +29,15 @@ export const errorResponse = (error: unknown, res: Response) => {
   if (error instanceof ErrorBase) {
     res.status(error.statusCode).json({ message: error.message });
     console.error("err", error.message);
+  } else if (error instanceof mongoose.Error.ValidationError) {
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+      errors: error.errors,
+    });
   } else {
     // If no proper message, send a generic Internal Server Error
     res.status(500).json({
-      message: "Internal Server Error",
+      message: error || "Internal Server Error",
     });
   }
 };

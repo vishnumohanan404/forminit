@@ -8,6 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { AxiosError } from "axios";
 
 interface BlockData {
   type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
@@ -42,16 +44,33 @@ const FormPage = () => {
         queryClient.invalidateQueries({ queryKey: ["dashboard"] });
         toast("Form saved successfully");
       },
+      onError: (error: AxiosError<{ message: string }>) => {
+        // An error happened!
+        toast.error(
+          error.response?.data?.message?.includes("Form validation failed")
+            ? "Form validation failed"
+            : "Something went wrong"
+        );
+      },
     });
   // Create mutation for updating the form title
-  const { mutate: updateFormMutation } = useMutation({
-    mutationFn: (workspaceDetails: EditorJSData) =>
-      updateForm(id || "", workspaceDetails),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      toast("Form title updated successfully");
-    },
-  });
+  const { mutate: updateFormMutation, isPending: isPendingUpdate } =
+    useMutation({
+      mutationFn: (workspaceDetails: EditorJSData) =>
+        updateForm(id || "", workspaceDetails),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+        toast("Form title updated successfully");
+      },
+      onError: (error: AxiosError<{ message: string }>) => {
+        // An error happened!
+        toast.error(
+          error.response?.data?.message?.includes("Form validation failed")
+            ? "Form validation failed"
+            : "Something went wrong"
+        );
+      },
+    });
 
   const handleSubmit = () => {
     console.log({ state });
@@ -92,15 +111,21 @@ const FormPage = () => {
           </div>
           <Button
             size="sm"
-            className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600"
+            className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
             onClick={handleSubmit}
-            disabled={!state.editorData && title === data?.title}
+            disabled={
+              (!state.editorData && title === data?.title) || !title
+              // isPendingCreate ||
+              // isPendingUpdate
+            }
           >
-            {!id ? (
-              <div>{isPendingCreate ? "Saving..." : "PUBLISH"}</div>
-            ) : (
-              <div>{false ? "Saving..." : "SAVE"}</div>
-            )}
+            <div>
+              {isPendingCreate || isPendingUpdate ? (
+                <LoadingSpinner />
+              ) : (
+                "PUBLISH"
+              )}
+            </div>
           </Button>
         </div>
       </PageTitle>

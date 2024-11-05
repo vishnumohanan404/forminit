@@ -1,5 +1,5 @@
 import { PropsWithChildren, useEffect } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthProvider";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "@/layouts/dashboard/AppSidebar";
@@ -7,6 +7,8 @@ import { Separator } from "../ui/separator";
 import { DarkModeToggle } from "../common/DarkModeToggle";
 import DashboardBreadcrumb from "../dashboard/DashboardBreadcrumb";
 import { Footer } from "../common/Footer";
+import AnimatedGradientText from "../ui/animated-gradient-text";
+import { cn } from "@/lib/utils";
 
 type ProtectedRouteProps = PropsWithChildren;
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -31,6 +33,17 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
               {location.pathname.split("/")[1]}
             </DashboardBreadcrumb>
           </div>
+          <AnimatedGradientText className="!bg-none !border-none">
+            <Link
+              to="https://github.com/vishnumohanan404/forminit"
+              target="_blank"
+              className={cn(
+                `text-sm font-medium pr-3 inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`
+              )}
+            >
+              We're on beta
+            </Link>
+          </AnimatedGradientText>
         </div>
 
         <Separator />

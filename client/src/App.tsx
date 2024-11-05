@@ -5,7 +5,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import DashboardPage from "./pages/Dashboard";
-import ProfilePage from "./pages/Profile";
 import NotFoundPage from "./pages/NotFound";
 
 import AuthProvider from "./contexts/AuthProvider";
@@ -90,14 +89,6 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ChangelogsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute>
-        <ProfilePage />
       </ProtectedRoute>
     ),
   },
