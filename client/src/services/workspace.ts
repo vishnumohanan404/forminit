@@ -14,8 +14,8 @@ export const createWorkspace = async (data: {
   return response.data;
 };
 
-export const deleteWorkspace = async (id: string) => {
-  const response = await axiosClient.delete(`/api/workspace/${id}`);
+export const deleteWorkspace = async (workspaceId: string) => {
+  const response = await axiosClient.delete(`/api/workspace/${workspaceId}`);
   return response.data;
 };
 

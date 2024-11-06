@@ -22,12 +22,25 @@ import {
 } from "@/components/ui/collapsible";
 import { Link } from "react-router-dom";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
 import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { deleteWorkspace } from "@/services/workspace";
+import { toast } from "sonner";
 
 export function AppSidebar() {
   const { data: dashboard } = useQuery({
@@ -36,7 +49,22 @@ export function AppSidebar() {
     staleTime: 10000,
   });
   const { open } = useSidebar();
+  const [showTrash, setShowTrash] = useState("");
+  const queryClient = useQueryClient();
 
+  const { mutate: deleteWorkspaceMutate, isPending } = useMutation({
+    mutationFn: (workspaceDetails: string) => deleteWorkspace(workspaceDetails),
+    onSuccess: () => {
+      // Boom baby!
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: () => {
+      toast.error("Workspace deletion failed");
+    },
+  });
+  const handleDeleteWorkspace = (workspaceId: string) => {
+    deleteWorkspaceMutate(workspaceId);
+  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -80,20 +108,62 @@ export function AppSidebar() {
                                   name: string;
                                   _id: string;
                                   forms: Array<string>;
-                                }) => (
-                                  <SidebarMenuButton
-                                    asChild
-                                    key={workspace._id}
-                                  >
-                                    <div className="flex truncate justify-between">
-                                      <Link
-                                        to={`/workspaces/${workspace._id}?name=${workspace.name}`}
-                                      >
-                                        <span>{workspace.name}</span>
-                                      </Link>
-                                    </div>
-                                  </SidebarMenuButton>
-                                )
+                                }) => {
+                                  return (
+                                    <SidebarMenuButton
+                                      asChild
+                                      key={workspace._id}
+                                      onMouseOver={() => {
+                                        setShowTrash(workspace._id);
+                                      }}
+                                      onMouseOut={() => {
+                                        setShowTrash("");
+                                      }}
+                                    >
+                                      <div className="flex truncate justify-between">
+                                        <Link
+                                          to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                                        >
+                                          <span>{workspace.name}</span>
+                                        </Link>
+                                        {showTrash === workspace._id && (
+                                          <Dialog>
+                                            <DialogTrigger asChild>
+                                              <Trash2Icon className="cursor-pointer" />
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                              <DialogHeader>
+                                                <DialogTitle>
+                                                  Deleting workspace
+                                                </DialogTitle>
+                                                <DialogDescription>
+                                                  All your forms will be deleted
+                                                </DialogDescription>
+                                              </DialogHeader>
+                                              <DialogFooter>
+                                                <Button
+                                                  variant={"destructive"}
+                                                  onClick={() =>
+                                                    handleDeleteWorkspace(
+                                                      workspace._id
+                                                    )
+                                                  }
+                                                >
+                                                  Delete
+                                                </Button>
+                                                <DialogClose asChild>
+                                                  <Button variant="secondary">
+                                                    Cancel
+                                                  </Button>
+                                                </DialogClose>
+                                              </DialogFooter>
+                                            </DialogContent>
+                                          </Dialog>
+                                        )}
+                                      </div>
+                                    </SidebarMenuButton>
+                                  );
+                                }
                               )
                             ) : (
                               <>

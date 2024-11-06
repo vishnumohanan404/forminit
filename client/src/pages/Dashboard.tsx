@@ -165,10 +165,12 @@ const DashboardPage = () => {
                       <p>Responses: {form.submissions}</p>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                      <Button variant="outline">
-                        <FileText className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
+                      <Link to={`/view-form/${form.form_id}`} target="_blank">
+                        <Button variant="outline">
+                          <FileText className="mr-2 h-4 w-4" />
+                          View
+                        </Button>
+                      </Link>
                       <div className="flex align-middle gap-5">
                         {form.published && (
                           <Button variant={"ghost"}>
