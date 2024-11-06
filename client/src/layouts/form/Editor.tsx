@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { Button } from "../../components/ui/button.tsx";
 import {
