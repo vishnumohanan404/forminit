@@ -1,6 +1,6 @@
 import PageTitle from "@/components/common/PageTitle";
 import { useParams, useSearchParams } from "react-router-dom";
-import Editor from "@/components/form/Editor";
+import Editor from "@/layouts/form/Editor";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "@/contexts/FormContext";
 import { createForm, fetchForm, updateForm } from "@/services/form";
@@ -36,7 +36,7 @@ const FormPage = () => {
       mutationFn: (workspaceDetails: EditorJSData) =>
         createForm({
           ...workspaceDetails,
-          title: "Hello",
+          title,
           workspaceId: searchParams.get("workspaceId") || "",
         }),
       onSuccess: () => {
@@ -107,7 +107,7 @@ const FormPage = () => {
             suppressContentEditableWarning
             onBlur={handleTitleChange}
           >
-            {!id ? "Create New Form" : title}
+            {!id ? "Untitled" : title}
           </div>
           <Button
             size="sm"
