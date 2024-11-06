@@ -103,11 +103,34 @@ body {
   }
 }
 
-/* editorjs background on contenteditable */
+/* editorjs */
+/* background on contenteditable */
 .ce-block--selected .ce-block__content {
   background: none;
 }
+.ce-popover__items .ce-popover-item__title {
+  color: rgb(63, 63, 70);
+  font-size: 14px;
+  font-weight: 400;
+}
+.ce-popover__items path {
+  stroke-width: 0.1;
+  fill: rgb(63, 63, 70);
+}
 
+.ce-settings .ce-popover__items svg,
+.ce-settings .ce-popover__items path {
+  stroke-width: inherit;
+  stroke: rgb(63, 63, 70);
+}
+.ce-toolbar__plus path {
+  fill: rgb(63, 63, 70);
+  stroke-width: 1;
+}
+.ce-toolbar__settings-btn path {
+  fill: rgb(63, 63, 70);
+  stroke-width: 2;
+}
 /* scrollbar */
 /* Apply to all scrollbars */
 ::-webkit-scrollbar {
