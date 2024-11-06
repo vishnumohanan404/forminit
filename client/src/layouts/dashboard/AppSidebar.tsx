@@ -120,16 +120,22 @@ export function AppSidebar() {
                                         setShowTrash("");
                                       }}
                                     >
-                                      <div className="flex truncate justify-between">
+                                      <div
+                                        className="flex truncate justify-between items-center w-full"
+                                        // onClick={(e) => e.stopPropagation()}
+                                      >
                                         <Link
                                           to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                                          className="w-full"
                                         >
-                                          <span>{workspace.name}</span>
+                                          <span className="w-full">
+                                            {workspace.name}
+                                          </span>
                                         </Link>
                                         {showTrash === workspace._id && (
                                           <Dialog>
                                             <DialogTrigger asChild>
-                                              <Trash2Icon className="cursor-pointer" />
+                                              <Trash2Icon className="cursor-pointer stroke-current hover:stroke-muted-foreground w-4 h-4" />
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-[425px]">
                                               <DialogHeader>
