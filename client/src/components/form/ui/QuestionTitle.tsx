@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
 
 interface EditableDivProps {
   question: string;
   placeholder: string;
   onInput: (value: string) => void;
-  onKeyDown: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLDivElement>, id?: number) => void;
 }
 
 const QuestionTitle: React.FC<EditableDivProps> = ({
@@ -29,16 +29,6 @@ const QuestionTitle: React.FC<EditableDivProps> = ({
     onInput(text);
   };
 
-  const handleBackspace = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const textContent = divRef.current?.innerText.trim();
-
-    // Check if content is empty
-    if (event.key === "Backspace" && textContent === "") {
-      event.preventDefault(); // Prevent default backspace behavior
-      onKeyDown(); // Trigger the action for removing the block
-    }
-  };
-
   useEffect(() => {
     if (divRef.current && question) {
       divRef.current.innerText = question; // Update the content when prop changes
@@ -52,7 +42,7 @@ const QuestionTitle: React.FC<EditableDivProps> = ({
         contentEditable
         className={`cdx-input shadow-none editable-div border-none focus:outline-none font-semibold py-2 px-0 question-title-field`}
         onInput={handleInput}
-        onKeyDown={handleBackspace}
+        onKeyDown={onKeyDown}
         suppressContentEditableWarning
         data-placeholder={placeholder}
       />

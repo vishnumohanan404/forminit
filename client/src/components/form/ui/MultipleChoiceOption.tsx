@@ -1,102 +1,127 @@
-import { API } from "@editorjs/editorjs";
-import { useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface MultipleChoiceOptionProps {
-  data: { optionValue: string; optionMarker: string };
-  onInputChange: (value: string) => void;
-  onKeyDown: () => void;
-  onHandleAddNextOption: (optionMarker: string) => void;
-  api: API;
+  optionsProp: Array<{ optionValue: string; optionMarker: string }>;
+  onLastOptionKeyDown: (
+    event: KeyboardEvent<HTMLInputElement>,
+    idx: number,
+    options: Array<{ optionValue: string; optionMarker: string }>
+  ) => void;
+  onAddNewOption: (
+    options: Array<{ optionValue: string; optionMarker: string }>
+  ) => void;
+  onInputChange: (
+    options: Array<{ optionValue: string; optionMarker: string }>
+  ) => void;
 }
-const MultipleChoiceOption = ({
-  data,
-  onInputChange,
-  onKeyDown,
-  onHandleAddNextOption,
-  api,
-}: MultipleChoiceOptionProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  // Use a local state to manage the input value
-  const [inputValue, setInputValue] = useState(data.optionValue || "");
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value;
-    setInputValue(newValue);
-    onInputChange(newValue);
+const MultipleChoiceOption = ({
+  optionsProp,
+  onLastOptionKeyDown,
+  onAddNewOption,
+  onInputChange,
+}: MultipleChoiceOptionProps) => {
+  // Use a local state to manage the input value
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
+    const newOptions = options.map((option, index) =>
+      idx === index ? { ...option, optionValue: event.target.value } : option
+    );
+    setOptions(newOptions);
+    onInputChange(newOptions);
   };
   const [nextOption, setNextOption] = useState("");
+  const [options, setOptions] = useState<
+    Array<{ optionValue: string; optionMarker: string }>
+  >([]);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   useEffect(() => {
-    if (inputRef.current) {
-      setInputValue(data.optionValue || ""); // Update the input field value when prop changes
-      const initialOptionMarker = data.optionMarker;
+    setOptions(optionsProp);
+  }, [optionsProp]);
+
+  useEffect(() => {
+    if (options?.length) {
+      const initialOptionMarker = options[options?.length - 1]?.optionMarker;
       const nextCharCode = initialOptionMarker.charCodeAt(0) + 1;
       const optionMarker = String.fromCharCode(nextCharCode);
       setNextOption(optionMarker);
     }
-  }, [data.optionValue, data.optionMarker]);
+  }, [options]);
 
-  const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleBackspace = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    idx: number
+  ) => {
     console.log("event.key :>> ", event.key);
-    if (event.key === "Backspace" && inputValue === "") {
+    if (
+      event.key === "Backspace" &&
+      options[idx].optionValue === "" &&
+      options.length > 1 
+    ) {
       // Prevent default backspace behavior and remove the block
       event.preventDefault();
-      onKeyDown();
+      const newOptions = options.filter((_, i) => i !== idx);
+      setOptions(newOptions);
+      if (idx > 0) {
+        setTimeout(() => {
+          inputRefs.current[idx - 1]?.focus();
+        }, 0);
+      }
+    } else {
+      onLastOptionKeyDown(event, idx, options);
     }
   };
-  const [remove, setRemove] = useState(true);
   const handleAddNextOption = () => {
-    onHandleAddNextOption(nextOption);
-    setRemove(true);
-  };
-
-  const handleShowAddButton = () => {
-    const currentBlockIndex = api.blocks.getCurrentBlockIndex();
-    const nextBlock = api.blocks.getBlockByIndex(currentBlockIndex + 1);
-    if (!nextBlock || nextBlock.name !== "multipleChoiceOptionBlock") {
-      setRemove(false);
-    }
+    const newOptions = [
+      ...options,
+      { optionValue: "", optionMarker: nextOption },
+    ];
+    setOptions(newOptions);
+    onAddNewOption(newOptions);
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="relative inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2">
+    <>
+      {options?.map((option, idx) => (
+        <div className="flex flex-col" key={option.optionMarker}>
+          <div className="relative inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2">
+            <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
+              <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
+                {option.optionMarker.toUpperCase()}
+              </span>
+            </div>
+            <input
+              type="text"
+              className={
+                "focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring  disabled:cursor-not-allowed disabled:opacity-50 pl-9"
+              }
+              placeholder={"OPTION " + option.optionMarker.toUpperCase()}
+              value={option.optionValue}
+              onChange={(e) => handleChange(e, idx)}
+              onKeyDown={(e) => handleBackspace(e, idx)}
+              ref={(el) => (inputRefs.current[idx] = el)}
+            />
+          </div>
+        </div>
+      ))}
+      <div className="relative inline-flex w-full max-w-sm align-middle">
         <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
           <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
-            {data.optionMarker.toUpperCase()}
+            {nextOption.toUpperCase()}
           </span>
         </div>
-        <input
-          ref={inputRef}
-          type="text"
+        <div
           className={
-            "focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring  disabled:cursor-not-allowed disabled:opacity-50 pl-9"
+            "focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring cursor-pointer opacity-50 pl-9"
           }
-          placeholder={"OPTION " + data.optionMarker.toUpperCase()}
-          value={inputValue}
-          onChange={handleChange}
-          onKeyDown={handleBackspace}
-          onClick={handleShowAddButton}
-        />
-      </div>
-      {!remove && (
-        <div className="relative inline-flex w-full max-w-sm align-middle">
-          <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
-            <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
-              {nextOption.toUpperCase()}
-            </span>
-          </div>
-          <div
-            ref={inputRef}
-            className={
-              " focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring cursor-pointer opacity-50 pl-9"
-            }
-            onClick={handleAddNextOption}
-          >
-            ADD OPTION
-          </div>
+          onClick={handleAddNextOption}
+        >
+          ADD OPTION
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

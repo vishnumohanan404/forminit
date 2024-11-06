@@ -1,10 +1,15 @@
 import { Textarea } from "@/components/ui/textarea";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  KeyboardEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface LongAnswerInputFieldProps {
   value: string;
   onInputChange: (value: string) => void;
-  onKeyDown: () => void;
+  onKeyDown: KeyboardEventHandler<HTMLTextAreaElement>;
 }
 
 const LongAnswerInput: React.FC<LongAnswerInputFieldProps> = ({
@@ -32,17 +37,6 @@ const LongAnswerInput: React.FC<LongAnswerInputFieldProps> = ({
     }
   }, [value]);
 
-  const handleBackspace = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Backspace") {
-      const inputField = inputRef;
-      if (inputField?.current?.value === "") {
-        // Prevent default backspace behavior and remove the block
-        event.preventDefault();
-        onKeyDown();
-      }
-    }
-  };
-
   return (
     <Textarea
       ref={inputRef}
@@ -51,7 +45,7 @@ const LongAnswerInput: React.FC<LongAnswerInputFieldProps> = ({
       onChange={handleInputChange}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      onKeyDown={handleBackspace}
+      onKeyDown={onKeyDown}
       rows={4}
     />
   );

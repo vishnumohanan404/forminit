@@ -7,19 +7,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import QuestionTitleBlock from "../../components/form/custom-blocks/QuestionTitleBlock.tsx";
-import ShortAnswerInputBlock from "../../components/form/custom-blocks/ShortAnswerInputBlock.tsx";
-import ShortAnswerTool from "../../components/form/tools/ShortAnswer.ts";
-import LongAnswerInputBlock from "../../components/form/custom-blocks/LongAnswerInputBlock.tsx";
-import LongAnswerTool from "../../components/form/tools/LongAnswer.ts";
-import MultipleChoiceOptionBlock from "../../components/form/custom-blocks/MultipleChoiceOptionBlock.tsx";
-import MultipleChoiceTool from "../../components/form/tools/MultipleChoice.ts";
-import CustomParagraph from "../../components/form/custom-blocks/CustomParagraph.tsx";
 import { throttle } from "@/lib/utils.ts";
 import { useFormContext } from "@/contexts/FormContext.tsx"; // Import the context
 import { fetchForm } from "@/services/form.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import ShortAnswerTool from "../../components/form/tools/ShortAnswer.tsx";
+import LongAnswerTool from "../../components/form/tools/LongAnswer.tsx";
+import MultipleChoiceTool from "../../components/form/tools/MultipleChoice.tsx";
+import CustomParagraph from "../../components/form/custom-blocks/CustomParagraph.tsx";
 
 const Editor = () => {
   const { id } = useParams();
@@ -36,19 +32,11 @@ const Editor = () => {
       editorInstance.current = new EditorJS({
         placeholder: "Type '/' to add blocks",
         holder: "editorjs",
-        autofocus: !!!data,
+        autofocus: true,
         data: data,
         minHeight: 30,
         tools: {
           paragraph: { class: CustomParagraph, inlineToolbar: true },
-          // custom blocks - used to make custom tools
-          questionTitleBlock: {
-            class: QuestionTitleBlock,
-            inlineToolbar: true,
-          },
-          shortAnswerInputBlock: ShortAnswerInputBlock,
-          longAnswerInputBlock: LongAnswerInputBlock,
-          multipleChoiceOptionBlock: MultipleChoiceOptionBlock,
           // custom tools - most tools are built using multiple custom blocks
           shortAnswerTool: ShortAnswerTool,
           longAnswerTool: LongAnswerTool,

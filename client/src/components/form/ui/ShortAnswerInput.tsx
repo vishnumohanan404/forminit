@@ -1,10 +1,15 @@
 import { Input } from "@/components/ui/input";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  KeyboardEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface ShortAnswerInputFieldProps {
   value: string;
   onInputChange: (value: string) => void;
-  onKeyDown: () => void;
+  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
 }
 
 const ShortAnswerInput: React.FC<ShortAnswerInputFieldProps> = ({
@@ -32,27 +37,16 @@ const ShortAnswerInput: React.FC<ShortAnswerInputFieldProps> = ({
     }
   }, [value]);
 
-  const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Backspace") {
-      const inputField = inputRef;
-      if (inputField?.current?.value === "") {
-        // Prevent default backspace behavior and remove the block
-        event.preventDefault();
-        onKeyDown();
-      }
-    }
-  };
-
   return (
     <Input
       ref={inputRef}
       type="text"
       placeholder={placeholder ? "Type your placeholder" : ""}
-      className="focus-visible:ring-0 my-2 w-[60%]"
+      className="focus-visible:ring-0 my-2 w-[60%] short-answer-input-field"
       onChange={handleInputChange}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      onKeyDown={handleBackspace}
+      onKeyDown={onKeyDown}
     />
   );
 };

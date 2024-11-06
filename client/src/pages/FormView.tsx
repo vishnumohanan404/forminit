@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { viewForm } from "@/services/form";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 interface Block {
   type: string;
@@ -18,6 +18,11 @@ interface Form {
   title: string;
   blocks: Block[];
 }
+
+interface MCQOptions {
+  optionValue: string;
+  optionMarker: string;
+}
 const FormViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useQuery<Form>({
@@ -26,21 +31,42 @@ const FormViewPage = () => {
     staleTime: 10000,
     enabled: !!id,
   });
+  useEffect(() => {
+    if (!isLoading && data) setFormState(data.blocks);
+  }, [data]);
+
   // State to store form input values
-  const [formState, setFormState] = useState<Record<string, any>>({});
-  const handleChange = (blockId: string, value: any) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [blockId]: value,
-    }));
+  const [formState, setFormState] = useState<Array<Block>>([]);
+  const handleChange = (blockId: string, value: any, type: string) => {
+    const newFormState = formState.map((block) => {
+      if (block._id === blockId) {
+        if (type === "shortAnswerTool" || type === "longAnswerTool") {
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              value: value, // Assuming you're updating the placeholder field
+            },
+          };
+        } else if (type === "multipleChoiceTool") {
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              selectedOption: value, // Store the selected option marker
+              // Assuming you're updating the options array
+            },
+          };
+        }
+      }
+      return block; // If _id doesn't match, return block unchanged
+    });
+    setFormState(newFormState);
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission, send formState to the API
-    console.log("Form submitted:", formState);
-    // Here, you'd call your API to submit the data
+    console.log("data :>> ", formState);
   };
-
   return (
     <div>
       {isLoading ? (
@@ -69,60 +95,88 @@ const FormViewPage = () => {
               <div className="mx-auto max-w-[650px]">
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col gap-2">
-                    {data?.blocks?.map((block) => {
+                    {formState?.map((block) => {
                       switch (block.type) {
-                        case "questionTitleBlock":
+                        case "shortAnswerTool":
                           return (
                             <div key={block._id}>
                               <label className="font-semibold py-2 px-0">
                                 {block.data?.title}
                               </label>
-                            </div>
-                          );
-                        case "shortAnswerInputBlock":
-                          return (
-                            <div key={block._id}>
                               <Input
                                 type="text"
-                                placeholder={block.data?.inputValue}
+                                placeholder={block.data?.placeholder}
                                 className="focus-visible:ring-0 my-2 w-[60%]"
-                                value={formState[block._id] || ""}
+                                value={block.data.value || ""}
                                 onChange={(e) =>
-                                  handleChange(block._id, e.target.value)
+                                  handleChange(
+                                    block._id,
+                                    e.target.value,
+                                    block.type
+                                  )
                                 }
                               />
                             </div>
                           );
-                        case "longAnswerInputBlock":
+                        case "longAnswerTool":
                           return (
                             <div key={block._id}>
+                              <label className="font-semibold py-2 px-0">
+                                {block.data?.title}
+                              </label>
                               <Textarea
-                                placeholder={block.data?.inputValue}
+                                placeholder={block.data?.placeholder}
                                 className="focus-visible:ring-0 my-2 resize-none"
                                 rows={4}
-                                value={formState[block._id] || ""}
+                                value={block.data.value || ""}
                                 onChange={(e) =>
-                                  handleChange(block._id, e.target.value)
+                                  handleChange(
+                                    block._id,
+                                    e.target.value,
+                                    block.type
+                                  )
                                 }
                               />
                             </div>
                           );
-                        case "multipleChoiceOptionBlock":
+                        case "multipleChoiceTool":
                           return (
                             <div key={block._id}>
-                              <div className="relative inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2">
-                                <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
-                                  <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
-                                    {block.data?.optionMarker.toUpperCase()}
-                                  </span>
-                                </div>
-                                <div
-                                  className={
-                                    "w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 pl-9 cursor-pointer"
-                                  }
-                                >
-                                  {block.data?.optionValue}
-                                </div>
+                              <label className="font-semibold py-2 px-0">
+                                {block.data?.title}
+                              </label>
+                              <div className="py-2">
+                                {block.data.options?.map(
+                                  (option: MCQOptions) => (
+                                    <div
+                                      key={option.optionMarker}
+                                      className={`relative cursor-pointer inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2`}
+                                      onClick={() => {
+                                        handleChange(
+                                          block._id,
+                                          option.optionMarker,
+                                          block.type
+                                        );
+                                      }}
+                                    >
+                                      <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
+                                        <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
+                                          {option.optionMarker.toUpperCase()}
+                                        </span>
+                                      </div>
+                                      <div
+                                        className={`min-w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 pl-9  ${
+                                          block.data.selectedOption ===
+                                          option.optionMarker
+                                            ? "border-sky-500"
+                                            : ""
+                                        }`}
+                                      >
+                                        {option.optionValue}
+                                      </div>
+                                    </div>
+                                  )
+                                )}
                               </div>
                             </div>
                           );
@@ -130,7 +184,9 @@ const FormViewPage = () => {
                           break;
                       }
                     })}
-                    <Button className="w-24 mt-6">Submit</Button>
+                    <Button className="w-24 mt-6" type="submit">
+                      Submit
+                    </Button>
                   </div>
                 </form>
               </div>
