@@ -51,7 +51,7 @@ export default class LongAnswerInputBlock {
 
   save(blockContent: HTMLElement) {
     return {
-      inputValue: blockContent.querySelector("input")?.value,
+      inputValue: blockContent.querySelector("textarea")?.value,
     };
   }
 }

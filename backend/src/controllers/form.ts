@@ -1,13 +1,31 @@
 import { Request, Response } from "express-serve-static-core";
 import { errorResponse } from "../helpers";
 import { FormDataInterface } from "../types/form";
-import { findForm, saveNewForm, updateExistingForm } from "../services/form";
+import {
+  findForm,
+  saveNewForm,
+  updateExistingForm,
+  viewFormData,
+} from "../services/form";
 
 export const fetchForm = async (req: Request, res: Response): Promise<void> => {
   try {
     const { user } = req;
     const { formId } = req.params;
     const form = await findForm(user._id, formId);
+    if (!form) {
+      res.status(404).send("form not found");
+      return;
+    }
+    res.status(200).json(form);
+  } catch (error) {
+    errorResponse(error, res);
+  }
+};
+export const viewForm = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { formId } = req.params;
+    const form = await viewFormData(formId);
     if (!form) {
       res.status(404).send("form not found");
       return;

@@ -2,9 +2,20 @@ export type User = {
   _id: string;
   fullName: string;
   email: string;
+  bio?: string;
   googleId: string;
 };
-
+export interface UserProfile {
+  fullName: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
+  googleId?: string;
+}
+export interface UserPwdData {
+  currentPwd?: string;
+  newPwd: string;
+}
 export type FormType = {
   name: string;
   submissions: number;
@@ -14,6 +25,7 @@ export type FormType = {
   form_id: string;
   _id: string;
   published?: boolean;
+  workspaceId?: string;
 };
 
 export type WorkspaceType = {

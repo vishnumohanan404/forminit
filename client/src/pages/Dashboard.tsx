@@ -14,69 +14,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Plus, Settings, User } from "lucide-react";
-import { useState } from "react";
-
-interface Workspace {
-  id: string;
-  name: string;
-  forms: number;
-  members: number;
-}
-
-interface Form {
-  id: number;
-  title: string;
-  status: "published" | "draft";
-  responses: number;
-}
-
-interface WorkspaceForms {
-  [key: string]: Form[];
-}
+import { FileText, LinkIcon, Plus, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([
-    { id: "1", name: "Personal", forms: 2, members: 1 },
-    { id: "2", name: "Team Project", forms: 5, members: 4 },
-    { id: "3", name: "Client Work", forms: 3, members: 2 },
-  ]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("1");
-
-  const [forms, setForms] = useState<WorkspaceForms>({
-    "1": [
-      { id: 1, title: "Customer Feedback", status: "published", responses: 24 },
-      { id: 2, title: "Event Registration", status: "draft", responses: 0 },
-    ],
-    "2": [
-      { id: 3, title: "Team Survey", status: "published", responses: 15 },
-      { id: 4, title: "Project Feedback", status: "draft", responses: 0 },
-      { id: 5, title: "Meeting Scheduler", status: "published", responses: 8 },
-    ],
-    "3": [
-      { id: 6, title: "Client Onboarding", status: "published", responses: 5 },
-      { id: 7, title: "Satisfaction Survey", status: "draft", responses: 0 },
-    ],
-  });
-
   const { data: dashboard, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
     staleTime: 10000,
   });
-  console.log("dashboard :>> ", dashboard);
   const publishedForms: FormType[] = dashboard?.workspaces?.flatMap(
     (workspace: WorkspaceType) =>
-      workspace.forms.filter((form) => form.published)
+      workspace.forms
+        .filter((form) => form.published)
+        .map((form) => ({ ...form, workspaceId: workspace._id }))
   );
   const allForms: FormType[] = dashboard?.workspaces?.flatMap(
-    (workspace: WorkspaceType) => workspace.forms
+    (workspace: WorkspaceType) =>
+      workspace.forms.map((form) => ({ ...form, workspaceId: workspace._id }))
   );
   const draftedForms: FormType[] = dashboard?.workspaces.flatMap(
     (workspace: WorkspaceType) =>
-      workspace.forms.filter((form) => !form.published) // Only include forms that are not published
+      workspace.forms
+        .filter((form) => !form.published)
+        .map((form) => ({ ...form, workspaceId: workspace._id })) // Only include forms that are not published
   );
-
   return (
     <div className="overflow-y-scroll px-5 pr-[8px]">
       <PageTitle>Home</PageTitle>
@@ -204,13 +166,20 @@ const DashboardPage = () => {
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline">
-                        <FileText className="mr-2 h-4 w-4" /> View
+                        <FileText className="mr-2 h-4 w-4" />
+                        View
                       </Button>
                       <div className="flex align-middle gap-5">
-                        <Button variant="outline">
-                          <Settings className="mr-2 h-4 w-4" /> Edit
-                        </Button>
-                        {form.published && <Button>Publish</Button>}
+                        {form.published && (
+                          <Button variant={"ghost"}>
+                            <LinkIcon />
+                          </Button>
+                        )}
+                        <Link to={`/form/${form.form_id}`}>
+                          <Button variant="outline">
+                            <Settings className="mr-2 h-4 w-4" /> Edit
+                          </Button>
+                        </Link>
                       </div>
                     </CardFooter>
                   </Card>
@@ -241,10 +210,16 @@ const DashboardPage = () => {
                         <FileText className="mr-2 h-4 w-4" /> View
                       </Button>
                       <div className="flex align-middle gap-5">
-                        <Button variant="outline">
-                          <Settings className="mr-2 h-4 w-4" /> Edit
-                        </Button>
-                        <Button>Publish</Button>
+                        {form.published && (
+                          <Button variant={"ghost"}>
+                            <LinkIcon />
+                          </Button>
+                        )}
+                        <Link to={`/form/${form.form_id}`}>
+                          <Button variant="outline">
+                            <Settings className="mr-2 h-4 w-4" /> Edit
+                          </Button>
+                        </Link>
                       </div>
                     </CardFooter>
                   </Card>
@@ -275,11 +250,16 @@ const DashboardPage = () => {
                         <FileText className="mr-2 h-4 w-4" /> View
                       </Button>
                       <div className="flex align-middle gap-5">
-                        <Button variant="outline">
-                          <Settings className="mr-2 h-4 w-4" /> Edit
-                        </Button>
-                        <Button>Publish</Button>{" "}
-                        {/* Option to publish the form */}
+                        {form.published && (
+                          <Button variant={"ghost"}>
+                            <LinkIcon />
+                          </Button>
+                        )}
+                        <Link to={`/form/${form.form_id}`}>
+                          <Button variant="outline">
+                            <Settings className="mr-2 h-4 w-4" /> Edit
+                          </Button>
+                        </Link>
                       </div>
                     </CardFooter>
                   </Card>

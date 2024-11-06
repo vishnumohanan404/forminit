@@ -42,7 +42,7 @@ const FormPage = () => {
       onSuccess: () => {
         // Boom baby!
         queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-        toast("Form saved successfully");
+        toast.success("Form saved successfully");
       },
       onError: (error: AxiosError<{ message: string }>) => {
         // An error happened!
@@ -60,7 +60,7 @@ const FormPage = () => {
         updateForm(id || "", workspaceDetails),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-        toast("Form title updated successfully");
+        toast.success("Form updated successfully");
       },
       onError: (error: AxiosError<{ message: string }>) => {
         // An error happened!

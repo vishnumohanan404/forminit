@@ -8,6 +8,7 @@ import SupportPage from "./pages/Support";
 import ChangelogsPage from "./pages/Changelogs";
 import FormPage from "./pages/Form";
 import WorkspacePage from "./pages/Workspace";
+import FormViewPage from "./pages/FormView";
 
 // TODO: explore Data API from
 export const routes = createBrowserRouter([
@@ -51,6 +52,10 @@ export const routes = createBrowserRouter([
         <FormPage />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/view-form/:id",
+    element: <FormViewPage />,
   },
   {
     path: "/settings",

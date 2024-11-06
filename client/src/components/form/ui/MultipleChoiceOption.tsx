@@ -43,7 +43,7 @@ const MultipleChoiceOption = ({
       onKeyDown();
     }
   };
-  const [remove, setRemove] = useState(false);
+  const [remove, setRemove] = useState(true);
   const handleAddNextOption = () => {
     onHandleAddNextOption(nextOption);
     setRemove(true);
@@ -52,7 +52,6 @@ const MultipleChoiceOption = ({
   const handleShowAddButton = () => {
     const currentBlockIndex = api.blocks.getCurrentBlockIndex();
     const nextBlock = api.blocks.getBlockByIndex(currentBlockIndex + 1);
-    console.log("object :>> ", nextBlock);
     if (!nextBlock || nextBlock.name !== "multipleChoiceOptionBlock") {
       setRemove(false);
     }

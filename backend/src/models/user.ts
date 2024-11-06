@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    bio: {
+      type: String,
+      required: false,
+    },
     password: {
       type: String,
       required: false,
@@ -20,7 +24,7 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+export type UserInterface = InferSchemaType<typeof userSchema>;
 const User = mongoose.model("User", userSchema);
 
 export default User;

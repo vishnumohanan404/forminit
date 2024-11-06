@@ -17,6 +17,10 @@ export const fetchForm = async (id: string | undefined) => {
   const response = await axiosClient.get(`/api/form/${id}`);
   return response.data;
 };
+export const viewForm = async (id: string | undefined) => {
+  const response = await axiosClient.get(`/api/form/view-form/${id}`);
+  return response.data;
+};
 export const createForm = async (formData: EditorJSData) => {
   const response = await axiosClient.post("/api/form", formData);
   return response.data;

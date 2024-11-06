@@ -174,7 +174,7 @@ const Auth = () => {
                 })}
                 id="email"
                 type="text"
-                placeholder="m@example.com"
+                placeholder="me@example.com"
               />
               {errors.email && <FormError>{errors.email.message}</FormError>}
             </div>

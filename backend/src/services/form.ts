@@ -45,7 +45,7 @@ export const saveNewForm = async (
           submissions: 0, // Initialize submissions to 0
           created: new Date(), // Set created date
           modified: new Date(), // Set modified date
-          url: `/forms/${savedForm._id}`, // URL for accessing the form
+          url: `/view-form/${savedForm._id}`, // URL for accessing the form
           form_id: savedForm._id, // Reference to the saved form
         },
       },
@@ -93,4 +93,9 @@ export const updateExistingForm = async (
     }
   }
   return updatedForm; // Return the updated form
+};
+
+export const viewFormData = async (formId: string): Promise<any> => {
+  const fullForm = await Form.findById(formId, { blocks: true, title: true });
+  return fullForm;
 };
