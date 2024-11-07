@@ -12,25 +12,17 @@ const BlockSchema = new mongoose.Schema({
   },
 });
 // Define a schema for the form containing multiple blocks
-const FormSchema = new mongoose.Schema({
+const SubmissionSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
   },
-  time: {
-    type: Number,
-    required: true,
-  },
-  version: {
+  formId: {
     type: String,
     required: true,
   },
   blocks: {
     type: [BlockSchema], // Array of blocks
-    required: true,
-  },
-  workspaceId: {
-    type: String,
     required: true,
   },
   createdAt: {
@@ -41,16 +33,12 @@ const FormSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
 });
 // Add a pre-save hook to update the updatedAt field
-FormSchema.pre("save", function (next) {
+SubmissionSchema.pre("save", function (next) {
   this.updatedAt = new Date();
   next();
 });
 
-const Form = mongoose.model("Form", FormSchema);
-export default Form;
+const Submission = mongoose.model("Submission", SubmissionSchema);
+export default Submission;

@@ -12,3 +12,8 @@ export interface FormDataInterface {
   time: number;
   version: string;
 }
+export interface SubmitFormDataInterface {
+  title: string;
+  blocks: BlockData[];
+  _id: string;
+}

@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { viewForm } from "@/services/form";
-import { useQuery } from "@tanstack/react-query";
+import { submitForm, SubmitFormData, viewForm } from "@/services/form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import NotFoundPage from "./NotFound";
 interface Block {
   type: string;
   data: any;
@@ -17,6 +18,7 @@ interface Form {
   _id: string;
   title: string;
   blocks: Block[];
+  disabled: boolean;
 }
 
 interface MCQOptions {
@@ -63,10 +65,25 @@ const FormViewPage = () => {
     });
     setFormState(newFormState);
   };
+  const queryClient = useQueryClient();
+
+  const { mutate: submitFormMutation, isPending } = useMutation({
+    mutationFn: (submitFormData: SubmitFormData) => submitForm(submitFormData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("data :>> ", formState);
+    submitFormMutation({
+      blocks: formState,
+      title: data?.title || "",
+      _id: data?._id || "",
+    });
   };
+  if (data?.disabled) {
+    return <NotFoundPage />;
+  }
   return (
     <div>
       {isLoading ? (
@@ -184,9 +201,13 @@ const FormViewPage = () => {
                           break;
                       }
                     })}
-                    <Button className="w-24 mt-6" type="submit">
-                      Submit
-                    </Button>
+                    {isPending ? (
+                      <></>
+                    ) : (
+                      <Button className="w-24 mt-6" type="submit">
+                        Submit
+                      </Button>
+                    )}
                   </div>
                 </form>
               </div>

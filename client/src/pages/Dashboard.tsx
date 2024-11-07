@@ -15,10 +15,17 @@ import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, LinkIcon, Plus, Settings } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
-  const { data: dashboard, isLoading } = useQuery({
+  const navigate = useNavigate();
+
+  const {
+    data: dashboard,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
     staleTime: 10000,
@@ -33,157 +40,197 @@ const DashboardPage = () => {
     (workspace: WorkspaceType) =>
       workspace.forms.map((form) => ({ ...form, workspaceId: workspace._id }))
   );
-  const draftedForms: FormType[] = dashboard?.workspaces.flatMap(
+  const draftedForms: FormType[] = dashboard?.workspaces?.flatMap(
     (workspace: WorkspaceType) =>
       workspace.forms
         .filter((form) => !form.published)
         .map((form) => ({ ...form, workspaceId: workspace._id })) // Only include forms that are not published
   );
+  const [hover, setHover] = useState("");
   return (
     <div className="overflow-y-scroll px-5 pr-[8px]">
       <PageTitle>Home</PageTitle>
       <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            {isLoading ? (
-              <>
-                <CardHeader>
-                  <CardTitle>
-                    <Skeleton className="h-6 w-[150px]" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-2">
-                  <Skeleton className="h-8 w-[250px] rounded-xl" />
-                </CardContent>
-              </>
-            ) : (
-              <>
-                <CardHeader>
-                  <CardTitle>
-                    Workspaces &nbsp;&nbsp;{dashboard?.workspaces?.length}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                  <CreateWorkspaceDialog>
-                    <Button className="w-full">
-                      <Plus className="mr-2 h-4 w-4" /> Create New Workspace
-                    </Button>
-                  </CreateWorkspaceDialog>
-                </CardContent>
-              </>
-            )}
-          </Card>
-          <Card>
-            {isLoading ? (
-              <>
-                <CardHeader>
-                  <CardTitle>
-                    <Skeleton className="h-6 w-[150px]" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-2">
-                  <Skeleton className="h-8 w-[250px] rounded-xl" />
-                </CardContent>
-              </>
-            ) : (
-              <>
-                <CardHeader className="pb-3">
-                  <CardTitle>Stats</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {dashboard.workspaces.reduce(
-                          (sum: number, workspace: WorkspaceType) =>
-                            sum + workspace.forms.length,
-                          0
-                        )}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Forms</p>
+        {!isError && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              {!isError && isLoading ? (
+                <>
+                  <CardHeader>
+                    <CardTitle>
+                      <Skeleton className="h-6 w-[150px]" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-2">
+                    <Skeleton className="h-8 w-[250px] rounded-xl" />
+                  </CardContent>
+                </>
+              ) : (
+                <>
+                  <CardHeader>
+                    <CardTitle>
+                      Workspaces &nbsp;&nbsp;{dashboard?.workspaces?.length}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-4">
+                    <CreateWorkspaceDialog>
+                      <Button className="w-full">
+                        <Plus className="mr-2 h-4 w-4" /> Create New Workspace
+                      </Button>
+                    </CreateWorkspaceDialog>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+            <Card>
+              {isLoading ? (
+                <>
+                  <CardHeader>
+                    <CardTitle>
+                      <Skeleton className="h-6 w-[150px]" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-2">
+                    <Skeleton className="h-8 w-[250px] rounded-xl" />
+                  </CardContent>
+                </>
+              ) : (
+                <>
+                  <CardHeader className="pb-3">
+                    <CardTitle>Stats</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-2xl font-bold">
+                          {dashboard?.workspaces?.reduce(
+                            (sum: number, workspace: WorkspaceType) =>
+                              sum + workspace.forms.length,
+                            0
+                          )}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Forms</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">
+                          {dashboard?.workspaces?.reduce(
+                            (sum: number, workspace: WorkspaceType) => {
+                              return (
+                                sum +
+                                workspace.forms.filter(
+                                  (form) => form.published === true
+                                ).length
+                              );
+                            },
+                            0
+                          )}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Published
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">
+                          {dashboard?.workspaces?.reduce(
+                            (sum: string, workspace: WorkspaceType) => {
+                              return (
+                                sum +
+                                workspace.forms.reduce(
+                                  (formSum, form) => formSum + form.submissions,
+                                  0
+                                )
+                              );
+                            },
+                            0
+                          )}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Submissions
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {dashboard.workspaces.reduce(
-                          (sum: number, workspace: WorkspaceType) => {
-                            return (
-                              sum +
-                              workspace.forms.filter(
-                                (form) => form.published === true
-                              ).length
-                            );
-                          },
-                          0
-                        )}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Published</p>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {dashboard.workspaces.reduce(
-                          (sum: string, workspace: WorkspaceType) => {
-                            return (
-                              sum +
-                              workspace.forms.reduce(
-                                (formSum, form) => formSum + form.submissions,
-                                0
-                              )
-                            );
-                          },
-                          0
-                        )}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Responses</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </>
-            )}
-          </Card>
-        </div>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          </div>
+        )}
         <Tabs defaultValue="all" className="mt-12">
           <TabsList>
             <TabsTrigger value="all">All Forms</TabsTrigger>
-            <TabsTrigger value="published">Published</TabsTrigger>
-            <TabsTrigger value="drafts">Drafts</TabsTrigger>
+            <TabsTrigger value="published" disabled>
+              Published
+            </TabsTrigger>
+            <TabsTrigger value="drafts" disabled>
+              Drafts
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-4">
             <div className="grid gap-4">
-              {allForms?.length > 0 ? (
+              {!isError && allForms?.length > 0 ? (
                 allForms.map((form) => (
-                  <Card key={form._id}>
-                    <CardHeader>
-                      <CardTitle>{form.name}</CardTitle>
-                      <CardDescription>
-                        Status:{" "}
-                        <span className="capitalize">
-                          {form.published ? "published" : "drafted"}
-                        </span>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p>Responses: {form.submissions}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Link to={`/view-form/${form.form_id}`} target="_blank">
-                        <Button variant="outline">
-                          <FileText className="mr-2 h-4 w-4" />
-                          View
-                        </Button>
-                      </Link>
-                      <div className="flex align-middle gap-5">
-                        {form.published && (
-                          <Button variant={"ghost"}>
-                            <LinkIcon />
-                          </Button>
-                        )}
-                        <Link to={`/form/${form.form_id}`}>
-                          <Button variant="outline">
-                            <Settings className="mr-2 h-4 w-4" /> Edit
-                          </Button>
-                        </Link>
+                  <Card
+                    key={form._id}
+                    className="cursor-pointer shadow-none"
+                    onClick={() => {
+                      navigate(
+                        `/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`
+                      );
+                    }}
+                    onMouseOver={() => setHover(form._id)}
+                    onMouseOut={() => setHover("")}
+                  >
+                    <CardHeader className="">
+                      <CardTitle
+                        className={
+                          hover === form._id
+                            ? "underline underline-offset-4"
+                            : ""
+                        }
+                      >
+                        {form.name}
+                      </CardTitle>
+                      <div className="flex justify-between w-full pt-2">
+                        <div>
+                          <div className="text-sm text-muted-foreground">
+                            Status:{" "}
+                            <span className="capitalize">
+                              {form.published ? "published" : "drafted"}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Submissions: {form.submissions}
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <Link
+                            to={`/view-form/${form.form_id}`}
+                            target="_blank"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Button variant="outline">
+                              <FileText className="mr-2 h-4 w-4" />
+                              View
+                            </Button>
+                          </Link>
+                          <div className="flex align-middle gap-5">
+                            {form.published && (
+                              <Button variant={"ghost"}>
+                                <LinkIcon />
+                              </Button>
+                            )}
+                            <Link
+                              to={`/form/${form.form_id}`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button variant="outline">
+                                <Settings className="mr-2 h-4 w-4" /> Edit
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
                       </div>
-                    </CardFooter>
+                    </CardHeader>
                   </Card>
                 ))
               ) : (
@@ -195,7 +242,7 @@ const DashboardPage = () => {
           </TabsContent>
           <TabsContent value="published" className="mt-4">
             <div className="grid gap-4">
-              {publishedForms?.length > 0 ? (
+              {!isError && publishedForms?.length > 0 ? (
                 publishedForms.map((form) => (
                   <Card key={form._id}>
                     <CardHeader>
@@ -205,7 +252,7 @@ const DashboardPage = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>Responses: {form.submissions}</p>
+                      <p>Submissions: {form.submissions}</p>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline">
@@ -235,7 +282,7 @@ const DashboardPage = () => {
           </TabsContent>
           <TabsContent value="drafts" className="mt-4">
             <div className="grid gap-4">
-              {draftedForms?.length > 0 ? (
+              {!isError && draftedForms?.length > 0 ? (
                 draftedForms.map((form) => (
                   <Card key={form._id}>
                     <CardHeader>
@@ -245,7 +292,7 @@ const DashboardPage = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>Responses: {form.submissions}</p>
+                      <p>Submissions: {form.submissions}</p>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="outline">

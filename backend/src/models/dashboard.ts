@@ -11,6 +11,10 @@ const formSchema = new mongoose.Schema({
     ref: "Form",
     required: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const workspaceSchema = new mongoose.Schema({

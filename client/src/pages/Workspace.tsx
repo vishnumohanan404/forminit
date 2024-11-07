@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 
 const WorkspacePage = () => {
   const [searchParams] = useSearchParams();

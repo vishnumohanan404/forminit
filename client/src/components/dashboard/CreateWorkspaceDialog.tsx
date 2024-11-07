@@ -62,12 +62,8 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
   return (
     <Dialog
       onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          handleDialogClose();
-          setIsOpen(false);
-        } else {
-          setIsOpen(true);
-        }
+        !isOpen && handleDialogClose();
+        setIsOpen(isOpen);
       }}
       open={isOpen}
     >

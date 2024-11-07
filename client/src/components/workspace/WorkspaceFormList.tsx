@@ -9,21 +9,28 @@ import {
 } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 
+interface FormDetails {
+  name: string;
+  submissions: number;
+  created: Date;
+  modified: Date;
+  url: string;
+  form_id: string;
+}
 interface ComponentProps {
   _id: string;
-  forms: Array<{
-    name: string;
-    submissions: number;
-    created: Date;
-    modified: Date;
-    url: string;
-    form_id: string;
-  }>;
+  forms: Array<FormDetails>;
 }
 
 const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const handleOnClick = (form: FormDetails) => {
+    navigate(
+      `/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`
+    );
+  };
   return (
     <AnimatePresence>
       <div>
@@ -35,6 +42,9 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
             transition={{ duration: 0.3 }}
             key={form.form_id}
             className="flex justify-between items-center px-3 py-2 rounded-md hover:bg-slate-200 hover:cursor-pointer"
+            onClick={() => {
+              handleOnClick(form);
+            }}
           >
             <div className="flex-col col-span-1">
               <h5 className="scroll-m-20 font-semibold tracking-tight text-muted-foreground text-slate-600">
@@ -65,9 +75,10 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
                 variant="ghost"
                 size="sm"
                 className="w-auto h-6 px-3 font-semibold text-muted-foreground"
-                onClick={() =>
-                  navigate(`/form/${form.form_id}?workspaceId=${id}`)
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/form/${form.form_id}?workspaceId=${id}`);
+                }}
               >
                 EDIT
               </Button>
@@ -79,6 +90,7 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Button
                         variant="ghost"

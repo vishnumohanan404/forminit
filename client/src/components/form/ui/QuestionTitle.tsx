@@ -31,7 +31,7 @@ const QuestionTitle: React.FC<EditableDivProps> = ({
 
   useEffect(() => {
     if (divRef.current && question) {
-      divRef.current.innerText = question; // Update the content when prop changes
+      divRef.current.innerText = question.trim(); // Update the content when prop changes
     }
   }, [question]);
 
