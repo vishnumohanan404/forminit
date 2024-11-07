@@ -111,7 +111,7 @@ const DashboardPage = () => {
                         </p>
                         <p className="text-sm text-muted-foreground">Forms</p>
                       </div>
-                      <div>
+                      <div className="text-muted-foreground">
                         <p className="text-2xl font-bold">
                           {dashboard?.workspaces?.reduce(
                             (sum: number, workspace: WorkspaceType) => {
@@ -190,14 +190,14 @@ const DashboardPage = () => {
                       >
                         {form.name}
                       </CardTitle>
-                      <div className="flex justify-between w-full pt-2">
+                      <div className="flex justify-between w-full pt-2 items-center">
                         <div>
-                          <div className="text-sm text-muted-foreground">
+                          {/* <div className="text-sm text-muted-foreground">
                             Status:{" "}
                             <span className="capitalize">
                               {form.published ? "published" : "drafted"}
                             </span>
-                          </div>
+                          </div> */}
                           <p className="text-sm text-muted-foreground">
                             Submissions: {form.submissions}
                           </p>
