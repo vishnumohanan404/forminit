@@ -1,0 +1,46 @@
+services:
+  client:
+    build: client
+    ports:
+      - "5173:5173"
+    networks:
+      - forminit
+    env_file:
+      - ./client/.env
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    networks:
+      - forminit
+    depends_on:
+      - mongo
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  mongo:
+    image: mongodb/mongodb-community-server:7.0.3-ubi8-20241108T082135Z
+    container_name: mongo
+    networks:
+      - forminit
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  forminit:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

@@ -9,6 +9,7 @@ import router from "./routes";
 import connectDB from "./config/db";
 import morgan from "morgan";
 import logger from "./logger";
+console.log("object :>> ");
 
 const port: number = Number(process.env.PORT) || 3000;
 const app: Application = express();

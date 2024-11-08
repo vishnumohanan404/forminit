@@ -1,4 +1,4 @@
-import mongoose, { Document, HydratedDocument } from "mongoose";
+import mongoose, { Document, HydratedDocument, ObjectId } from "mongoose";
 import Dashboard from "../models/dashboard";
 interface FormInterface {
   submission: number; // Assuming each form contains some data
@@ -13,11 +13,13 @@ interface WorkspaceInterface {
 export interface DashboardInterface extends Document {
   user_id: mongoose.Types.ObjectId;
   workspaces: WorkspaceInterface[];
+  _id: ObjectId;
+  __v: number;
 }
 
 export const findDashboard = async (
   userId: string
-): Promise<HydratedDocument<DashboardInterface> | null> => {
+): Promise<DashboardInterface | null> => {
   const dashboard: DashboardInterface | null = await Dashboard.findOne({
     user_id: userId,
   });
