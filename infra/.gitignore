@@ -1,0 +1,21 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.backup
+
+# Crash log files
+crash.log
+
+# Exclude .tfvars files which contain sensitive data
+*.tfvars
+
+# Ignore override files as they are usually local changes to an existing configuration
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include Terraform plan output files (generated during plan command)
+*.tfplan
