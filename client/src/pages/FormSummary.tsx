@@ -15,7 +15,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   deleteForm,
   disableForm,
-  fetchForm,
   fetchSubmissions,
   viewForm,
 } from "@/services/form";
@@ -34,7 +33,6 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AxiosError } from "axios";
-import { fetchDashboard } from "@/services/dashboard";
 interface BlockData {
   type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
   data: any; // Data specific to the block type
