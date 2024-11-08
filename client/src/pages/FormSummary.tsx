@@ -157,7 +157,7 @@ const FormSummaryPage = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Submitted at</TableHead>
-                    {formView?.blocks.map(
+                    {formView?.blocks?.map(
                       (block: {
                         _id: string;
                         type: string;
@@ -165,7 +165,7 @@ const FormSummaryPage = () => {
                       }) => {
                         return (
                           <TableHead key={block._id}>
-                            {block.data.title}
+                            {block.data?.title}
                           </TableHead>
                         );
                       }
