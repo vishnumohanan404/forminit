@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import request from "supertest";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import app from "../index"; // Import your Express app
 import User from "../models/user"; // Im// Import Dashboard model
-import jwt from "jsonwebtoken";
 import Dashboard from "../models/dashboard";
+import { app } from "../app";
 
 let mongoServer: MongoMemoryServer;
 jest.mock("jsonwebtoken", () => ({
@@ -14,6 +13,10 @@ beforeAll(async () => {
   // Start in-memory MongoDB server
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
+
+  // Set the in-memory MongoDB URI for your application
+  process.env.MONGO_URI = uri;
+
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(uri);
   }
