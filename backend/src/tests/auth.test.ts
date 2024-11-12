@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import request from "supertest";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import app from "../index"; // Import your Express app
 import User from "../models/user"; // Im// Import Dashboard model
-import jwt from "jsonwebtoken";
 import Dashboard from "../models/dashboard";
+import { app } from "../app";
 
 let mongoServer: MongoMemoryServer;
 jest.mock("jsonwebtoken", () => ({
