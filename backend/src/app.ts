@@ -19,7 +19,7 @@ app.use(
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:5173", "http://127.0.0.1:50827"],
+    origin: [process.env.CLIENT_URL || "http://localhost:5173"],
   })
 );
 app.options("*", cors());
