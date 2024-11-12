@@ -20,7 +20,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-
   const {
     data: dashboard,
     isLoading,
