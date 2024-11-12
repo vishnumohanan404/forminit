@@ -17,6 +17,11 @@ spec:
           image: mongodb/mongodb-community-server:7.0.3-ubi8-20241108T082135Z
           ports:
             - containerPort: 27017
+          command:
+            - chown
+            - -R
+            - "mongodb:mongodb"
+            - /data/db
           volumeMounts:
             - name: mongodb-persistent-storage
               mountPath: /data/db
