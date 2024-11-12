@@ -20,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
@@ -43,6 +43,7 @@ import { deleteWorkspace } from "@/services/workspace";
 import { toast } from "sonner";
 
 export function AppSidebar() {
+  const navigate = useNavigate();
   const { data: dashboard, isError } = useQuery({
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
@@ -57,6 +58,7 @@ export function AppSidebar() {
     onSuccess: () => {
       // Boom baby!
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      navigate("/dashboard");
     },
     onError: () => {
       toast.error("Workspace deletion failed");

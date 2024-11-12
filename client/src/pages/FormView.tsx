@@ -124,7 +124,7 @@ const FormViewPage = () => {
                                 type="text"
                                 placeholder={block.data?.placeholder}
                                 className="focus-visible:ring-0 my-2 w-[60%]"
-                                value={block.data.value || ""}
+                                value={block.data?.value || ""}
                                 onChange={(e) =>
                                   handleChange(
                                     block._id,
@@ -145,7 +145,7 @@ const FormViewPage = () => {
                                 placeholder={block.data?.placeholder}
                                 className="focus-visible:ring-0 my-2 resize-none"
                                 rows={4}
-                                value={block.data.value || ""}
+                                value={block.data?.value || ""}
                                 onChange={(e) =>
                                   handleChange(
                                     block._id,

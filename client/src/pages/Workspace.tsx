@@ -35,7 +35,7 @@ const WorkspacePage = () => {
       <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
         {!!dashboard?.workspaces?.filter(
           (item: { _id: string }) => item._id === id
-        )[0].forms.length ? (
+        )[0]?.forms.length ? (
           <>
             <WorkspaceFormList
               item={
