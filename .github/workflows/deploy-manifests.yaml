@@ -29,5 +29,19 @@ jobs:
       - name: Save cluster config details to kubeconfig
         run: civo kubernetes config ${{secrets.CIVO_CLUSTER_NAME}} --save --local-path ~/.kube/config -y
 
+      - name: Create Kubernetes Secret Frontend
+        run: |
+          kubectl create secret generic forminit \
+            --from-literal=VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
+            --from-literal=VITE_BACKEND_URL=http://backend-service:3000 \
+            --dry-run=client -o yaml | kubectl apply -f -
+      - name: Create Kubernetes Secret Backend
+        run: |
+          kubectl create secret generic forminit-backend \
+            --from-literal=MONGO_URI=mongodb://mongodb-service:27017/forminit \
+            --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --from-literal=GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
+            --from-literal=GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            --dry-run=client -o yaml | kubectl apply -f -
       - name: Apply Kubernetes manifests
         run: kubectl apply -f manifests/k8s
