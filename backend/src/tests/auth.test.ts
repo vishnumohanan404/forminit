@@ -14,6 +14,10 @@ beforeAll(async () => {
   // Start in-memory MongoDB server
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
+
+  // Set the in-memory MongoDB URI for your application
+  process.env.MONGO_URI = uri;
+
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(uri);
   }
