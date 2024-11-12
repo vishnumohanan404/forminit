@@ -1,0 +1,44 @@
+name: deploy-manifests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "manifests/**"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd backend && docker build -t vishnumohanan/forminit .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      - run: docker push vishnumohanan/forminit
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install-civo
+        uses: civo/action-civo@v1.0.0
+        with:
+          token: ${{secrets.CIVO_TOKEN}}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - name: Make config folder
+        run: mkdir ~/.kube
+
+      - name: Set region
+        run: civo region current ${{secrets.CIVO_REGION}}
+
+      - name: Save cluster config details to kubeconfig
+        run: civo kubernetes config ${{secrets.CIVO_CLUSTER_NAME}} --save --local-path ~/.kube/config -y
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f manifests/k8s
