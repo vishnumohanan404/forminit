@@ -22,11 +22,11 @@ spec:
               mountPath: /data/db
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "128Mi"
+              memory: "256Mi"
               cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
       volumes:
         - name: mongodb-persistent-storage
           persistentVolumeClaim:
@@ -54,4 +54,3 @@ spec:
   resources:
     requests:
       storage: 2Gi
-
