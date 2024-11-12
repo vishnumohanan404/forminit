@@ -9,7 +9,6 @@ import router from "./routes";
 import connectDB from "./config/db";
 import morgan from "morgan";
 import logger from "./logger";
-console.log("object :>> ");
 
 const port: number = Number(process.env.PORT) || 3000;
 const app: Application = express();
@@ -24,9 +23,10 @@ app.use(
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://127.0.0.1:50827"],
   })
 );
+app.options("*", cors());
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
