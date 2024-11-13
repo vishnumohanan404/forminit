@@ -9,6 +9,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { FormProvider } from "./contexts/FormContext";
 import { Toaster } from "./components/ui/sonner";
 import { routes } from "./Routes";
+import { Suspense } from "react";
+import SuspenseLayout from "./layouts/SuspenseLayout";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +22,9 @@ function App() {
           <Layout>
             <QueryClientProvider client={queryClient}>
               <AuthProvider>
-                <RouterProvider router={routes} />
+                <Suspense fallback={<SuspenseLayout />}>
+                  <RouterProvider router={routes} />
+                </Suspense>
               </AuthProvider>
               <ReactQueryDevtools initialIsOpen={false} />
               <Toaster />
