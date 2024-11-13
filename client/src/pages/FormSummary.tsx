@@ -101,8 +101,6 @@ const FormSummaryPage = () => {
       });
     },
   });
-
-  console.log("submissions :>> ", submissionsError?.response);
   const isLoading = isSubmissionsLoading || isFormViewLoading;
   return (
     <div className="overflow-y-scroll px-5">
