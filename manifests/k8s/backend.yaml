@@ -41,7 +41,7 @@ spec:
             - name: NODE_ENV
               value: dev
             - name: CLIENT_URL
-              value: http://74.220.22.242:31328
+              value: http://forminit.vishnuverse.xyz
           resources:
             requests:
               memory: "64Mi"
