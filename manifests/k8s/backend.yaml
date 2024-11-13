@@ -39,7 +39,7 @@ spec:
                   name: forminit-backend
                   key: GOOGLE_CLIENT_SECRET
             - name: NODE_ENV
-              value: production
+              value: dev
             - name: CLIENT_URL
               value: http://74.220.22.242:31328
           resources:
