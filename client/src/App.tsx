@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import AuthProvider from "./contexts/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import Layout from "./layouts/Layout";
+import Layout from "./layouts/LayoutDiv";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { FormProvider } from "./contexts/FormContext";
