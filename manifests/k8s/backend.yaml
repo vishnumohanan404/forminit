@@ -40,6 +40,8 @@ spec:
                   key: GOOGLE_CLIENT_SECRET
             - name: NODE_ENV
               value: production
+            - name: CLIENT_URL
+              value: http://74.220.22.242:31328
           resources:
             requests:
               memory: "64Mi"
