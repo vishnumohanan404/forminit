@@ -170,9 +170,9 @@ const SettingsPage = () => {
   }, [watch]);
 
   return (
-    <div className="overflow-y-scroll px-5">
+    <div className="px-5">
       <PageTitle>Settings</PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
         <Tabs defaultValue="profile" className="space-y-4">
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>

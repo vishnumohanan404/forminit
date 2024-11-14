@@ -103,7 +103,7 @@ const FormSummaryPage = () => {
   });
   const isLoading = isSubmissionsLoading || isFormViewLoading;
   return (
-    <div className="overflow-y-scroll px-5">
+    <div className="px-5">
       <PageTitle>
         <div className="flex items-center justify-between">
           {searchParams.get("name")}
@@ -117,7 +117,7 @@ const FormSummaryPage = () => {
           </Button>
         </div>
       </PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
         <Tabs defaultValue="submissions" className="w-full">
           <TabsList className="grid w-[400px] grid-cols-3 mb-4">
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
@@ -310,14 +310,14 @@ const FormSummaryPage = () => {
                         Delete
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
                       <DialogHeader>
                         <DialogTitle>Are you sure?</DialogTitle>
                         <DialogDescription>
                           Confirm to delete the form
                         </DialogDescription>
                       </DialogHeader>
-                      <DialogFooter>
+                      <DialogFooter className="gap-3">
                         <Button type="submit" onClick={() => handleDelete()}>
                           Confirm
                         </Button>
