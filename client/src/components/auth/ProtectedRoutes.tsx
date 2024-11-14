@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   return user ? (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex flex-col col-span-1 min-h-screen max-h-screen overflow-hidden w-full">
+      <main className="flex flex-col col-span-1 max-h-full overflow-hidden w-full mb-10">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
@@ -43,7 +43,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
             </Link>
           </AnimatedGradientText>
         </div>
-
         <Separator />
         {children}
       </main>

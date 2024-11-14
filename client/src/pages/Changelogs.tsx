@@ -31,45 +31,6 @@ interface ChangelogEntry {
 
 const changelogs: ChangelogEntry[] = [
   {
-    version: "2.1.0",
-    date: "2024-05-15",
-    changes: [
-      { type: "feature", description: "Added support for multi-page forms" },
-      { type: "improvement", description: "Enhanced form analytics dashboard" },
-      {
-        type: "bugfix",
-        description: "Fixed issue with form submission on Safari browsers",
-      },
-    ],
-  },
-  {
-    version: "2.0.1",
-    date: "2024-04-02",
-    changes: [
-      { type: "bugfix", description: "Resolved data export formatting issues" },
-      { type: "improvement", description: "Optimized form loading times" },
-    ],
-  },
-  {
-    version: "2.0.0",
-    date: "2024-03-15",
-    changes: [
-      {
-        type: "feature",
-        description: "Introduced new drag-and-drop form builder interface",
-      },
-      {
-        type: "feature",
-        description: "Added support for custom themes and branding",
-      },
-      {
-        type: "improvement",
-        description: "Revamped user dashboard for better navigation",
-      },
-      { type: "bugfix", description: "Fixed multiple accessibility issues" },
-    ],
-  },
-  {
     version: "1.5.2",
     date: "2024-02-10",
     changes: [
@@ -80,20 +41,6 @@ const changelogs: ChangelogEntry[] = [
       {
         type: "improvement",
         description: "Enhanced performance of form template loading",
-      },
-    ],
-  },
-  {
-    version: "1.5.1",
-    date: "2024-01-20",
-    changes: [
-      {
-        type: "bugfix",
-        description: "Resolved issue with email notifications not sending",
-      },
-      {
-        type: "improvement",
-        description: "Updated third-party dependencies for security",
       },
     ],
   },
@@ -153,9 +100,9 @@ const ChangelogsPage = () => {
     }
   };
   return (
-    <div className="overflow-y-scroll px-5">
+    <div className="px-5">
       <PageTitle>Changelogs</PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <Select
             onValueChange={(value) =>

@@ -19,7 +19,7 @@ const WorkspacePage = () => {
   };
 
   return (
-    <div className="overflow-y-scroll px-5">
+    <div className="px-5">
       <PageTitle>
         <div className="flex items-center justify-between">
           {searchParams.get("name")}
@@ -32,7 +32,7 @@ const WorkspacePage = () => {
           </Button>
         </div>
       </PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px]  overflow-auto flex-grow container">
         {!!dashboard?.workspaces?.filter(
           (item: { _id: string }) => item._id === id
         )[0]?.forms.length ? (

@@ -47,9 +47,9 @@ const DashboardPage = () => {
   );
   const [hover, setHover] = useState("");
   return (
-    <div className="overflow-y-scroll px-5 pr-[8px]">
+    <div className="px-5">
       <PageTitle>Home</PageTitle>
-      <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+      <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container ">
         {!isError && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
