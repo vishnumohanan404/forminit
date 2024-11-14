@@ -31,7 +31,7 @@ const AppSidebarFooter = () => {
               side="top"
               className="w-[--radix-popper-anchor-width]"
             >
-              <Link to="/profile">
+              <Link to="/settings">
                 <DropdownMenuItem className="cursor-pointer">
                   <span>Account</span>
                 </DropdownMenuItem>
