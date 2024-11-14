@@ -7,7 +7,7 @@ import { createForm, fetchForm, updateForm } from "@/services/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AxiosError } from "axios";
 import {
@@ -35,6 +35,7 @@ const FormPage = () => {
   const queryClient = useQueryClient();
   // Local state for the title
   const [title, setTitle] = useState("");
+  const titleRef = useRef<HTMLInputElement>(null);
   // Create mutation for creating a new form
   const { mutate: createFormMutation, isPending: isPendingCreate } =
     useMutation({
@@ -98,22 +99,30 @@ const FormPage = () => {
       setTitle(data.title);
     }
   }, [isFetched, data]);
-  const handleTitleChange = (event: React.FocusEvent<HTMLDivElement>) => {
-    const newTitle = event.currentTarget.textContent || "";
-    setTitle(newTitle);
-    // Update the form title using the mutation
-  };
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value)
+  }
+
+  const handleTitleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      titleRef.current?.blur()
+    }
+  }
   return (
     <div className="overflow-y-auto px-5">
       <PageTitle>
         <div className="flex justify-between items-center">
-          <div
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={handleTitleChange}
-          >
-            {!id ? "Untitled" : title}
-          </div>
+        <input
+            ref={titleRef}
+            type="text"
+            value={title}
+            onChange={handleTitleChange}
+            onKeyDown={handleTitleKeyDown}
+            placeholder={!id ? "Untitled" : ""}
+            className="text-4xl font-bold outline-none bg-transparent w-full"
+            aria-label="Form title"
+          />
           <TooltipProvider>
             {(!state.editorData && title === data?.title) || !title ? (
               <Tooltip>
