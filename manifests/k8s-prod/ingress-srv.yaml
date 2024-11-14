@@ -5,6 +5,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
+  tls:
+    - hosts:
+        - forminit.vishnuverse.xyz
+      secretName: forminit-tls
   rules:
     - host: forminit.vishnuverse.xyz
       http:
