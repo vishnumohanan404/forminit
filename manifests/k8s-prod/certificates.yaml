@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: forminit-letsencrypt
+  namespace: default
+spec:
+  acme:
+    email: vishnumohan1996nov@gmail.com
+    # We use the staging server here for testing to avoid hitting
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # if not existing, it will register a new account and stores it
+      name: letsencrypt
+    solvers:
+      - http01:
+          # The ingressClass used to create the necessary ingress routes
+          ingress:
+            class: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: forminit-certificate
+  namespace: default
+spec:
+  secretName: forminit-tls
+  issuerRef:
+    name: forminit-letsencrypt
+  commonName: forminit.vishnuverse.xyz
+  dnsNames:
+    - forminit.vishnuverse.xyz

@@ -24,7 +24,7 @@ spec:
                   name: forminit
                   key: VITE_GOOGLE_CLIENT_ID
             - name: VITE_BACKEND_URL
-              value: http://forminit.vishnuverse.xyz
+              value: https://forminit.vishnuverse.xyz
           resources:
             requests:
               memory: "512Mi"
