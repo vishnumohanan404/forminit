@@ -119,7 +119,7 @@ const FormSummaryPage = () => {
       </PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
         <Tabs defaultValue="submissions" className="w-full">
-          <TabsList className="grid w-[400px] grid-cols-3 mb-4">
+          <TabsList className="grid max-w-[400px] grid-cols-3 mb-4">
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="share">Share</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
