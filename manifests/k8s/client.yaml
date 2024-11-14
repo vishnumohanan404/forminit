@@ -18,6 +18,8 @@ spec:
           ports:
             - containerPort: 80
           env:
+            - name: NODE_ENV
+              value: "production"
             - name: VITE_GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
