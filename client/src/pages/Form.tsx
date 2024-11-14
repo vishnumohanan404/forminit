@@ -118,13 +118,15 @@ const FormPage = () => {
             {(!state.editorData && title === data?.title) || !title ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
-                    disabled
-                  >
-                    PUBLISH
-                  </Button>
+                  <span className="flex">
+                    <Button
+                      size="sm"
+                      className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
+                      disabled
+                    >
+                      PUBLISH
+                    </Button>
+                  </span>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Update the title to publish this form</p>
