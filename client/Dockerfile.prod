@@ -1,5 +1,5 @@
-# Use an official Node.js base image
-FROM node:18
+# Use an official Node.js base image for building the app
+FROM node:18 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -7,14 +7,23 @@ WORKDIR /app
 # Copy package.json and package-lock.json files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install production dependencies (without devDependencies)
+RUN npm install --only=production
 
 # Copy the rest of the app's source code
 COPY . .
 
-# Expose the port the app will run on
-EXPOSE 5173
+# Build the app for production
+RUN npm run build
 
-# Start the React app in development mode
-CMD ["npm", "run", "dev-exposed"]
+# Use a smaller base image for serving the production build
+FROM nginx:alpine
+
+# Copy the production build files from the previous stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose the port that Nginx will run on
+EXPOSE 80
+
+# Start Nginx to serve the app
+CMD ["nginx", "-g", "daemon off;"]
