@@ -1,6 +1,7 @@
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoutes";
+import SuccessFormSubmitPage from "./pages/SuccessFormSubmit";
 const DashboardPage = React.lazy(() => import("./pages/Dashboard"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const Auth = React.lazy(() => import("./pages/Auth"));
@@ -58,6 +59,10 @@ export const routes = createBrowserRouter([
   {
     path: "/view-form/:id",
     element: <FormViewPage />,
+  },
+  {
+    path: "/success",
+    element: <SuccessFormSubmitPage />,
   },
   {
     path: "/form-summary/:formId",
