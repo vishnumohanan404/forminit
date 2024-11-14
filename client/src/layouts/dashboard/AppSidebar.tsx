@@ -140,7 +140,7 @@ export function AppSidebar() {
                                               <DialogTrigger asChild>
                                                 <Trash2Icon className="cursor-pointer stroke-current hover:stroke-muted-foreground w-4 h-4" />
                                               </DialogTrigger>
-                                              <DialogContent className="sm:max-w-[425px]">
+                                              <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
                                                 <DialogHeader>
                                                   <DialogTitle>
                                                     Deleting workspace
@@ -150,7 +150,7 @@ export function AppSidebar() {
                                                     deleted
                                                   </DialogDescription>
                                                 </DialogHeader>
-                                                <DialogFooter>
+                                                <DialogFooter className="gap-3">
                                                   <Button
                                                     variant={"destructive"}
                                                     onClick={() =>

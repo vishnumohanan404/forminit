@@ -68,14 +68,14 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
       open={isOpen}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-[625px] max-w-[90%] rounded-md">
         <DialogHeader>
           <DialogTitle>Create workspace</DialogTitle>
           <DialogDescription>Click save once you're done.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="sm:text-right">
               Name
             </Label>
             <Input
@@ -87,8 +87,8 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
               maxLength={20}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="description" className="sm:text-right">
               Description
             </Label>
             <Textarea
@@ -102,7 +102,7 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <Button
             type="submit"
             onClick={handleSubmit}

@@ -11,7 +11,7 @@ export default function SuccessFormSubmitPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-center">
       <h1 className="text-4xl font-bold mb-4">Form Submitted Successfully!</h1>
       <p className="text-xl mb-8 text-muted-foreground">
         Thank you for your submission.
