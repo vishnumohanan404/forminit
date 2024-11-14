@@ -55,7 +55,6 @@ const WorkspacePage = () => {
             <h4 className="scroll-m-20 text-xl font-semibold text-muted-foreground">
               Looks like it's empty here. Create your first form!
             </h4>
-            {/* <img src="/box.png" alt="" className="w-1/4" /> */}
           </div>
         )}
       </main>
