@@ -1,6 +1,8 @@
 # FormInIt
 
-A modern notion-like application for building and sharing complex forms for data collection.
+A modern notion-like form builder.
+
+![Project Logo](https://forminit.vishnuverse.xyz/thumbnail.png)
 
 ## Table of Contents
 
@@ -12,7 +14,11 @@ A modern notion-like application for building and sharing complex forms for data
 
 ## Usage
 
-For installation and usage use the readme files in respective directories
+### Local development
+
+`docker-compose up -d`
+
+For installation and usage of each application use the readme files in respective directories
 
 ## Features
 
@@ -39,6 +45,5 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 
 Feel free to reach out:
 
-
 Email: *vishnumohan1996nov@gmail.com*  
-GitHub: *@vishnumohanan404*
+GitHub: _@vishnumohanan404_
