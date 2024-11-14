@@ -100,20 +100,20 @@ const FormPage = () => {
     }
   }, [isFetched, data]);
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value)
-  }
+    setTitle(event.target.value);
+  };
 
   const handleTitleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      titleRef.current?.blur()
+    if (event.key === "Enter") {
+      event.preventDefault();
+      titleRef.current?.blur();
     }
-  }
+  };
   return (
     <div className="overflow-y-auto px-5">
       <PageTitle>
         <div className="flex justify-between items-center">
-        <input
+          <input
             ref={titleRef}
             type="text"
             value={title}

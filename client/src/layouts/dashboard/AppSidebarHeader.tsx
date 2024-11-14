@@ -1,4 +1,3 @@
-
 import Logo from "@/components/svg/Logo";
 import {
   SidebarHeader,
@@ -12,9 +11,7 @@ const AppSidebarHeader = () => {
   return (
     <SidebarHeader className={!open ? "pl-1" : ""}>
       <SidebarMenu>
-        <SidebarMenuItem
-          className={open ? "flex items-center gap-1" : ""}
-        >
+        <SidebarMenuItem className={open ? "flex items-center gap-1" : ""}>
           <div className={open ? "h-9 w-9" : "h-6 w-6"}>
             <Logo />
           </div>
