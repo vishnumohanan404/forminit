@@ -7,10 +7,10 @@ spec:
   acme:
     email: vishnumohan1996nov@gmail.com
     # We use the staging server here for testing to avoid hitting
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # if not existing, it will register a new account and stores it
-      name: letsencrypt
+      name: letsencrypt-production
     solvers:
       - http01:
           # The ingressClass used to create the necessary ingress routes
