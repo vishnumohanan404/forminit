@@ -10,7 +10,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AxiosError } from "axios";
-
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 interface BlockData {
   type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
   data: any; // Data specific to the block type
@@ -109,24 +114,38 @@ const FormPage = () => {
           >
             {!id ? "Untitled" : title}
           </div>
-          <Button
-            size="sm"
-            className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
-            onClick={handleSubmit}
-            disabled={
-              (!state.editorData && title === data?.title) || !title
-              // isPendingCreate ||
-              // isPendingUpdate
-            }
-          >
-            <div>
-              {isPendingCreate || isPendingUpdate ? (
-                <LoadingSpinner />
-              ) : (
-                "PUBLISH"
-              )}
-            </div>
-          </Button>
+          <TooltipProvider>
+            {(!state.editorData && title === data?.title) || !title ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
+                    disabled
+                  >
+                    PUBLISH
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Update the title to publish this form</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button
+                size="sm"
+                className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
+                onClick={handleSubmit}
+              >
+                <div>
+                  {isPendingCreate || isPendingUpdate ? (
+                    <LoadingSpinner />
+                  ) : (
+                    "PUBLISH"
+                  )}
+                </div>
+              </Button>
+            )}
+          </TooltipProvider>
         </div>
       </PageTitle>
       <Editor />
