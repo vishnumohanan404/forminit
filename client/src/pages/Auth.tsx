@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import FormError from "@/components/auth/FormError";
@@ -42,7 +40,6 @@ const Auth = () => {
   const [searchParams, setSearchParams] = useSearchParams(); // Initialize searchParams
   const isLogin = searchParams.get("mode") !== "signup";
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
   useEffect(() => {
