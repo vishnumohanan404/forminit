@@ -22,6 +22,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import GoogleLogo from "@/components/svg/GoogleLogo";
 import Logo from "@/components/svg/Logo";
 import Title from "@/components/common/Title";
+import PasswordField from "@/components/auth/PasswordField";
 
 interface LoginFormFields {
   email: string;
@@ -55,7 +56,9 @@ const Auth = () => {
     setError,
     formState: { errors, isSubmitting },
     getValues,
+    reset,
   } = useForm<AuthFormFields>({ mode: "onBlur" });
+
   const onSubmitLogin: SubmitHandler<AuthFormFields> = async (data) => {
     try {
       const response = await login(data);
@@ -111,11 +114,13 @@ const Auth = () => {
   const toggleMode = () => {
     const newMode = isLogin ? "signup" : "login";
     setSearchParams({ mode: newMode }); // Update URL parameter
+    reset();
   };
 
-  return user ? (
-    <Navigate to="/dashboard" />
-  ) : (
+  if (user) {
+    return <Navigate to="/dashboard" />;
+  }
+  return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -180,82 +185,52 @@ const Auth = () => {
               />
               {errors.email && <FormError>{errors.email.message}</FormError>}
             </div>
-            <div className="space-y-1">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  {...register("password", {
-                    required: {
-                      value: true,
-                      message: "Please enter a password",
-                    },
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters long",
-                    },
-                    maxLength: {
-                      value: 30,
-                      message: "Password must be at most 30 characters long",
-                    },
-                  })}
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                />
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  )}
-                  <span className="sr-only">
-                    {showPassword ? "Hide password" : "Show password"}
-                  </span>
-                </Button>
-              </div>
-              {errors.password && (
-                <FormError>{errors.password.message}</FormError>
-              )}
-            </div>
+            <PasswordField
+              register={register}
+              errorMessage={errors.password?.message}
+              fieldType="password"
+              fieldTitle="Password"
+              validationOptions={{
+                required: {
+                  value: true,
+                  message: "Please enter a password",
+                },
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters long",
+                },
+                maxLength: {
+                  value: 30,
+                  message: "Password must be at most 30 characters long",
+                },
+              }}
+            />
             {!isLogin && (
-              <div className="space-y-1">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  {...register("confirmPassword", {
-                    required: {
-                      value: true,
-                      message: "Please confirm your password",
-                    },
-                    validate: (value) => {
-                      return (
-                        value === getValues().password ||
-                        "Passwords should match"
-                      );
-                    },
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters long",
-                    },
-                    maxLength: {
-                      value: 30,
-                      message: "Password must be at most 30 characters long",
-                    },
-                  })}
-                  id="confirm-password"
-                  type="text"
-                  placeholder="••••••••"
-                />
-                {errors.confirmPassword && (
-                  <FormError>{errors.confirmPassword.message}</FormError>
-                )}
-              </div>
+              <PasswordField
+                register={register}
+                errorMessage={errors.confirmPassword?.message}
+                fieldType="confirmPassword"
+                fieldTitle="Confirm Password"
+                validationOptions={{
+                  required: {
+                    value: true,
+                    message: "Please confirm your password",
+                  },
+                  validate: (value) => {
+                    return (
+                      value === getValues().password || "Passwords should match"
+                    );
+                  },
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters long",
+                  },
+                  maxLength: {
+                    value: 30,
+                    message: "Password must be at most 30 characters long",
+                  },
+                }}
+              />
             )}
             {errors.root && <FormError>{errors.root.message}</FormError>}
             <Button type="submit" className="w-full" disabled={isSubmitting}>
