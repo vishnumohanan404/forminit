@@ -1,9 +1,5 @@
 import PageTitle from "@/components/common/PageTitle";
-import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -18,7 +14,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, MessageSquarePlus, Upload, X } from "lucide-react";
+import { AlertCircle, MessageSquarePlus } from "lucide-react";
+import FeatureRequest from "@/layouts/support/FeatureRequest";
+import ReportBug from "@/layouts/support/ReportBug";
 interface FAQ {
   question: string;
   answer: string;
@@ -53,43 +51,6 @@ const faqs: FAQ[] = [
 ];
 
 const SupportPage = () => {
-  const [featureRequest, setFeatureRequest] = useState({
-    title: "",
-    description: "",
-  });
-  const [bugReport, setBugReport] = useState({
-    title: "",
-    description: "",
-    steps: "",
-  });
-  const [files, setFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFeatureRequest = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Here you would typically send the feature request to your backend
-    console.log("Feature request submitted:", featureRequest);
-    setFeatureRequest({ title: "", description: "" });
-  };
-
-  const handleBugReport = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Here you would typically send the bug report to your backend
-    console.log("Bug report submitted:", { ...bugReport, files });
-    setBugReport({ title: "", description: "", steps: "" });
-    setFiles([]);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index));
-  };
-
   return (
     <div className="px-5">
       <PageTitle>Support</PageTitle>
@@ -131,41 +92,7 @@ const SupportPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleFeatureRequest} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="feature-title">Feature Title</Label>
-                    <Input
-                      id="feature-title"
-                      value={featureRequest.title}
-                      onChange={(e) =>
-                        setFeatureRequest({
-                          ...featureRequest,
-                          title: e.target.value,
-                        })
-                      }
-                      placeholder="Enter a brief title for your feature request"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="feature-description">
-                      Feature Description
-                    </Label>
-                    <Textarea
-                      id="feature-description"
-                      value={featureRequest.description}
-                      onChange={(e) =>
-                        setFeatureRequest({
-                          ...featureRequest,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Describe the feature you'd like to see and how it would benefit you"
-                      required
-                    />
-                  </div>
-                  <Button type="submit">Submit Feature Request</Button>
-                </form>
+                <FeatureRequest />
               </CardContent>
             </Card>
           </TabsContent>
@@ -179,94 +106,7 @@ const SupportPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleBugReport} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="bug-title">Bug Title</Label>
-                    <Input
-                      id="bug-title"
-                      value={bugReport.title}
-                      onChange={(e) =>
-                        setBugReport({ ...bugReport, title: e.target.value })
-                      }
-                      placeholder="Enter a brief title for the bug"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bug-description">Bug Description</Label>
-                    <Textarea
-                      id="bug-description"
-                      value={bugReport.description}
-                      onChange={(e) =>
-                        setBugReport({
-                          ...bugReport,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Describe the bug in detail"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bug-steps">Steps to Reproduce</Label>
-                    <Textarea
-                      id="bug-steps"
-                      value={bugReport.steps}
-                      onChange={(e) =>
-                        setBugReport({ ...bugReport, steps: e.target.value })
-                      }
-                      placeholder="Provide step-by-step instructions to reproduce the bug"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="file-upload">
-                      Upload Images or Videos (optional)
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Select Files
-                      </Button>
-                      <Input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*,video/*"
-                        multiple
-                        className="hidden"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                      />
-                    </div>
-                    {files.length > 0 && (
-                      <div className="mt-2 space-y-2">
-                        {files.map((file, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between bg-muted p-2 rounded-md"
-                          >
-                            <span className="text-sm truncate">
-                              {file.name}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeFile(index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <Button type="submit">Submit Bug Report</Button>
-                </form>
+                <ReportBug />
               </CardContent>
             </Card>
           </TabsContent>
