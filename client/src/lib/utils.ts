@@ -21,3 +21,8 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+export function capitalizeFirstLetter(str: string) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
