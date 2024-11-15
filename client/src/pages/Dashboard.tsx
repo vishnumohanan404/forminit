@@ -1,5 +1,4 @@
 import PageTitle from "@/components/common/PageTitle";
-import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,13 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HomeStatsCard from "@/layouts/dashboard/HomeStatsCard";
 import HomeWorkspaceCard from "@/layouts/dashboard/HomeWorkspaceCard";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, LinkIcon, Plus, Settings } from "lucide-react";
+import { FileText, LinkIcon, Settings } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -57,77 +56,10 @@ const DashboardPage = () => {
               showSkeleton={!isError && isLoading}
               workspaceCount={dashboard?.workspaces?.length}
             />
-            <Card>
-              {isLoading ? (
-                <>
-                  <CardHeader>
-                    <CardTitle>
-                      <Skeleton className="h-6 w-[150px]" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid gap-2">
-                    <Skeleton className="h-8 w-[250px] rounded-xl" />
-                  </CardContent>
-                </>
-              ) : (
-                <>
-                  <CardHeader className="pb-3">
-                    <CardTitle>Stats</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-2xl font-bold">
-                          {dashboard?.workspaces?.reduce(
-                            (sum: number, workspace: WorkspaceType) =>
-                              sum + workspace.forms.length,
-                            0
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">Forms</p>
-                      </div>
-                      <div className="text-muted-foreground">
-                        <p className="text-2xl font-bold">
-                          {dashboard?.workspaces?.reduce(
-                            (sum: number, workspace: WorkspaceType) => {
-                              return (
-                                sum +
-                                workspace.forms.filter(
-                                  (form) => form.published === true
-                                ).length
-                              );
-                            },
-                            0
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Published
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold">
-                          {dashboard?.workspaces?.reduce(
-                            (sum: string, workspace: WorkspaceType) => {
-                              return (
-                                sum +
-                                workspace.forms.reduce(
-                                  (formSum, form) => formSum + form.submissions,
-                                  0
-                                )
-                              );
-                            },
-                            0
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Submissions
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </>
-              )}
-            </Card>
+            <HomeStatsCard
+              isLoading={isLoading}
+              workspaces={dashboard?.workspaces}
+            />
           </div>
         )}
         <Tabs defaultValue="all" className="mt-12">
