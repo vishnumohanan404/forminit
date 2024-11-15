@@ -9,17 +9,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HomeFormsListItem from "@/layouts/dashboard/HomeFormsListItem";
 import HomeStatsCard from "@/layouts/dashboard/HomeStatsCard";
 import HomeWorkspaceCard from "@/layouts/dashboard/HomeWorkspaceCard";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, LinkIcon, Settings } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
-  const navigate = useNavigate();
   const {
     data: dashboard,
     isLoading,
@@ -45,7 +44,6 @@ const DashboardPage = () => {
         .filter((form) => !form.published)
         .map((form) => ({ ...form, workspaceId: workspace._id })) // Only include forms that are not published
   );
-  const [hover, setHover] = useState("");
   return (
     <div className="px-5">
       <PageTitle>Home</PageTitle>
@@ -75,73 +73,9 @@ const DashboardPage = () => {
           <TabsContent value="all" className="mt-4">
             <div className="grid gap-4">
               {!isError && allForms?.length > 0 ? (
-                allForms.map((form) => (
-                  <Card
-                    key={form._id}
-                    className="cursor-pointer shadow-none"
-                    onClick={() => {
-                      navigate(
-                        `/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`
-                      );
-                    }}
-                    onMouseOver={() => setHover(form._id)}
-                    onMouseOut={() => setHover("")}
-                  >
-                    <CardHeader className="">
-                      <CardTitle
-                        className={
-                          hover === form._id
-                            ? "underline underline-offset-4"
-                            : ""
-                        }
-                      >
-                        {form.name}
-                      </CardTitle>
-                      <div className="flex justify-between w-full pt-2 items-center">
-                        <div>
-                          {/* <div className="text-sm text-muted-foreground">
-                            Status:{" "}
-                            <span className="capitalize">
-                              {form.published ? "published" : "drafted"}
-                            </span>
-                          </div> */}
-                          <p className="text-sm text-muted-foreground">
-                            Submissions: {form.submissions}
-                          </p>
-                        </div>
-                        <div className="flex gap-3">
-                          <Link
-                            to={`/view-form/${form.form_id}`}
-                            target="_blank"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Button variant="outline">
-                              <FileText className="mr-2 h-4 w-4" />
-                              View
-                            </Button>
-                          </Link>
-                          <div className="flex align-middle gap-5">
-                            {form.published && (
-                              <Button variant={"ghost"}>
-                                <LinkIcon />
-                              </Button>
-                            )}
-                            <Link
-                              to={`/form/${form.form_id}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Button variant="outline">
-                                <Settings className="mr-2 h-4 w-4" /> Edit
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))
+                allForms.map((form) => <HomeFormsListItem form={form} />)
               ) : (
-                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
+                <p className="text-2xl mx-auto w-fit my-16 font-semibold text-muted-foreground">
                   No published forms available
                 </p>
               )}
