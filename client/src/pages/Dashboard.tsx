@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HomeWorkspaceCard from "@/layouts/dashboard/HomeWorkspaceCard";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
@@ -52,35 +53,10 @@ const DashboardPage = () => {
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container ">
         {!isError && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              {!isError && isLoading ? (
-                <>
-                  <CardHeader>
-                    <CardTitle>
-                      <Skeleton className="h-6 w-[150px]" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid gap-2">
-                    <Skeleton className="h-8 w-[250px] rounded-xl" />
-                  </CardContent>
-                </>
-              ) : (
-                <>
-                  <CardHeader>
-                    <CardTitle>
-                      Workspaces &nbsp;&nbsp;{dashboard?.workspaces?.length}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid gap-4">
-                    <CreateWorkspaceDialog>
-                      <Button className="w-full">
-                        <Plus className="mr-2 h-4 w-4" /> Create New Workspace
-                      </Button>
-                    </CreateWorkspaceDialog>
-                  </CardContent>
-                </>
-              )}
-            </Card>
+            <HomeWorkspaceCard
+              showSkeleton={!isError && isLoading}
+              workspaceCount={dashboard?.workspaces?.length}
+            />
             <Card>
               {isLoading ? (
                 <>
