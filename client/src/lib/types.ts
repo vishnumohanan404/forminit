@@ -40,3 +40,16 @@ export type DashboardDataTypes = {
   workspaces: WorkspaceType[];
   __v: number;
 };
+
+export type Block = {
+  type: string;
+  data: any;
+  _id: string;
+};
+
+export type FormView = {
+  _id: string;
+  title: string;
+  blocks: Block[];
+  disabled: boolean;
+};
