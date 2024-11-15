@@ -23,6 +23,7 @@ import GoogleLogo from "@/components/svg/GoogleLogo";
 import Logo from "@/components/svg/Logo";
 import Title from "@/components/common/Title";
 import PasswordField from "@/components/auth/PasswordField";
+import InputField from "@/components/auth/InputField";
 
 interface LoginFormFields {
   email: string;
@@ -146,45 +147,39 @@ const Auth = () => {
             className="space-y-4"
           >
             {!isLogin && (
-              <div className="space-y-1">
-                <Label htmlFor="fullname">Full Name</Label>
-                <Input
-                  id="fullname"
-                  placeholder="John Doe"
-                  {...register("fullName", {
-                    required: {
-                      value: true,
-                      message: "Please enter your full name",
-                    },
-                    maxLength: 20,
-                    minLength: 3,
-                  })}
-                />
-                {errors.fullName && (
-                  <FormError>{errors.fullName.message}</FormError>
-                )}
-              </div>
-            )}
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                {...register("email", {
+              <InputField
+                register={register}
+                errorMessage={errors.fullName?.message}
+                fieldTitle="Full name"
+                fieldType="fullName"
+                validationOptions={{
                   required: {
                     value: true,
-                    message: "Please enter a valid email address",
+                    message: "Please enter your full name",
                   },
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message:
-                      "Email must be in the format 'example@example.com'",
-                  },
-                })}
-                id="email"
-                type="text"
-                placeholder="me@example.com"
+                  maxLength: 20,
+                  minLength: 3,
+                }}
+                placeholder="e.g: John Doe"
               />
-              {errors.email && <FormError>{errors.email.message}</FormError>}
-            </div>
+            )}
+            <InputField
+              register={register}
+              errorMessage={errors.email?.message}
+              fieldTitle="Email"
+              fieldType="email"
+              validationOptions={{
+                required: {
+                  value: true,
+                  message: "Please enter a valid email address",
+                },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Email must be in the format 'example@example.com'",
+                },
+              }}
+              placeholder="me@example.com"
+            />
             <PasswordField
               register={register}
               errorMessage={errors.password?.message}
