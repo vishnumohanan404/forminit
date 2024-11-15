@@ -11,7 +11,6 @@ const HomeFormsListItem = ({ form }: { form: FormType }) => {
 
   return (
     <Card
-      key={form._id}
       className="cursor-pointer shadow-none"
       onClick={() => {
         navigate(

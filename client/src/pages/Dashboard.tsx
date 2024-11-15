@@ -73,7 +73,9 @@ const DashboardPage = () => {
           <TabsContent value="all" className="mt-4">
             <div className="grid gap-4">
               {!isError && allForms?.length > 0 ? (
-                allForms.map((form) => <HomeFormsListItem form={form} />)
+                allForms.map((form) => (
+                  <HomeFormsListItem form={form} key={form._id} />
+                ))
               ) : (
                 <p className="text-2xl mx-auto w-fit my-16 font-semibold text-muted-foreground">
                   No published forms available
@@ -82,7 +84,7 @@ const DashboardPage = () => {
             </div>
           </TabsContent>
           <TabsContent value="published" className="mt-4">
-            <div className="grid gap-4">
+            {/* <div className="grid gap-4">
               {!isError && publishedForms?.length > 0 ? (
                 publishedForms.map((form) => (
                   <Card key={form._id}>
@@ -119,10 +121,10 @@ const DashboardPage = () => {
                   No published forms available
                 </p>
               )}
-            </div>
+            </div> */}
           </TabsContent>
           <TabsContent value="drafts" className="mt-4">
-            <div className="grid gap-4">
+            {/* <div className="grid gap-4">
               {!isError && draftedForms?.length > 0 ? (
                 draftedForms.map((form) => (
                   <Card key={form._id}>
@@ -159,7 +161,7 @@ const DashboardPage = () => {
                   No published forms available
                 </p>
               )}
-            </div>
+            </div> */}
           </TabsContent>
         </Tabs>
       </main>
