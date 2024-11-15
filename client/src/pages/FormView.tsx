@@ -73,7 +73,6 @@ const FormViewPage = () => {
     mutationFn: (submitFormData: SubmitFormData) => submitForm(submitFormData),
     onSuccess: () => {
       navigate("/success", { replace: true });
-
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
