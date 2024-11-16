@@ -110,7 +110,7 @@ const FormPage = () => {
     }
   };
   return (
-    <div className="overflow-y-auto px-5">
+    <div className="px-5">
       <PageTitle>
         <div className="flex justify-between items-center">
           <input
