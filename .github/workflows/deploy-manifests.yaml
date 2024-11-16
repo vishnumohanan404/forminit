@@ -31,13 +31,13 @@ jobs:
 
       - name: Create Kubernetes Secret Frontend
         run: |
-          kubectl create secret generic forminit \
+          kubectl create secret generic forminit --namespace=forminit \
             --from-literal=VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
             --from-literal=VITE_BACKEND_URL=http://backend-service:3000 \
             --dry-run=client -o yaml | kubectl apply -f -
       - name: Create Kubernetes Secret Backend
         run: |
-          kubectl create secret generic forminit-backend \
+          kubectl create secret generic forminit-backend --namespace=forminit \
             --from-literal=MONGO_URI=mongodb://mongodb-service:27017/forminit \
             --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
             --from-literal=GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
