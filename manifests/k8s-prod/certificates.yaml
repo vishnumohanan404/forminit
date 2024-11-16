@@ -13,7 +13,6 @@ spec:
       - http01:
           ingress:
             class: traefik
-            
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
