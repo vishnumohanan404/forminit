@@ -41,4 +41,4 @@ jobs:
         run: civo kubernetes config ${{secrets.CIVO_CLUSTER_NAME}} --save --local-path ~/.kube/config -y
 
       - name: Rollout updated manifest
-        run: kubectl rollout restart deployment frontend
+        run: kubectl rollout restart deployment frontend --namespace=forminit
