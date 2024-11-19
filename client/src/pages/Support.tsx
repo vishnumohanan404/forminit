@@ -127,7 +127,7 @@ const SupportPage = () => {
               </Button>
               <Button className="flex items-center" variant="outline">
                 <AlertCircle className="mr-2 h-4 w-4" />
-                support@formcraft.com
+                support@forminit.com
               </Button>
             </div>
           </CardContent>

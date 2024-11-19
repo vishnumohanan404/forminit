@@ -7,6 +7,7 @@ import { Separator } from "../ui/separator";
 import DashboardBreadcrumb from "../dashboard/DashboardBreadcrumb";
 import AnimatedGradientText from "../ui/animated-gradient-text";
 import { cn } from "@/lib/utils";
+import { DarkModeToggle } from "../common/DarkModeToggle";
 
 type ProtectedRouteProps = PropsWithChildren;
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -31,17 +32,20 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
               {location.pathname.split("/")[1]}
             </DashboardBreadcrumb>
           </div>
-          <AnimatedGradientText className="!bg-none !border-none">
-            <Link
-              to="https://github.com/vishnumohanan404/forminit"
-              target="_blank"
-              className={cn(
-                `text-sm font-medium pr-3 inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`
-              )}
-            >
-              We're on beta
-            </Link>
-          </AnimatedGradientText>
+          <div className="flex gap-2 items-center mr-2 py-2">
+            <AnimatedGradientText className="!bg-none !border-none">
+              <Link
+                to="https://github.com/vishnumohanan404/forminit"
+                target="_blank"
+                className={cn(
+                  `text-sm font-medium pr-3 inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent px-2`
+                )}
+              >
+                We're on beta
+              </Link>
+            </AnimatedGradientText>
+            <DarkModeToggle />
+          </div>
         </div>
         <Separator />
         {children}
