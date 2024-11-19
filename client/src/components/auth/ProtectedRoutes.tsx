@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useLayoutEffect } from "react";
+import { PropsWithChildren, useLayoutEffect } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthProvider";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
