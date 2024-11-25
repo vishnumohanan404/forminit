@@ -27,6 +27,16 @@ For installation and usage of each application use the readme files in respectiv
 3. Dashboard for managing form entries and data collection/ analytics
 4. Shareable link for your form
 
+## Stack and Tools
+- React
+- Express
+- Typescript
+- Kubernetes
+- Terraform
+- Github Actions
+- Civo Cloud
+- Prometheus & Grafana
+
 ## Contributing
 
 This project is open for learning purposes.
@@ -35,11 +45,7 @@ This project is open for learning purposes.
 2. Create your feature branch: git checkout -b feature/my-feature
 3. Commit your changes: git commit -m 'Add new feature'
 4. Push to the branch: git push origin feature/my-feature
-5. Open a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+5. Open a pull request to main
 
 ## Contact
 
