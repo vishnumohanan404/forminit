@@ -2,7 +2,7 @@
 
 A modern notion-like form builder.
 
-![Project Logo](https://forminit.vishnuverse.xyz/thumbnail.png)
+![Project Logo](https://github.com/vishnumohanan404/forminit/blob/main/client/public/thumbnail.png)
 
 ## Table of Contents
 
