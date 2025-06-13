@@ -17,36 +17,34 @@ import { Link } from "react-router-dom";
 const AppSidebarFooter = () => {
   const { setUser, user } = useAuth();
   return (
-    <SidebarFooter>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton>
-                <User2 /> {user && user.fullName}
-                <ChevronUpIcon className="ml-auto" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              side="top"
-              className="w-[--radix-popper-anchor-width]"
-            >
-              <Link to="/settings">
-                <DropdownMenuItem className="cursor-pointer">
-                  <span>Account</span>
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => setUser(null)}
-              >
-                <span>Sign out</span>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton>
+              <User2 /> {user && user.fullName}
+              <ChevronUpIcon className="ml-auto" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="top"
+            className="w-[--radix-popper-anchor-width]"
+          >
+            <Link to="/settings">
+              <DropdownMenuItem className="cursor-pointer">
+                <span>Account</span>
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarFooter>
+            </Link>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => setUser(null)}
+            >
+              <span>Sign out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 };
 

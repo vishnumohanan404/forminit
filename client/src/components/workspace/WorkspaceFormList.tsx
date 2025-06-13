@@ -33,7 +33,7 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
   };
   return (
     <AnimatePresence>
-      <div>
+      <div className="flex flex-col gap-4">
         {item.forms?.map((form) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -41,7 +41,7 @@ const WorkspaceFormList = ({ item }: { item: ComponentProps }) => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
             key={form.form_id}
-            className="flex justify-between items-center px-3 py-2 rounded-md hover:bg-slate-200 hover:cursor-pointer"
+            className="flex justify-between items-center px-3 py-2 rounded-md border hover:border-gray-600 hover:cursor-pointer"
             onClick={() => {
               handleOnClick(form);
             }}

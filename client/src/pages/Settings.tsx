@@ -42,10 +42,10 @@ const SettingsPage = () => {
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="notifications" disabled={true}>
+            {/* <TabsTrigger value="notifications" disabled={true}>
               Notifications
-            </TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            </TabsTrigger> */}
+            {/* <TabsTrigger value="appearance">Appearance</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="profile">

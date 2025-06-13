@@ -91,5 +91,5 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar")],
+  plugins: [import("tailwindcss-animate"), import("tailwind-scrollbar")],
 };

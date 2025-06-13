@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
 import User from "../models/user"; // Mongoose model for User
-import { ConflictError, UnauthorizedError } from "../errors/user";
-import jwt from "jsonwebtoken";
+import {
+  ConflictError,
+  UnauthorizedError,
+  UserNotFoundError,
+} from "../errors/user";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { NotFoundError } from "../errors/common";
 import Dashboard from "../models/dashboard";
 import mongoose from "mongoose";
@@ -13,7 +17,7 @@ interface UserInput {
   password: string;
 }
 
-const tokenExpiry = { expiresIn: "1h" };
+const tokenExpiry: SignOptions = { expiresIn: "1h" };
 
 // Service function for registering a new user
 export const registerNewUser = async ({
@@ -68,7 +72,7 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   // Check if the user exists by email
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    throw new NotFoundError("NOT_FOUND_ERROR");
+    throw new UserNotFoundError("USER_NOT_FOUND");
   }
   if (!user.password) {
     throw new UnauthorizedError("USER_NOT_AUTHORIZED"); // If password is not set (Google login)
@@ -103,7 +107,8 @@ export const registerGoogleUser = async (code: string) => {
     idToken: tokens.id_token,
     audience: process.env.GOOGLE_CLIENT_ID,
   });
-  const { email, name, sub } = googleUser.getPayload() || {};
+  console.log("googleUser.getPayload() :>> ", googleUser.getPayload());
+  const { email, name, sub, picture } = googleUser.getPayload() || {};
   if (!email) {
     throw new UnauthorizedError("USER_NOT_AUTHORIZED");
   }
@@ -122,6 +127,7 @@ export const registerGoogleUser = async (code: string) => {
       email,
       password: null,
       googleId: sub,
+      avatar: picture || "",
     });
     const user = await newUser.save();
     const newDashboard = new Dashboard({

@@ -26,6 +26,7 @@ export type FormType = {
   _id: string;
   published?: boolean;
   workspaceId?: string;
+  disabled: boolean
 };
 
 export type WorkspaceType = {

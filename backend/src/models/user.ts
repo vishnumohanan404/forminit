@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       required: false,
       select: false,
     },
+    avatar: {
+      type: String,
+      required: false,
+    },
     googleId: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }

@@ -61,10 +61,8 @@ const Auth = () => {
     try {
       const response = await login(data);
       setUser(response.user);
-      console.log("navigate   :>> ");
       navigate("/dashboard");
     } catch (error) {
-      console.log("navigate error :>> ");
       if (error instanceof Error) {
         setError("root", { message: error.message });
       }

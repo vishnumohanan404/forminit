@@ -96,12 +96,6 @@ export const fetchSubmissions = async (req: Request, res: Response) => {
 
   try {
     const submissions = await getSubmissionsByFormId(formId);
-
-    if (!submissions || submissions.length === 0) {
-      res.status(404).json({ message: "No submissions found for this form." });
-      return;
-    }
-
     res.status(200).json(submissions); // Return the submissions as JSON
   } catch (error) {
     errorResponse(error, res);

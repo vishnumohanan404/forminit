@@ -11,7 +11,7 @@ const HomeFormsListItem = ({ form }: { form: FormType }) => {
 
   return (
     <Card
-      className="cursor-pointer shadow-none"
+      className="cursor-pointer shadow-none hover:border-gray-600"
       onClick={() => {
         navigate(
           `/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`
@@ -21,9 +21,7 @@ const HomeFormsListItem = ({ form }: { form: FormType }) => {
       onMouseOut={() => setHover(false)}
     >
       <CardHeader className="">
-        <CardTitle className={hover ? "underline underline-offset-4" : ""}>
-          {form.name}
-        </CardTitle>
+        <CardTitle>{form.name}</CardTitle>
         <div className="flex justify-between w-full pt-2 items-center">
           <div>
             <p className="text-sm text-muted-foreground">
@@ -36,8 +34,8 @@ const HomeFormsListItem = ({ form }: { form: FormType }) => {
               target="_blank"
               onClick={(e) => e.stopPropagation()}
             >
-              <Button variant="outline">
-                <FileText className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm">
+                <FileText className="h-4 w-4" />
                 View
               </Button>
             </Link>
@@ -51,8 +49,8 @@ const HomeFormsListItem = ({ form }: { form: FormType }) => {
                 to={`/form/${form.form_id}`}
                 onClick={(e) => e.stopPropagation()}
               >
-                <Button variant="outline">
-                  <Settings className="mr-2 h-4 w-4" /> Edit
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4" /> Edit
                 </Button>
               </Link>
             </div>

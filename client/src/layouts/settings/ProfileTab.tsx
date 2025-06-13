@@ -77,7 +77,7 @@ const ProfileTab = ({
             <AvatarFallback>{profile?.fullName?.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
-        {isLoading ? (
+        {/* {isLoading ? (
           <Skeleton className="h-[36px] w-[133px]" />
         ) : (
           <>
@@ -96,7 +96,7 @@ const ProfileTab = ({
               Change Avatar
             </Button>
           </>
-        )}
+        )} */}
       </div>
       <div className="space-y-2">
         {isLoading ? (

@@ -78,7 +78,9 @@ const FormSummaryPage = () => {
                 <Skeleton className="w-full h-6" />
                 <Skeleton className="w-full h-6" />
               </div>
-            ) : isSubmissionsError || isFormViewError ? (
+            ) : isSubmissionsError ||
+              isFormViewError ||
+              (submissions && submissions.length < 1) ? (
               <div className="text-center py-10">
                 <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                   No data available
