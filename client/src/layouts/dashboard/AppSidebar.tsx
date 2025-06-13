@@ -20,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchDashboard } from "@/services/dashboard";
@@ -43,6 +43,8 @@ import { deleteWorkspace } from "@/services/workspace";
 import { toast } from "sonner";
 
 export function AppSidebar() {
+  const location = useLocation();
+  const currentWorkspaceId = location.pathname.split("/")[2];
   const navigate = useNavigate();
   const { data: dashboard, isError } = useQuery({
     queryKey: ["dashboard"],
@@ -124,8 +126,11 @@ export function AppSidebar() {
                                         }}
                                       >
                                         <div
-                                          className="flex truncate justify-between items-center w-full"
-                                          // onClick={(e) => e.stopPropagation()}
+                                          className={`flex truncate justify-between items-center w-full px-2 py-1 rounded-md ${
+                                            currentWorkspaceId === workspace._id
+                                              ? "bg-muted text-primary font-medium"
+                                              : ""
+                                          }`}
                                         >
                                           <Link
                                             to={`/workspaces/${workspace._id}?name=${workspace.name}`}
@@ -191,7 +196,14 @@ export function AppSidebar() {
                       </Collapsible>
                     ) : (
                       <SidebarMenuButton asChild>
-                        <Link to={item.url}>
+                        <Link
+                          to={item.url}
+                          className={`flex items-center gap-2 w-full px-2 py-1 rounded-md ${
+                            location.pathname === item.url
+                              ? "bg-muted text-primary font-medium"
+                              : ""
+                          }`}
+                        >
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>
@@ -209,7 +221,14 @@ export function AppSidebar() {
               {productItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link to={item.url}>
+                    <Link
+                      to={item.url}
+                      className={`flex items-center gap-2 w-full px-2 py-1 rounded-md ${
+                        location.pathname === item.url
+                          ? "bg-muted text-primary font-medium"
+                          : ""
+                      }`}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
