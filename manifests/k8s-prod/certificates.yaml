@@ -1,0 +1,28 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: forminit-letsencrypt
+  namespace: forminit
+spec:
+  acme:
+    email: vishnumohan1996nov@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-production
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: forminit-certificate
+  namespace: forminit
+spec:
+  secretName: forminit-tls
+  issuerRef:
+    name: forminit-letsencrypt
+  commonName: forminit.vishnuverse.xyz
+  dnsNames:
+    - forminit.vishnuverse.xyz

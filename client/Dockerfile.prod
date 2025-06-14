@@ -1,0 +1,36 @@
+# Use an official Node.js base image for building the app
+FROM node:18 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_BACKEND_URL
+# Copy package.json and package-lock.json files
+COPY package*.json ./
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+# Install production dependencies (without devDependencies)
+RUN npm install
+
+# Copy the rest of the app's source code
+COPY . .
+
+# Build the app for production
+RUN npm run build
+
+# Use a smaller base image for serving the production build
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/dist /app/dist
+
+# Expose the port that Nginx will run on
+EXPOSE 80
+
+COPY package.json .
+COPY vite.config.ts .
+
+RUN npm i typescript
+# Start Nginx to serve the app
+CMD ["npm", "run", "preview"]

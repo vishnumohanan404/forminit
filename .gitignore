@@ -1,0 +1,31 @@
+# Node & Dependencies
+node_modules/
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*           # Allow override by local setups
+
+# Build Artifacts
+dist/
+build/
+coverage/
+
+# OS-Specific
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# TypeScript
+*.tsbuildinfo
+
+# Commit Hooks / Husky
+.husky/_/
