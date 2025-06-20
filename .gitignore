@@ -29,3 +29,7 @@ Thumbs.db
 
 # Commit Hooks / Husky
 .husky/_/
+
+
+.gitlab-ci-local
+.gitlab-ci-local/*

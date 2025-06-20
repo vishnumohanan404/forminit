@@ -63,34 +63,40 @@ const SettingsTab = ({ disabled }: { disabled: boolean }) => {
         <div>
           <h2 className="text-lg font-semibold mb-2">Delete Form</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            By deleting form you will lose all data related to this form
-            including submissions
+            By deleting form you will lose all data related to this form including submissions
           </p>
           <Dialog
-            onOpenChange={(isOpen) => {
+            onOpenChange={isOpen => {
               setIsOpen(isOpen);
             }}
             open={isOpen}
           >
             <DialogTrigger asChild>
-              <Button variant="destructive" className="text-sm">
-                <TrashIcon className="h-4 w-4 mr-2" />
+              <Button
+                variant="destructive"
+                className="text-sm"
+              >
+                <TrashIcon className="h-4 w-4" />
                 Delete
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
               <DialogHeader>
                 <DialogTitle>Are you sure?</DialogTitle>
-                <DialogDescription>
-                  Confirm to delete the form
-                </DialogDescription>
+                <DialogDescription>Confirm to delete the form</DialogDescription>
               </DialogHeader>
               <DialogFooter className="gap-3">
-                <Button type="submit" onClick={() => handleDelete()}>
+                <Button
+                  type="submit"
+                  onClick={() => handleDelete()}
+                >
                   Confirm
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                  >
                     Close
                   </Button>
                 </DialogClose>

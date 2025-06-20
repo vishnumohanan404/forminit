@@ -1,9 +1,10 @@
 import { ErrorBase } from "./base";
+import { FieldValidationError } from "express-validator";
 
 type ErrorName = "REQUEST_VALIDATION_ERROR" | "NOT_FOUND_ERROR";
 
 export class RequestValidationError extends ErrorBase<ErrorName> {
-  constructor(name: ErrorName, cause: any) {
+  constructor(name: ErrorName, cause: FieldValidationError[] | unknown) {
     super({
       name,
       message: "Invalid Request",

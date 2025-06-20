@@ -1,38 +1,6 @@
-import mongoose from "mongoose";
 import request from "supertest";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import User from "../models/user"; // Im// Import Dashboard model
-import Dashboard from "../models/dashboard";
+import User from "../models/user";
 import { app } from "../app";
-
-let mongoServer: MongoMemoryServer;
-jest.mock("jsonwebtoken", () => ({
-  sign: jest.fn(() => "mocked-jwt-token"),
-}));
-beforeAll(async () => {
-  // Start in-memory MongoDB server
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  // Set the in-memory MongoDB URI for your application
-  process.env.MONGO_URI = uri;
-
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(uri);
-  }
-});
-
-afterAll(async () => {
-  // Stop the in-memory MongoDB server
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
-
-beforeEach(async () => {
-  // Clear collections before each test
-  await User.deleteMany({});
-  await Dashboard.deleteMany({});
-});
 
 describe("POST /api/auth/signup", () => {
   it("should register a new user and return JWT token in cookies", async () => {

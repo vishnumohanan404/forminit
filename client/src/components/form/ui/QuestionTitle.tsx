@@ -38,6 +38,8 @@ const QuestionTitle: React.FC<EditableDivProps> = ({
   return (
     <div className="relative">
       <div
+        role="textbox"
+        tabIndex={0}
         ref={divRef}
         contentEditable
         className={`cdx-input shadow-none editable-div border-none focus:outline-none font-semibold py-2 px-0 question-title-field`}

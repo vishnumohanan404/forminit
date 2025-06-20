@@ -24,13 +24,11 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
   });
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setFields((prev) => ({ ...prev, workspace_name: value }));
+    setFields(prev => ({ ...prev, workspace_name: value }));
   };
-  const handleTextAreaChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleTextAreaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
-    setFields((prev) => ({ ...prev, workspace_description: value }));
+    setFields(prev => ({ ...prev, workspace_description: value }));
   };
   const handleDialogClose = () => {
     // Reset the fields state when the dialog closes
@@ -61,7 +59,7 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
   };
   return (
     <Dialog
-      onOpenChange={(isOpen) => {
+      onOpenChange={isOpen => {
         !isOpen && handleDialogClose();
         setIsOpen(isOpen);
       }}
@@ -75,7 +73,10 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="sm:text-right">
+            <Label
+              htmlFor="name"
+              className="sm:text-right"
+            >
               Name
             </Label>
             <Input
@@ -88,7 +89,10 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="sm:text-right">
+            <Label
+              htmlFor="description"
+              className="sm:text-right"
+            >
               Description
             </Label>
             <Textarea
@@ -109,14 +113,13 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
             disabled={!fields.workspace_name.length || isPending}
             className="min-w-32"
           >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Save changes"
-            )}
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save changes"}
           </Button>
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button
+              type="button"
+              variant="secondary"
+            >
               Close
             </Button>
           </DialogClose>

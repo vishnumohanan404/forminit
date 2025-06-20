@@ -1,25 +1,7 @@
-import mongoose, { Document, HydratedDocument, ObjectId } from "mongoose";
 import Dashboard from "../models/dashboard";
-interface FormInterface {
-  submission: number; // Assuming each form contains some data
-  created: Date;
-  modified: Date;
-  url: string;
-}
-interface WorkspaceInterface {
-  name: string;
-  forms: FormInterface[]; // Array of Form objects, can be empty
-}
-export interface DashboardInterface extends Document {
-  user_id: mongoose.Types.ObjectId;
-  workspaces: WorkspaceInterface[];
-  _id: ObjectId;
-  __v: number;
-}
+import { DashboardInterface } from "../types/dashboard";
 
-export const findDashboard = async (
-  userId: string
-): Promise<DashboardInterface | null> => {
+export const findDashboard = async (userId: string): Promise<DashboardInterface | null> => {
   const dashboard: DashboardInterface | null = await Dashboard.findOne({
     user_id: userId,
   });
@@ -28,7 +10,7 @@ export const findDashboard = async (
 
 export const addWorkspace = async (
   userId: string,
-  name: string
+  name: string,
 ): Promise<DashboardInterface | null> => {
   const dashboard: DashboardInterface | null = await Dashboard.findOne({
     user_id: userId,

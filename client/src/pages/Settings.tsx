@@ -1,13 +1,7 @@
 import PageTitle from "@/components/common/PageTitle";
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserDetails } from "@/services/settings";
 import { UserProfile } from "@/lib/types";
@@ -38,7 +32,10 @@ const SettingsPage = () => {
     <div className="px-5">
       <PageTitle>Settings</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
-        <Tabs defaultValue="profile" className="space-y-4">
+        <Tabs
+          defaultValue="profile"
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
@@ -52,9 +49,7 @@ const SettingsPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your profile details here
-                </CardDescription>
+                <CardDescription>Update your profile details here</CardDescription>
               </CardHeader>
               <CardContent>
                 <ProfileTab
@@ -70,9 +65,7 @@ const SettingsPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Account Settings</CardTitle>
-                <CardDescription>
-                  Manage your account preferences
-                </CardDescription>
+                <CardDescription>Manage your account preferences</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <AccountTab user={user} />
@@ -84,9 +77,7 @@ const SettingsPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>
-                  Manage how you receive notifications
-                </CardDescription>
+                <CardDescription>Manage how you receive notifications</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <NotificationTab />
@@ -98,9 +89,7 @@ const SettingsPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Appearance Settings</CardTitle>
-                <CardDescription>
-                  Customize the look and feel of the application
-                </CardDescription>
+                <CardDescription>Customize the look and feel of the application</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <AppearanceTab />

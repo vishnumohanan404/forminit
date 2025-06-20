@@ -8,12 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FormView } from "@/lib/types";
+import { BlockData, OptionsBlockData } from "@shared/types";
 
-interface BlockData {
-  type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
-  data: any; // Data specific to the block type
-}
-interface SubmissionData {
+export interface SubmissionData {
   _id: string;
   title: string;
   formId: string;
@@ -34,25 +31,21 @@ const SubmissionsTable = ({
       <TableHeader>
         <TableRow>
           <TableHead>Submitted at</TableHead>
-          {formView?.blocks?.map(
-            (block: { _id: string; type: string; data: { title: string } }) => {
-              return <TableHead key={block._id}>{block.data?.title}</TableHead>;
-            }
-          )}
+          {formView?.blocks?.map((block: BlockData) => {
+            return <TableHead key={block._id}>{block.data?.title}</TableHead>;
+          })}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {submissions?.map((submission: any) => (
+        {submissions?.map((submission: SubmissionData) => (
           <TableRow key={submission._id}>
-            <TableCell>
-              {new Date(submission.createdAt).toLocaleString()}
-            </TableCell>
-            {submission.blocks.map((block: any) => (
+            <TableCell>{new Date(submission.createdAt).toLocaleString()}</TableCell>
+            {submission.blocks.map((block: BlockData) => (
               <TableCell key={block._id}>
                 {block.type === "multipleChoiceTool"
-                  ? block.data.options.find(
-                      (option: any) =>
-                        option.optionMarker === block.data.selectedOption
+                  ? block?.data?.options?.find(
+                      (option: OptionsBlockData) =>
+                        option.optionMarker === block.data.selectedOption,
                     )?.optionValue || "N/A"
                   : block.data.value || "N/A"}
               </TableCell>

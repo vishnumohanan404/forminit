@@ -12,17 +12,19 @@ const FeatureRequest = () => {
   const handleFeatureRequest = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Here you would typically send the feature request to your backend
-    console.log("Feature request submitted:", featureRequest);
     setFeatureRequest({ title: "", description: "" });
   };
   return (
-    <form onSubmit={handleFeatureRequest} className="space-y-4">
+    <form
+      onSubmit={handleFeatureRequest}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label htmlFor="feature-title">Feature Title</Label>
         <Input
           id="feature-title"
           value={featureRequest.title}
-          onChange={(e) =>
+          onChange={e =>
             setFeatureRequest({
               ...featureRequest,
               title: e.target.value,
@@ -37,7 +39,7 @@ const FeatureRequest = () => {
         <Textarea
           id="feature-description"
           value={featureRequest.description}
-          onChange={(e) =>
+          onChange={e =>
             setFeatureRequest({
               ...featureRequest,
               description: e.target.value,

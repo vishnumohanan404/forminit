@@ -1,26 +1,28 @@
-FROM node:18 AS build
+FROM node:24-alpine3.21 AS build
 
 WORKDIR /app
 
 COPY package*.json ./
+COPY backend/package*.json ./backend/
+COPY packages/types/package*.json ./packages/types/
+COPY packages/types ./packages/types
 
-RUN npm install
+RUN npm install --workspace=backend 
 
-RUN npm install --only=dev
+COPY ./backend ./backend
 
-COPY . .
+RUN npm run build --workspace=backend 
 
-RUN npm run build
-
-FROM node:18-slim
+FROM node:24-alpine3.21
 
 WORKDIR /app
 
-COPY --from=build /app/dist /app/dist
+COPY --from=build /app/backend/dist /app/backend/dist
+COPY --from=build /app/backend/package*.json /app/backend/
 COPY --from=build /app/package*.json /app/
 
 RUN npm install --only=production
 
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "./backend/dist/index.js"]

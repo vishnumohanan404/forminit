@@ -16,7 +16,6 @@ const ReportBug = () => {
   const handleBugReport = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Here you would typically send the bug report to your backend
-    console.log("Bug report submitted:", { ...bugReport, files });
     setBugReport({ title: "", description: "", steps: "" });
     setFiles([]);
   };
@@ -31,15 +30,16 @@ const ReportBug = () => {
     setFiles(files.filter((_, i) => i !== index));
   };
   return (
-    <form onSubmit={handleBugReport} className="space-y-4">
+    <form
+      onSubmit={handleBugReport}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label htmlFor="bug-title">Bug Title</Label>
         <Input
           id="bug-title"
           value={bugReport.title}
-          onChange={(e) =>
-            setBugReport({ ...bugReport, title: e.target.value })
-          }
+          onChange={e => setBugReport({ ...bugReport, title: e.target.value })}
           placeholder="Enter a brief title for the bug"
           required
         />
@@ -49,7 +49,7 @@ const ReportBug = () => {
         <Textarea
           id="bug-description"
           value={bugReport.description}
-          onChange={(e) =>
+          onChange={e =>
             setBugReport({
               ...bugReport,
               description: e.target.value,
@@ -64,9 +64,7 @@ const ReportBug = () => {
         <Textarea
           id="bug-steps"
           value={bugReport.steps}
-          onChange={(e) =>
-            setBugReport({ ...bugReport, steps: e.target.value })
-          }
+          onChange={e => setBugReport({ ...bugReport, steps: e.target.value })}
           placeholder="Provide step-by-step instructions to reproduce the bug"
           required
         />

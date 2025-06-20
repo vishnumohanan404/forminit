@@ -16,21 +16,15 @@ const NotificationTab = () => {
   });
 
   const handleNotificationUpdate = (key: keyof NotificationSettings) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
     // Here you would typically send the updated notification settings to your backend
-    console.log("Notifications updated:", {
-      ...notifications,
-      [key]: !notifications[key],
-    });
   };
   return (
     <>
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label htmlFor="email-notifications">Email Notifications</Label>
-          <p className="text-sm text-muted-foreground">
-            Receive notifications via email
-          </p>
+          <p className="text-sm text-muted-foreground">Receive notifications via email</p>
         </div>
         <Switch
           id="email-notifications"
@@ -61,9 +55,7 @@ const NotificationTab = () => {
         <Switch
           id="newsletter"
           checked={notifications.newsletterSubscription}
-          onCheckedChange={() =>
-            handleNotificationUpdate("newsletterSubscription")
-          }
+          onCheckedChange={() => handleNotificationUpdate("newsletterSubscription")}
         />
       </div>
     </>

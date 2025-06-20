@@ -1,6 +1,5 @@
 import { Request, Response } from "express-serve-static-core";
 import { errorResponse } from "../helpers";
-import { FormDataInterface } from "../types/form";
 import {
   findForm,
   getSubmissionsByFormId,
@@ -11,10 +10,11 @@ import {
   deleteFormById,
   toggleFormDisabled,
 } from "../services/form";
+import { FormDataInterface } from "@shared/types";
 
 export const fetchForm = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { user } = req;
+    const user = req.user!;
     const { formId } = req.params;
     const form = await findForm(user._id, formId);
     if (!form) {
@@ -40,13 +40,9 @@ export const viewForm = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const createNewForm = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createNewForm = async (req: Request, res: Response): Promise<void> => {
   try {
     const { body } = req;
-    console.log("body :>> ", body);
     const newForm: FormDataInterface | null = await saveNewForm(body);
     res.status(200).json(newForm);
   } catch (error) {
@@ -54,10 +50,7 @@ export const createNewForm = async (
   }
 };
 
-export const updateForm = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const updateForm = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params; // Get the form ID from the request parameters
     const formData = req.body; // Get the updated form data from the request body
@@ -74,10 +67,7 @@ export const updateForm = async (
   }
 };
 
-export const submitForm = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const submitForm = async (req: Request, res: Response): Promise<void> => {
   try {
     const formData = req.body; // Get the updated form data from the request body
     const updatedForm = await submitFormData(formData); // Call the service function to update the form

@@ -1,18 +1,12 @@
 import { Request, Response } from "express-serve-static-core";
 import { errorResponse } from "../helpers";
-import {
-  addWorkspace,
-  DashboardInterface,
-  findDashboard,
-} from "../services/dashboard";
+import { addWorkspace, findDashboard } from "../services/dashboard";
+import { DashboardInterface } from "../types/dashboard";
 
-export const getDashboard = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getDashboard = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { user } = req;
-    const dashboard = await findDashboard(user._id);
+    const user = req.user!;
+    const dashboard = await findDashboard(String(user._id));
     if (!dashboard) {
       res.status(404).send("Dashboard not found");
       return;
@@ -23,15 +17,12 @@ export const getDashboard = async (
   }
 };
 
-export const createWorkspace = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createWorkspace = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { user } = req;
+    const user = req.user!;
     const dashboard: DashboardInterface | null = await addWorkspace(
-      user._id,
-      req.body.name
+      String(user._id),
+      req.body.name,
     );
     if (!dashboard) {
       res.status(404).send("Dashboard not found");

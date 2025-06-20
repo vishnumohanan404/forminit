@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { SubmissionInterface } from "../types/submission";
 // Define a schema for individual blocks
 const BlockSchema = new mongoose.Schema({
   type: {
@@ -40,5 +41,5 @@ SubmissionSchema.pre("save", function (next) {
   next();
 });
 
-const Submission = mongoose.model("Submission", SubmissionSchema);
+const Submission = mongoose.model<SubmissionInterface>("Submission", SubmissionSchema);
 export default Submission;

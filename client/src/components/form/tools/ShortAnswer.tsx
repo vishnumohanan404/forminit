@@ -29,9 +29,7 @@ export default class ShortAnswerTool {
     this.wrapper.classList.add("short-answer-block");
     // Insert Title Block
 
-    const onKeyDown = (
-      event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>
-    ) => {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>) => {
       if (event.key === "Backspace") {
         if (this.data.placeholder === "" && this.data.title === "") {
           // Prevent default backspace behavior and remove the block
@@ -41,13 +39,7 @@ export default class ShortAnswerTool {
           setTimeout(() => {
             if (currentIndex > 0) {
               const previousIndex = currentIndex - 1;
-              console.log(
-                "Moving focus to previous block index: ",
-                previousIndex
-              );
               this.api.caret.setToBlock(previousIndex, "end");
-            } else {
-              console.log("No previous block to move to.");
             }
           }, 0);
         }
@@ -58,7 +50,7 @@ export default class ShortAnswerTool {
       <div>
         <QuestionTitle
           placeholder={"Type your question here"}
-          onInput={(value) => {
+          onInput={value => {
             this.data.title = value;
           }}
           onKeyDown={onKeyDown}
@@ -71,17 +63,15 @@ export default class ShortAnswerTool {
           onKeyDown={onKeyDown}
           value={this.data.placeholder || ""}
         />
-      </div>
+      </div>,
     );
     return this.wrapper; // This block itself doesn't need content
   }
 
-  save(blockContent: HTMLElement): {} {
-    const target = blockContent.querySelector(
-      ".short-answer-input-field"
-    ) as HTMLInputElement;
+  save(blockContent: HTMLElement): ShortAnswerDataInterface {
+    const target = blockContent.querySelector(".short-answer-input-field") as HTMLInputElement;
     return {
-      title: blockContent.querySelector(".question-title-field")?.innerHTML,
+      title: blockContent.querySelector(".question-title-field")?.innerHTML || "",
       placeholder: target?.value,
       required: this.data.required,
     };

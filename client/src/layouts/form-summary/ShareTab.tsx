@@ -1,17 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 const ShareTab = () => {
   const [searchParams] = useSearchParams();
-  console.log('searchParams.get("url") :>> ', searchParams.get("url"));
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(
-        window.location.origin + searchParams.get("url") || ""
-      );
+      await navigator.clipboard.writeText(window.location.origin + searchParams.get("url") || "");
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
@@ -22,9 +18,8 @@ const ShareTab = () => {
         <div>
           <h2 className="text-lg font-semibold mb-2">Share Link</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Your form is now published and ready to be shared with the world!
-            Copy this link to share your form on social media, messaging apps or
-            via email.
+            Your form is now published and ready to be shared with the world! Copy this link to
+            share your form on social media, messaging apps or via email.
           </p>
         </div>
         <div className="flex gap-2">
@@ -37,11 +32,18 @@ const ShareTab = () => {
             to={window.location.origin + searchParams.get("url") || ""}
             target="_blank"
           >
-            <Button variant="outline" className="shrink-0">
+            <Button
+              variant="outline"
+              className="shrink-0"
+            >
               <ExternalLink className="h-4 w-4" />
             </Button>
           </Link>
-          <Button onClick={handleCopy} variant="default" className="shrink-0">
+          <Button
+            onClick={handleCopy}
+            variant="default"
+            className="shrink-0"
+          >
             <Copy className="h-4 w-4 mr-2" />
             Copy
           </Button>
@@ -52,7 +54,7 @@ const ShareTab = () => {
     </Button> */}
       </div>
       {/* Embed Form Section */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <div>
           <h2 className="text-lg font-semibold mb-2">Embed Form</h2>
           <p className="text-sm text-muted-foreground mb-4">
@@ -83,7 +85,7 @@ const ShareTab = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

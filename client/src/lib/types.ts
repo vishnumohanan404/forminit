@@ -1,3 +1,5 @@
+import { BlockData } from "@shared/types";
+
 export type User = {
   _id: string;
   fullName: string;
@@ -16,6 +18,7 @@ export interface UserPwdData {
   currentPwd?: string;
   newPwd: string;
 }
+
 export type FormType = {
   name: string;
   submissions: number;
@@ -26,7 +29,7 @@ export type FormType = {
   _id: string;
   published?: boolean;
   workspaceId?: string;
-  disabled: boolean
+  disabled: boolean;
 };
 
 export type WorkspaceType = {
@@ -42,15 +45,9 @@ export type DashboardDataTypes = {
   __v: number;
 };
 
-export type Block = {
-  type: string;
-  data: any;
-  _id: string;
-};
-
 export type FormView = {
   _id: string;
   title: string;
-  blocks: Block[];
+  blocks: BlockData[];
   disabled: boolean;
 };

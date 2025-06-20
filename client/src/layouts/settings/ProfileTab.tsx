@@ -11,8 +11,8 @@ import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg"];
+// const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+// const ALLOWED_TYPES = ["image/jpeg", "image/jpg"];
 
 const ProfileTab = ({
   profile,
@@ -41,40 +41,47 @@ const ProfileTab = ({
       toast.error(
         error.response?.data?.message?.includes("User validation failed")
           ? "User data validation failed"
-          : "Something went wrong"
+          : "Something went wrong",
       );
     },
   });
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file size and type
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error("File size exceeds 2MB limit");
-        return;
-      }
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        toast.error("Only JPG/JPEG files are allowed");
-        return;
-      }
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     // Validate file size and type
+  //     if (file.size > MAX_FILE_SIZE) {
+  //       toast.error("File size exceeds 2MB limit");
+  //       return;
+  //     }
+  //     if (!ALLOWED_TYPES.includes(file.type)) {
+  //       toast.error("Only JPG/JPEG files are allowed");
+  //       return;
+  //     }
 
-      // If valid, update profile with new avatar
-      // const reader = new FileReader();
-      // reader.onload = () => {
-      //   setProfile({ ...profile, avatar: reader.result as string });
-      // };
-      // reader.readAsDataURL(file);
-    }
-  };
+  //     // If valid, update profile with new avatar
+  //     // const reader = new FileReader();
+  //     // reader.onload = () => {
+  //     //   setProfile({ ...profile, avatar: reader.result as string });
+  //     // };
+  //     // reader.readAsDataURL(file);
+  //   }
+  // };
   return (
-    <form onSubmit={handleProfileUpdate} className="space-y-4">
+    <form
+      onSubmit={handleProfileUpdate}
+      className="space-y-4"
+    >
       <div className="flex items-center space-x-4">
-        {isLoading ? (
+        {isLoading && !profile?.avatar ? (
           <Skeleton className="rounded-full h-24 w-24" />
         ) : (
           <Avatar className="h-24 w-24">
-            <AvatarImage src={profile?.avatar} alt={profile?.fullName} />
-            <AvatarFallback>{profile?.fullName?.charAt(0)}</AvatarFallback>
+            <AvatarImage
+              src={profile.avatar}
+              alt={profile.fullName}
+              referrerPolicy="no-referrer"
+            />
+            <AvatarFallback>{profile.fullName?.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
         {/* {isLoading ? (
@@ -99,11 +106,7 @@ const ProfileTab = ({
         )} */}
       </div>
       <div className="space-y-2">
-        {isLoading ? (
-          <Skeleton className="h-4 w-20" />
-        ) : (
-          <Label htmlFor="name">Name </Label>
-        )}
+        {isLoading ? <Skeleton className="h-4 w-20" /> : <Label htmlFor="name">Name </Label>}
         {isLoading ? (
           <div className="pt-1">
             <Skeleton className="h-[36px] w-full" />
@@ -112,7 +115,7 @@ const ProfileTab = ({
           <Input
             id="name"
             value={profile?.fullName}
-            onChange={(e) =>
+            onChange={e =>
               setProfile({
                 ...profile,
                 fullName: e.target.value,
@@ -122,11 +125,7 @@ const ProfileTab = ({
         )}
       </div>
       <div className="space-y-2">
-        {isLoading ? (
-          <Skeleton className="h-4 w-20" />
-        ) : (
-          <Label htmlFor="name">Email </Label>
-        )}
+        {isLoading ? <Skeleton className="h-4 w-20" /> : <Label htmlFor="name">Email </Label>}
         {isLoading ? (
           <div className="pt-1">
             <Skeleton className="h-[36px] w-full" />
@@ -136,17 +135,13 @@ const ProfileTab = ({
             id="email"
             type="email"
             value={profile?.email}
-            onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+            onChange={e => setProfile({ ...profile, email: e.target.value })}
             disabled
           />
         )}
       </div>
       <div className="space-y-2">
-        {isLoading ? (
-          <Skeleton className="h-4 w-20" />
-        ) : (
-          <Label htmlFor="name">Bio </Label>
-        )}
+        {isLoading ? <Skeleton className="h-4 w-20" /> : <Label htmlFor="name">Bio </Label>}
         {isLoading ? (
           <div className="pt-1">
             <Skeleton className="h-[60px] w-full" />
@@ -155,7 +150,7 @@ const ProfileTab = ({
           <Textarea
             id="bio"
             value={profile?.bio}
-            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+            onChange={e => setProfile({ ...profile, bio: e.target.value })}
           />
         )}
       </div>
@@ -164,12 +159,12 @@ const ProfileTab = ({
           <Skeleton className="h-[36px] w-[128px]" />
         </div>
       ) : (
-        <Button type="submit" disabled={isPending} className="min-w-[128px]">
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Save Changes"
-          )}
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="min-w-[128px]"
+        >
+          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
         </Button>
       )}
     </form>

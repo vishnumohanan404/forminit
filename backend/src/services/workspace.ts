@@ -1,11 +1,7 @@
 import Dashboard from "../models/dashboard";
 import Form from "../models/form";
 
-export const deleteWorkspaceAndForms = async (
-  userId: string,
-  workspaceId: string
-) => {
-  console.log("dashboard :>> ", workspaceId);
+export const deleteWorkspaceAndForms = async (userId: string, workspaceId: string) => {
   const dashboard = await Dashboard.findOne({
     user_id: userId,
     "workspaces._id": workspaceId,
@@ -16,7 +12,7 @@ export const deleteWorkspaceAndForms = async (
 
   // Find the index of the workspace in the dashboard
   const workspaceIndex = dashboard.workspaces.findIndex(
-    (workspace) => workspace._id.toString() === workspaceId
+    workspace => workspace._id?.toString() === workspaceId,
   );
   if (workspaceIndex === -1) {
     throw new Error("Workspace not found.");

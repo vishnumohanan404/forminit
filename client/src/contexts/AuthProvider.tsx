@@ -1,11 +1,5 @@
 import { User } from "@/lib/types";
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 
 export interface AuthProviderProps {
   user: User | null;

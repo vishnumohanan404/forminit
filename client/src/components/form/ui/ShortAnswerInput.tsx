@@ -1,10 +1,5 @@
 import { Input } from "@/components/ui/input";
-import React, {
-  KeyboardEventHandler,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { KeyboardEventHandler, useEffect, useRef, useState } from "react";
 
 interface ShortAnswerInputFieldProps {
   value: string;

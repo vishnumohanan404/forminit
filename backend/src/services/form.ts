@@ -1,13 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import Dashboard from "../models/dashboard";
 import Form from "../models/form";
-import { FormDataInterface, SubmitFormDataInterface } from "../types/form";
+import { SubmitFormDataInterface } from "../types/form";
 import Submission from "../models/submission";
+import { SubmissionInterface } from "../types/submission";
+import { FormDataInterface } from "@shared/types";
 
 export const findForm = async (
-  userId: string,
-  formId: string
-): Promise<any> => {
+  userId: Types.ObjectId,
+  formId: string,
+): Promise<FormDataInterface | null> => {
   const dashboard = await Dashboard.findOne({
     user_id: userId,
   });
@@ -18,7 +20,7 @@ export const findForm = async (
   const formObjectId = new mongoose.Types.ObjectId(formId);
   // Check if the form exists in any of the user's workspaces
   for (const workspace of dashboard.workspaces) {
-    const form = workspace.forms?.find((f) => f?.form_id.equals(formObjectId));
+    const form = workspace.forms?.find(f => f?.form_id.equals(formObjectId));
     if (form) {
       // Fetch the full form details from the Form model
       const fullForm = await Form.findById(form.form_id);
@@ -30,13 +32,12 @@ export const findForm = async (
 };
 
 export const saveNewForm = async (
-  formData: FormDataInterface
+  formData: FormDataInterface,
 ): Promise<FormDataInterface | null> => {
-  console.log("formData :>> ", formData);
   const newForm = new Form(formData);
   const savedForm = await newForm.save();
 
-  const dashboardUpdate = await Dashboard.findOneAndUpdate(
+  await Dashboard.findOneAndUpdate(
     { "workspaces._id": formData.workspaceId }, // Find the workspace by its ID
     {
       $push: {
@@ -51,21 +52,16 @@ export const saveNewForm = async (
         },
       },
     },
-    { new: true } // Return the updated document
+    { new: true }, // Return the updated document
   );
-  if (dashboardUpdate) {
-    console.log("Form added to dashboard successfully:", dashboardUpdate);
-  } else {
-    console.error("Error updating dashboard: Workspace not found.");
-  }
-  console.log("Form saved successfully:", savedForm);
+
   return savedForm;
 };
 
 export const updateExistingForm = async (
   id: string,
-  formData: FormDataInterface
-): Promise<any> => {
+  formData: FormDataInterface,
+): Promise<FormDataInterface | null> => {
   const formObjectId = new mongoose.Types.ObjectId(id); // Convert the ID to ObjectId
   const updatedForm = await Form.findByIdAndUpdate(formObjectId, formData, {
     new: true, // Return the updated document
@@ -86,7 +82,7 @@ export const updateExistingForm = async (
           { "workspace.forms.form_id": formObjectId }, // Filter to match the correct form
           { "form.form_id": formObjectId }, // Filter to match the correct workspace form
         ],
-      }
+      },
     );
 
     if (!updatedDashboard) {
@@ -96,7 +92,7 @@ export const updateExistingForm = async (
   return updatedForm; // Return the updated form
 };
 
-export const viewFormData = async (formId: string): Promise<any> => {
+export const viewFormData = async (formId: string): Promise<FormDataInterface | null> => {
   const fullForm = await Form.findById(formId, {
     blocks: true,
     title: true,
@@ -115,7 +111,6 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
   });
   await newSubmission.save();
   // Step 2: Update the form's submission count
-  console.log("formObjectId :>> ", formObjectId);
   const updatedDashboard = await Dashboard.findOneAndUpdate(
     {
       "workspaces.forms.form_id": formObjectId, // Find the correct form in the nested structure
@@ -126,26 +121,21 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
     {
       new: true, // Return the updated document
       arrayFilters: [{ "form.form_id": formObjectId }], // Filter to target the correct form inside the workspace
-    }
+    },
   );
   if (!updatedDashboard) {
     console.error("Error updating form submissions: Form not found.");
     return null;
   }
-
-  console.log(
-    "Dashboard form submissions updated successfully:",
-    updatedDashboard
-  );
   return updatedDashboard; // Return the updated form with updated submissions count
 };
 
-export const getSubmissionsByFormId = async (formId: string) => {
+export const getSubmissionsByFormId = async (formId: string): Promise<SubmissionInterface[]> => {
   try {
     // Find all submissions with the matching formId
     const submissions = await Submission.find({ formId });
     return submissions;
-  } catch (error) {
+  } catch {
     throw new Error(`Error fetching submissions for formId: ${formId}`);
   }
 };
@@ -158,10 +148,6 @@ export const deleteFormById = async (formId: string) => {
     if (submissionsCount > 0) {
       // If there are submissions, delete the form and its submissions
 
-      console.log(
-        `Form has ${submissionsCount} submissions. Proceeding with deletion...`
-      );
-
       // Step 2: Delete the form from the Submission collection
       const submissionDeleteResult = await Submission.deleteMany({ formId });
 
@@ -169,11 +155,11 @@ export const deleteFormById = async (formId: string) => {
       const formDeleteResult = await Form.findByIdAndDelete(formId);
 
       // Step 4: Delete references of the form from the Dashboard collection
-      const dashboardUpdateResult = await Dashboard.updateMany(
+      await Dashboard.updateMany(
         { "workspaces.forms.form_id": formId },
         {
           $pull: { "workspaces.$[].forms": { form_id: formId } },
-        }
+        },
       );
 
       // If deletion was successful, return success
@@ -190,16 +176,13 @@ export const deleteFormById = async (formId: string) => {
       }
     } else {
       // If there are no submissions, delete the references and form only
-      console.log(
-        "Form has no submissions. Deleting references from Dashboard and Form."
-      );
 
       // Step 2: Delete references of the form from the Dashboard collection
       const dashboardUpdateResult = await Dashboard.updateMany(
         { "workspaces.forms.form_id": formId },
         {
           $pull: { "workspaces.$[].forms": { form_id: formId } },
-        }
+        },
       );
 
       // Step 3: Delete the form from the Form collection
@@ -208,8 +191,7 @@ export const deleteFormById = async (formId: string) => {
       if (formDeleteResult && dashboardUpdateResult.modifiedCount > 0) {
         return {
           success: true,
-          message:
-            "Form and its references deleted successfully (no submissions).",
+          message: "Form and its references deleted successfully (no submissions).",
         };
       } else {
         return { success: false, message: "Form or references not found." };
@@ -246,7 +228,7 @@ export const toggleFormDisabled = async (formId: string) => {
       {
         new: true,
         arrayFilters: [{ "form.form_id": formObjectId }],
-      }
+      },
     );
 
     if (!dashboardUpdateResult) {

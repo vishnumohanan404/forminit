@@ -1,10 +1,5 @@
 import Logo from "@/components/svg/Logo";
-import {
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { SidebarHeader, SidebarMenu, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 const AppSidebarHeader = () => {
   const { open } = useSidebar();

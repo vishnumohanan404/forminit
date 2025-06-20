@@ -1,7 +1,8 @@
+import { FieldValidationError } from "express-validator";
 export class ErrorBase<T extends string> extends Error {
   name: T;
   message: string;
-  cause: any;
+  cause: FieldValidationError[] | unknown;
   statusCode: number;
   constructor({
     name,
@@ -11,7 +12,7 @@ export class ErrorBase<T extends string> extends Error {
   }: {
     name: T;
     message: string;
-    cause?: any;
+    cause?: FieldValidationError[] | unknown;
     statusCode?: number;
   }) {
     super();

@@ -23,34 +23,34 @@ const AccountTab = ({ user }: { user: UserProfile }) => {
     },
     mode: "onBlur",
   });
-  const { mutate: updatePassword, isPending: isPwdUpdatePending } = useMutation(
-    {
-      mutationFn: (userPwd: UserPwdData) => updateUserPassword(userPwd),
-      onSuccess: () => {
-        // Boom baby!
-        toast.success("Password updated successfully");
-      },
-      onError: (error: AxiosError<{ message: string }>) => {
-        // An error happened!
-        toast.error(
-          error.response?.data?.message?.includes("User validation failed")
-            ? "User data validation failed"
-            : "Something went wrong"
-        );
-      },
-    }
-  );
+  const { mutate: updatePassword, isPending: isPwdUpdatePending } = useMutation({
+    mutationFn: (userPwd: UserPwdData) => updateUserPassword(userPwd),
+    onSuccess: () => {
+      // Boom baby!
+      toast.success("Password updated successfully");
+    },
+    onError: (error: AxiosError<{ message: string }>) => {
+      // An error happened!
+      toast.error(
+        error.response?.data?.message?.includes("User validation failed")
+          ? "User data validation failed"
+          : "Something went wrong",
+      );
+    },
+  });
 
   const handlePasswordSubmit = async (data: {
     currentPwd?: string;
     newPwd: string;
     confirmPwd: string;
   }) => {
-    console.log("password :>> ", data);
     updatePassword(data);
   };
   return (
-    <form onSubmit={handleSubmit(handlePasswordSubmit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit(handlePasswordSubmit)}
+      className="space-y-4"
+    >
       {!user?.googleId && (
         <div className="space-y-2">
           <Label htmlFor="currentPwd">Current Password</Label>
@@ -58,16 +58,10 @@ const AccountTab = ({ user }: { user: UserProfile }) => {
             id="currentPwd"
             type="password"
             {...register("currentPwd", {
-              required: user
-                ? !user?.googleId
-                  ? "Current password is required"
-                  : false
-                : false,
+              required: user ? (!user?.googleId ? "Current password is required" : false) : false,
             })}
           />
-          {errors.currentPwd && (
-            <p className="text-red-500 text-sm">{errors.currentPwd.message}</p>
-          )}
+          {errors.currentPwd && <p className="text-red-500 text-sm">{errors.currentPwd.message}</p>}
         </div>
       )}
       <div className="space-y-2">
@@ -87,9 +81,7 @@ const AccountTab = ({ user }: { user: UserProfile }) => {
             },
           })}
         />
-        {errors.newPwd && (
-          <p className="text-red-500 text-sm">{errors.newPwd.message}</p>
-        )}
+        {errors.newPwd && <p className="text-red-500 text-sm">{errors.newPwd.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirmPwd">Confirm New Password</Label>
@@ -98,13 +90,10 @@ const AccountTab = ({ user }: { user: UserProfile }) => {
           type="password"
           {...register("confirmPwd", {
             required: "Confirm password is required",
-            validate: (value) =>
-              value === getValues().newPwd || "Passwords do not match",
+            validate: value => value === getValues().newPwd || "Passwords do not match",
           })}
         />
-        {errors.confirmPwd && (
-          <p className="text-red-500 text-sm">{errors.confirmPwd.message}</p>
-        )}
+        {errors.confirmPwd && <p className="text-red-500 text-sm">{errors.confirmPwd.message}</p>}
       </div>
       <Button
         type="submit"
@@ -117,11 +106,7 @@ const AccountTab = ({ user }: { user: UserProfile }) => {
         }
         className="min-w-[154px]"
       >
-        {isPwdUpdatePending ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          "Change Password"
-        )}
+        {isPwdUpdatePending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Change Password"}
       </Button>
     </form>
   );

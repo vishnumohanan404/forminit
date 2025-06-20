@@ -1,12 +1,6 @@
 import PageTitle from "@/components/common/PageTitle";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -55,7 +49,10 @@ const SupportPage = () => {
     <div className="px-5">
       <PageTitle>Support</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
-        <Tabs defaultValue="faq" className="space-y-4">
+        <Tabs
+          defaultValue="faq"
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="faq">FAQs</TabsTrigger>
             <TabsTrigger value="feature">Request Feature</TabsTrigger>
@@ -71,9 +68,16 @@ const SupportPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full"
+                >
                   {faqs.map((faq, index) => (
-                    <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionItem
+                      value={`item-${index}`}
+                      key={index}
+                    >
                       <AccordionTrigger>{faq.question}</AccordionTrigger>
                       <AccordionContent>{faq.answer}</AccordionContent>
                     </AccordionItem>
@@ -87,9 +91,7 @@ const SupportPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Request a Feature</CardTitle>
-                <CardDescription>
-                  Let us know what features you'd like to see
-                </CardDescription>
+                <CardDescription>Let us know what features you'd like to see</CardDescription>
               </CardHeader>
               <CardContent>
                 <FeatureRequest />
@@ -115,17 +117,21 @@ const SupportPage = () => {
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Need More Help?</CardTitle>
-            <CardDescription>
-              Get in touch with our support team
-            </CardDescription>
+            <CardDescription>Get in touch with our support team</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
-              <Button className="flex items-center" variant="outline">
+              <Button
+                className="flex items-center"
+                variant="outline"
+              >
                 <MessageSquarePlus className="mr-2 h-4 w-4" />
                 Live Chat
               </Button>
-              <Button className="flex items-center" variant="outline">
+              <Button
+                className="flex items-center"
+                variant="outline"
+              >
                 <AlertCircle className="mr-2 h-4 w-4" />
                 support@forminit.com
               </Button>

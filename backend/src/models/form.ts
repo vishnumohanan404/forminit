@@ -1,4 +1,6 @@
+import { FormDataInterface } from "@shared/types";
 import mongoose from "mongoose";
+
 // Define a schema for individual blocks
 const BlockSchema = new mongoose.Schema({
   type: {
@@ -12,7 +14,7 @@ const BlockSchema = new mongoose.Schema({
   },
 });
 // Define a schema for the form containing multiple blocks
-const FormSchema = new mongoose.Schema({
+const FormSchema = new mongoose.Schema<FormDataInterface>({
   title: {
     type: String,
     required: true,
@@ -52,5 +54,5 @@ FormSchema.pre("save", function (next) {
   next();
 });
 
-const Form = mongoose.model("Form", FormSchema);
+const Form = mongoose.model<FormDataInterface>("Form", FormSchema);
 export default Form;

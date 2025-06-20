@@ -1,0 +1,293 @@
+stages:
+  - .pre
+  - code-quality
+  - unit-test
+  - code-analysis
+  - security
+  - release
+  - .post
+.format:
+  stage: code-quality
+  script:
+    - npm run format
+.lint:
+  stage: code-quality
+  script:
+    - npm run lint
+.typecheck:
+  stage: code-quality
+  script:
+    - npm run tsc
+.cache_mongo_binaries:
+  stage: unit-test
+  image: node:24-bookworm
+  script:
+    - |
+      node -e "
+        process.env.MONGOMS_DOWNLOAD_DIR = '.mongodb-binaries';
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+        MongoMemoryServer.create({
+          binary: { 
+            version: '7.0.21',
+            platform: 'linux',
+            arch: 'aarch64',
+            os: {
+              os: 'ubuntu',
+              dist: 'ubuntu2004'
+            } 
+          }
+        }).then(server => server.stop());
+      "
+  cache:
+    key: mongodb-binaries
+    paths:
+      - .mongodb-binaries
+  artifacts:
+    paths:
+      - .mongodb-binaries
+    expire_in: 1 hour
+unit_test:
+  stage: unit-test
+  image:
+    name: node:24-bookworm
+  script:
+    - npm run test:coverage
+  artifacts:
+    paths:
+      - backend/coverage/lcov.info
+      - client/coverage/lcov.info
+  cache: []
+  before_script: &ref_0
+    - npm ci
+sonarqube-analysis:
+  stage: code-analysis
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+  script:
+    - >
+      sonar-scanner -Dsonar.organization=vishnumohanan404
+      -Dsonar.projectKey=vishnumohanan404_forminit
+      -Dsonar.sources=backend/src,client/src,packages/types
+      -Dsonar.tests=backend/src/tests,client/src/tests
+      -Dsonar.exclusions=**/tests/**
+      -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,client/coverage/lcov.info
+      -Dsonar.host.url=https://sonarcloud.io
+  dependencies:
+    - unit_test
+  rules:
+    - if: >-
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
+        ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" ||
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")
+      when: always
+    - when: never
+  cache: []
+  before_script: *ref_0
+.sonarqube-quality-gate-check:
+  stage: code-analysis
+  image: node:18-alpine
+  script:
+    - apk add --no-cache curl jq
+    - echo "⏳ Waiting 15s for SonarCloud to finish analysis..."
+    - sleep 15
+    - |
+      sh -c '
+        STATUS=$(curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=vishnumohanan404_forminit" | jq -r ".projectStatus.status");
+        echo "Sonar Quality Gate Status: $STATUS";
+        if [ "$STATUS" != "OK" ]; then
+          echo "❌ Sonar Quality Gate failed. Blocking merge request.";
+          exit 1;
+        fi
+      '
+  needs:
+    - job: sonarqube-analysis
+      artifacts: false
+  rules:
+    - if: >-
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
+        ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" ||
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")
+      when: always
+    - when: never
+  allow_failure: false
+trivy_fs_scan:
+  stage: security
+  image:
+    name: node:18
+  before_script:
+    - >-
+      curl -sfL
+      https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+      | sh
+  script:
+    - ./bin/trivy fs . --exit-code 1 --severity HIGH,CRITICAL
+  rules:
+    - if: >-
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
+        ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" ||
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")
+      when: always
+    - when: never
+  cache: []
+owasp_dep_check:
+  stage: security
+  image:
+    name: owasp/dependency-check:latest
+  before_script: []
+  script:
+    - mkdir -p owasp-report
+    - >-
+      dependency-check.sh --project "my-app" --scan . --format HTML --out
+      owasp-report/
+  artifacts:
+    paths:
+      - owasp-report/
+    expire_in: 1 week
+  rules:
+    - if: >-
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
+        ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" ||
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")
+      when: always
+    - when: never
+  cache: []
+trivy_image_scan:
+  stage: security
+  image:
+    name: docker:24.0.7
+  services:
+    - name: docker:24.0.7-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ''
+  before_script:
+    - apk add --no-cache curl bash
+    - docker builder prune -a --force
+    - >-
+      curl -sfL
+      https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+      | sh
+  script:
+    - docker build --no-cache -f backend/Dockerfile.prod -t backend-image .
+    - docker build --no-cache -f client/Dockerfile.prod -t client-image .
+    - ./bin/trivy image --exit-code 1 --severity HIGH,CRITICAL backend-image
+    - ./bin/trivy image --exit-code 1 --severity HIGH,CRITICAL client-image
+  rules:
+    - if: >-
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
+        ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" ||
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")
+      when: always
+    - when: never
+  cache: []
+version:
+  stage: release
+  image:
+    name: node:18
+  before_script:
+    - apt-get update && apt-get install -y jq
+    - npm ci
+  script:
+    - |
+      if [ -z "$(find .changeset -name '*.md' ! -name 'README.md')" ]; then
+        echo "❌ No unreleased changesets. Skipping version bump."
+        echo "VERSION=" > version.env
+        exit 0
+      fi
+    - echo "✅ Bumping version using changeset..."
+    - npx changeset version
+    - VERSION=$(jq -r '.version' client/package.json)
+    - echo "VERSION=$VERSION" > version.env
+    - git config --global user.email "ci@example.com"
+    - git config --global user.name "CI Bot"
+    - git add .
+    - |
+      if git diff --staged --quiet; then
+        echo "❌ No changes to commit after version bump. Skipping."
+        exit 0
+      fi
+    - |
+      git commit -m "chore(release): v$VERSION [skip ci]"
+    - git tag v$VERSION
+    - >-
+      git remote set-url origin
+      https://gitlab-ci-token:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git push origin HEAD:main --tags [skip ci]
+  artifacts:
+    reports:
+      dotenv: version.env
+    paths:
+      - ./**/package.json
+      - CHANGELOG.md
+    expire_in: 1 day
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  cache: []
+docker_push:
+  stage: release
+  image:
+    name: docker:24.0.7
+  services:
+    - name: docker:24.0.7-dind
+  dependencies:
+    - version
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ''
+  before_script:
+    - apk add --no-cache curl bash aws-cli jq
+    - echo "Assuming project-specific IAM Role..."
+    - |
+      CREDS=$(aws sts assume-role \
+        --role-arn "arn:aws:iam::283773803331:role/forminit-role" \
+        --role-session-name gitlab-ci-session)
+    - >-
+      export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r
+      '.Credentials.AccessKeyId')
+    - >-
+      export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r
+      '.Credentials.SecretAccessKey')
+    - >-
+      export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r
+      '.Credentials.SessionToken')
+    - echo "Logging into AWS ECR with assumed role credentials..."
+    - >-
+      aws ecr get-login-password | docker login --username AWS --password-stdin
+      $ECR_REGISTRY
+  script:
+    - source version.env
+    - |
+      if [ -z "$VERSION" ]; then
+        echo "❌ No version bump detected, skipping Docker push."
+        exit 0
+      fi
+    - echo "Using version $VERSION"
+    - >-
+      docker build -f ./client/Dockerfile.prod -t
+      $ECR_REGISTRY/forminit-client:$VERSION .
+    - >-
+      docker build -f ./backend/Dockerfile.prod -t
+      $ECR_REGISTRY/forminit-backend:$VERSION .
+    - docker push $ECR_REGISTRY/forminit-client:$VERSION
+    - docker push $ECR_REGISTRY/forminit-backend:$VERSION
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  cache: []
+default:
+  tags:
+    - local
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+  before_script: *ref_0
+variables:
+  NODE_ENV: test
+  NPM_CONFIG_CACHE: .npm
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "push"
+include:
+  - local: .gitlab/ci/base-jobs.yml
+  - local: .gitlab/ci/sonarqube.yml
+  - local: .gitlab/ci/security-jobs.yml
+  - local: .gitlab/ci/release-jobs.yml

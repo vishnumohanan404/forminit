@@ -1,16 +1,22 @@
+import { FormDataInterface } from "@shared/types";
 import axiosClient from ".";
 
-interface BlockData {
-  type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
-  data: any; // Data specific to the block type
+export interface BlockData {
+  type: string;
+  data: {
+    title?: string;
+    required?: boolean;
+    placeholder?: string;
+    options?: Array<{ optionValue: string; optionMarker: string }>;
+  };
 }
 
 export interface EditorJSData {
   title: string;
-  time: number; // Timestamp when the data was saved
+  time?: number; // Timestamp when the data was saved
   blocks: BlockData[]; // Array of block data
   workspaceId: string; // ID of the workspace
-  version: string;
+  version?: string;
 }
 
 export interface SubmitFormData {
@@ -18,7 +24,7 @@ export interface SubmitFormData {
   blocks: BlockData[];
   _id: string;
 }
-export const fetchForm = async (id: string | undefined) => {
+export const fetchForm = async (id: string | undefined): Promise<FormDataInterface> => {
   const response = await axiosClient.get(`/api/form/${id}`);
   return response.data;
 };

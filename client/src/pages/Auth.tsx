@@ -57,7 +57,7 @@ const Auth = () => {
     reset,
   } = useForm<AuthFormFields>({ mode: "onBlur" });
 
-  const onSubmitLogin: SubmitHandler<AuthFormFields> = async (data) => {
+  const onSubmitLogin: SubmitHandler<AuthFormFields> = async data => {
     try {
       const response = await login(data);
       setUser(response.user);
@@ -68,7 +68,7 @@ const Auth = () => {
       }
     }
   };
-  const onSubmitSignUp: SubmitHandler<AuthFormFields> = async (data) => {
+  const onSubmitSignUp: SubmitHandler<AuthFormFields> = async data => {
     try {
       const response = await signup({
         fullName: data.fullName!,
@@ -90,16 +90,14 @@ const Auth = () => {
 
   const handleGoogleSignIn = useGoogleLogin({
     flow: "auth-code",
-    onSuccess: async (codeResponse) => {
-      console.log(codeResponse);
+    onSuccess: async codeResponse => {
       setIsLoading(true);
       const response = await googleSignIn(codeResponse);
       setUser(response.user);
       setIsLoading(false);
       navigate("/");
     },
-    onError: (tokenResponse) => {
-      console.log(tokenResponse.error_description);
+    onError: tokenResponse => {
       setError("root", {
         message: tokenResponse.error_description || "Something went wrong",
       });
@@ -206,10 +204,8 @@ const Auth = () => {
                     value: true,
                     message: "Please confirm your password",
                   },
-                  validate: (value) => {
-                    return (
-                      value === getValues().password || "Passwords should match"
-                    );
+                  validate: value => {
+                    return value === getValues().password || "Passwords should match";
                   },
                   minLength: {
                     value: 8,
@@ -223,10 +219,12 @@ const Auth = () => {
               />
             )}
             {errors.root && <FormError>{errors.root.message}</FormError>}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLogin ? "Login" : "Register"}
             </Button>
           </form>
@@ -236,9 +234,7 @@ const Auth = () => {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -249,11 +245,7 @@ const Auth = () => {
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <GoogleLogo />
-            )}
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleLogo />}
             Continue with Google
           </Button>
         </CardContent>

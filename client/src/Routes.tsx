@@ -17,7 +17,12 @@ const FormSummaryPage = React.lazy(() => import("./pages/FormSummary"));
 export const routes = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/dashboard" replace />,
+    element: (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    ),
     errorElement: <NotFoundPage />,
   },
   {

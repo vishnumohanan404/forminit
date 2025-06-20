@@ -1,12 +1,7 @@
 import { useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { Button } from "../../components/ui/button.tsx";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { throttle } from "@/lib/utils.ts";
 import { useFormContext } from "@/contexts/FormContext.tsx"; // Import the context
 import { fetchForm } from "@/services/form.ts";
@@ -16,6 +11,7 @@ import ShortAnswerTool from "../../components/form/tools/ShortAnswer.tsx";
 import LongAnswerTool from "../../components/form/tools/LongAnswer.tsx";
 import MultipleChoiceTool from "../../components/form/tools/MultipleChoice.tsx";
 import CustomParagraph from "../../components/form/custom-blocks/CustomParagraph.tsx";
+import { FormDataInterface } from "@shared/types";
 
 const Editor = () => {
   const { id } = useParams();
@@ -23,7 +19,7 @@ const Editor = () => {
   const { dispatch } = useFormContext();
   const { data, isFetched } = useQuery({
     queryKey: ["form", id],
-    queryFn: () => fetchForm(id),
+    queryFn: (): Promise<FormDataInterface> => fetchForm(id),
     staleTime: 10000,
     enabled: !!id,
   });
@@ -43,27 +39,26 @@ const Editor = () => {
           multipleChoiceTool: MultipleChoiceTool,
         },
         onChange: throttle(() => {
-          const data = editorInstance.current
+          editorInstance.current
             ?.save()
-            .then((savedData) => {
-              console.log({ savedData });
+            .then(savedData => {
               dispatch({
                 type: "SET_FORM_DATA",
-                payload: savedData,
+                payload: {
+                  ...savedData,
+                  title: data?.title || "",
+                  workspaceId: data?.workspaceId || "",
+                },
               });
             })
-            .catch((error) => {
+            .catch(error => {
               console.error("Saving failed: ", error);
             });
-          return data;
         }, 0.5),
       });
     }
     return () => {
-      if (
-        editorInstance.current &&
-        typeof editorInstance.current.destroy === "function"
-      ) {
+      if (editorInstance.current && typeof editorInstance.current.destroy === "function") {
         editorInstance.current?.destroy();
         editorInstance.current = null;
       }
@@ -72,12 +67,18 @@ const Editor = () => {
 
   return (
     <div className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container">
-      <div id="editorjs" className="pb-0 "></div>
+      <div
+        id="editorjs"
+        className="pb-0 "
+      ></div>
       <div className="ce-block__content items-start">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="secondary" className="text-muted-foreground">
+              <Button
+                variant="secondary"
+                className="text-muted-foreground"
+              >
                 Submit
               </Button>
             </TooltipTrigger>

@@ -1,0 +1,27 @@
+format:
+  stage: code-quality
+  resource_group: code-quality
+  script:
+    - npm run format
+
+lint:
+  stage: code-quality
+  resource_group: code-quality
+  script:
+    - npm run lint
+
+typecheck:
+  stage: code-quality
+  resource_group: code-quality
+  script:
+    - npm run tsc
+
+unit_test:
+  stage: unit-test
+  image: node:18
+  script:
+    - npm run test:coverage
+  artifacts:
+    paths:
+      - backend/coverage/lcov.info
+      - client/coverage/lcov.info

@@ -28,9 +28,7 @@ export default class LongAnswerTool {
   render() {
     this.wrapper = document.createElement("div");
     this.wrapper.classList.add("long-answer-block");
-    const onKeyDown = (
-      event: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>
-    ) => {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => {
       if (event.key === "Backspace") {
         if (this.data.title === "") {
           // Prevent default backspace behavior and remove the block
@@ -39,13 +37,7 @@ export default class LongAnswerTool {
           setTimeout(() => {
             if (currentIndex > 0) {
               const previousIndex = currentIndex - 1;
-              console.log(
-                "Moving focus to previous block index: ",
-                previousIndex
-              );
               this.api.caret.setToBlock(previousIndex, "end");
-            } else {
-              console.log("No previous block to move to.");
             }
           }, 0);
         }
@@ -57,25 +49,24 @@ export default class LongAnswerTool {
       <div>
         <QuestionTitle
           placeholder={"Type your question here"}
-          onInput={(value) => {
+          onInput={value => {
             this.data.title = value;
           }}
           onKeyDown={onKeyDown}
           question={this.data.title}
         />
         <LongAnswerInput
-          onInputChange={(value) => {
+          onInputChange={value => {
             this.data.placeholder = value;
           }}
           onKeyDown={onKeyDown}
           value={this.data.placeholder || ""}
         />
-      </div>
+      </div>,
     );
     return this.wrapper; // This block itself doesn't need content
   }
-  save(blockContent: HTMLElement): {} {
-    console.log({ blockContent });
+  save(): LongAnswerDataInterface {
     // No need to save anything for the parent tool
     return {
       ...this.data,

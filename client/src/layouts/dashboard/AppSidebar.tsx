@@ -15,11 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import AppSidebarHeader from "./AppSidebarHeader";
 import AppSidebarFooter from "./AppSidebarFooter";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -80,10 +76,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {!isError &&
-                sidebarApplicationItems.map((item) => (
+                sidebarApplicationItems.map(item => (
                   <SidebarMenuItem key={item.title}>
                     {item.type === "collapsible" ? (
-                      <Collapsible defaultOpen className="group/collapsible">
+                      <Collapsible
+                        defaultOpen
+                        className="group/collapsible"
+                      >
                         <>
                           <div className="flex">
                             <CollapsibleTrigger asChild>
@@ -136,9 +135,7 @@ export function AppSidebar() {
                                             to={`/workspaces/${workspace._id}?name=${workspace.name}`}
                                             className="w-full"
                                           >
-                                            <span className="w-full">
-                                              {workspace.name}
-                                            </span>
+                                            <span className="w-full">{workspace.name}</span>
                                           </Link>
                                           {showTrash === workspace._id && (
                                             <Dialog>
@@ -147,29 +144,22 @@ export function AppSidebar() {
                                               </DialogTrigger>
                                               <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
                                                 <DialogHeader>
-                                                  <DialogTitle>
-                                                    Deleting workspace
-                                                  </DialogTitle>
+                                                  <DialogTitle>Deleting workspace</DialogTitle>
                                                   <DialogDescription>
-                                                    All your forms will be
-                                                    deleted
+                                                    All your forms will be deleted
                                                   </DialogDescription>
                                                 </DialogHeader>
                                                 <DialogFooter className="gap-3">
                                                   <Button
                                                     variant={"destructive"}
                                                     onClick={() =>
-                                                      handleDeleteWorkspace(
-                                                        workspace._id
-                                                      )
+                                                      handleDeleteWorkspace(workspace._id)
                                                     }
                                                   >
                                                     Delete
                                                   </Button>
                                                   <DialogClose asChild>
-                                                    <Button variant="secondary">
-                                                      Cancel
-                                                    </Button>
+                                                    <Button variant="secondary">Cancel</Button>
                                                   </DialogClose>
                                                 </DialogFooter>
                                               </DialogContent>
@@ -178,7 +168,7 @@ export function AppSidebar() {
                                         </div>
                                       </SidebarMenuButton>
                                     );
-                                  }
+                                  },
                                 )
                               ) : (
                                 <>
@@ -218,15 +208,13 @@ export function AppSidebar() {
           {open && <SidebarGroupLabel>Product</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {productItems.map((item) => (
+              {productItems.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link
                       to={item.url}
                       className={`flex items-center gap-2 w-full px-2 py-1 rounded-md ${
-                        location.pathname === item.url
-                          ? "bg-muted text-primary font-medium"
-                          : ""
+                        location.pathname === item.url ? "bg-muted text-primary font-medium" : ""
                       }`}
                     >
                       <item.icon />

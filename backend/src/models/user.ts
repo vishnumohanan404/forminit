@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType } from "mongoose";
+import mongoose, { InferSchemaType, Types } from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -26,9 +26,11 @@ const userSchema = new mongoose.Schema(
     },
     googleId: { type: String, unique: true, sparse: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-export type UserInterface = InferSchemaType<typeof userSchema>;
+
+export type UserInterface = InferSchemaType<typeof userSchema> & { _id: Types.ObjectId };
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

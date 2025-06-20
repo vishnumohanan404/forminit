@@ -1,10 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
-import React, {
-  KeyboardEventHandler,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { KeyboardEventHandler, useEffect, useRef, useState } from "react";
 
 interface LongAnswerInputFieldProps {
   value: string;

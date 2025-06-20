@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { DashboardInterface } from "../types/dashboard";
 
 const formSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -31,6 +32,6 @@ const dashboardSchema = new mongoose.Schema({
   workspaces: [workspaceSchema],
 });
 
-const Dashboard = mongoose.model("Dashboard", dashboardSchema);
+const Dashboard = mongoose.model<DashboardInterface>("Dashboard", dashboardSchema);
 
 export default Dashboard;

@@ -1,13 +1,7 @@
 import PageTitle from "@/components/common/PageTitle";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -28,6 +22,7 @@ interface ChangelogEntry {
     description: string;
   }[];
 }
+type TabType = "all" | "feature" | "improvement" | "bugfix";
 
 const changelogs: ChangelogEntry[] = [
   {
@@ -67,19 +62,15 @@ const changelogs: ChangelogEntry[] = [
 const ChangelogsPage = () => {
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
   const [expandedVersions, setExpandedVersions] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<
-    "all" | "feature" | "improvement" | "bugfix"
-  >("all");
+  const [activeTab, setActiveTab] = useState<"all" | "feature" | "improvement" | "bugfix">("all");
 
   const filteredChangelogs = selectedVersion
-    ? changelogs.filter((log) => log.version === selectedVersion)
+    ? changelogs.filter(log => log.version === selectedVersion)
     : changelogs;
 
   const toggleExpand = (version: string) => {
-    setExpandedVersions((prev) =>
-      prev.includes(version)
-        ? prev.filter((v) => v !== version)
-        : [...prev, version]
+    setExpandedVersions(prev =>
+      prev.includes(version) ? prev.filter(v => v !== version) : [...prev, version],
     );
   };
 
@@ -104,18 +95,17 @@ const ChangelogsPage = () => {
       <PageTitle>Changelogs</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <Select
-            onValueChange={(value) =>
-              setSelectedVersion(value === "all" ? null : value)
-            }
-          >
+          <Select onValueChange={value => setSelectedVersion(value === "all" ? null : value)}>
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Filter by version" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Versions</SelectItem>
-              {changelogs.map((log) => (
-                <SelectItem key={log.version} value={log.version}>
+              {changelogs.map(log => (
+                <SelectItem
+                  key={log.version}
+                  value={log.version}
+                >
                   Version {log.version}
                 </SelectItem>
               ))}
@@ -124,7 +114,7 @@ const ChangelogsPage = () => {
 
           <Tabs
             value={activeTab}
-            onValueChange={(value: any) => setActiveTab(value)}
+            onValueChange={(value: string) => setActiveTab(value as TabType)}
             className="w-full sm:w-auto"
           >
             <TabsList className="grid w-full grid-cols-4">
@@ -138,7 +128,7 @@ const ChangelogsPage = () => {
 
         <div className="space-y-6">
           <AnimatePresence>
-            {filteredChangelogs.map((log) => (
+            {filteredChangelogs.map(log => (
               <motion.div
                 key={log.version}
                 initial={{ opacity: 0, y: 20 }}
@@ -152,9 +142,7 @@ const ChangelogsPage = () => {
                     onClick={() => toggleExpand(log.version)}
                   >
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-2xl font-bold">
-                        Version {log.version}
-                      </CardTitle>
+                      <CardTitle className="text-2xl font-bold">Version {log.version}</CardTitle>
                       <div className="flex items-center space-x-2">
                         <CardDescription className="text-sm font-medium">
                           {log.date}
@@ -171,10 +159,7 @@ const ChangelogsPage = () => {
                     <CardContent className="pt-4">
                       <ul className="space-y-3">
                         {log.changes
-                          .filter(
-                            (change) =>
-                              activeTab === "all" || change.type === activeTab
-                          )
+                          .filter(change => activeTab === "all" || change.type === activeTab)
                           .map((change, index) => (
                             <motion.li
                               key={index}
@@ -188,19 +173,15 @@ const ChangelogsPage = () => {
                                   change.type === "feature"
                                     ? "default"
                                     : change.type === "improvement"
-                                    ? "secondary"
-                                    : "destructive"
+                                      ? "secondary"
+                                      : "destructive"
                                 }
                                 className="mt-0.5 flex items-center space-x-1 px-2 py-1"
                               >
                                 {getIcon(change.type)}
-                                <span className="capitalize">
-                                  {change.type}
-                                </span>
+                                <span className="capitalize">{change.type}</span>
                               </Badge>
-                              <span className="flex-1">
-                                {change.description}
-                              </span>
+                              <span className="flex-1">{change.description}</span>
                             </motion.li>
                           ))}
                       </ul>
@@ -218,7 +199,10 @@ const ChangelogsPage = () => {
         )}
 
         <div className="mt-8 text-center">
-          <Button variant="outline" onClick={() => window.scrollTo(0, 0)}>
+          <Button
+            variant="outline"
+            onClick={() => window.scrollTo(0, 0)}
+          >
             Back to Top
           </Button>
         </div>

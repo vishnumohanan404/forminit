@@ -1,22 +1,23 @@
 import { Request, Response, NextFunction } from "express-serve-static-core";
 import jwt from "jsonwebtoken";
-import User from "../models/user";
+import User, { UserInterface } from "../models/user";
+import { Types } from "mongoose";
 
 interface DecodedToken {
-  _id: string;
+  _id: Types.ObjectId;
 }
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
 declare module "express-serve-static-core" {
   export interface Request {
-    user: any;
+    user?: UserInterface;
   }
 }
 
 export const verifyToken = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   const token = req.cookies.jwt; // Get the token from the HTTP-only cookie
   if (!token) {
@@ -34,7 +35,7 @@ export const verifyToken = async (
     if (!user) {
       throw new Error("Authentication failed. User not found.");
     }
-    req.user = decoded; //
+    req.user = user; //
     next(); // Call next middleware
   } catch (error) {
     console.error("Token error", error);

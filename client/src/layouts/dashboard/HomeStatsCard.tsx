@@ -28,47 +28,31 @@ const HomeStatsCard = ({
             <CardTitle>Stats</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-between items-center">
+            <div className="grid grid-cols-3">
               <div>
                 <p className="text-2xl font-bold">
                   {workspaces?.reduce(
-                    (sum: number, workspace: WorkspaceType) =>
-                      sum + workspace.forms.length,
-                    0
+                    (sum: number, workspace: WorkspaceType) => sum + workspace.forms.length,
+                    0,
                   )}
                 </p>
                 <p className="text-sm text-muted-foreground">Forms</p>
               </div>
-              <div className="text-muted-foreground">
+              {/* <div className="text-muted-foreground">
                 <p className="text-2xl font-bold">
-                  {workspaces?.reduce(
-                    (sum: number, workspace: WorkspaceType) => {
-                      return (
-                        sum +
-                        workspace.forms.filter(
-                          (form) => form.published === true
-                        ).length
-                      );
-                    },
-                    0
-                  )}
+                  {workspaces?.reduce((sum: number, workspace: WorkspaceType) => {
+                    return sum + workspace.forms.filter(form => form.published === true).length;
+                  }, 0)}
                 </p>
                 <p className="text-sm text-muted-foreground">Published</p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-2xl font-bold">
-                  {workspaces?.reduce(
-                    (sum: number, workspace: WorkspaceType) => {
-                      return (
-                        sum +
-                        workspace.forms.reduce(
-                          (formSum, form) => formSum + form.submissions,
-                          0
-                        )
-                      );
-                    },
-                    0
-                  )}
+                  {workspaces?.reduce((sum: number, workspace: WorkspaceType) => {
+                    return (
+                      sum + workspace.forms.reduce((formSum, form) => formSum + form.submissions, 0)
+                    );
+                  }, 0)}
                 </p>
                 <p className="text-sm text-muted-foreground">Submissions</p>
               </div>

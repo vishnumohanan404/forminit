@@ -3,31 +3,15 @@ import { useParams, useSearchParams } from "react-router-dom";
 import Editor from "@/layouts/form/Editor";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "@/contexts/FormContext";
-import { createForm, fetchForm, updateForm } from "@/services/form";
+import { createForm, EditorJSData, fetchForm, updateForm } from "@/services/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useRef } from "react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AxiosError } from "axios";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-interface BlockData {
-  type: string; // Type of the block (e.g., 'header', 'paragraph', etc.)
-  data: any; // Data specific to the block type
-}
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
-interface EditorJSData {
-  title: string;
-  time: number; // Timestamp when the data was saved
-  blocks: BlockData[]; // Array of block data
-  workspaceId: string;
-  version: string;
-}
 const FormPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -37,51 +21,47 @@ const FormPage = () => {
   const [title, setTitle] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
   // Create mutation for creating a new form
-  const { mutate: createFormMutation, isPending: isPendingCreate } =
-    useMutation({
-      mutationFn: (workspaceDetails: EditorJSData) =>
-        createForm({
-          ...workspaceDetails,
-          title,
-          workspaceId: searchParams.get("workspaceId") || "",
-        }),
-      onSuccess: () => {
-        // Boom baby!
-        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-        toast.success("Form saved successfully");
-      },
-      onError: (error: AxiosError<{ message: string }>) => {
-        // An error happened!
-        toast.error(
-          error.response?.data?.message?.includes("Form validation failed")
-            ? "Form validation failed"
-            : "Something went wrong"
-        );
-      },
-    });
+  const { mutate: createFormMutation, isPending: isPendingCreate } = useMutation({
+    mutationFn: (workspaceDetails: EditorJSData) =>
+      createForm({
+        ...workspaceDetails,
+        title,
+        workspaceId: searchParams.get("workspaceId") || "",
+      }),
+    onSuccess: () => {
+      // Boom baby!
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success("Form saved successfully");
+    },
+    onError: (error: AxiosError<{ message: string }>) => {
+      // An error happened!
+      toast.error(
+        error.response?.data?.message?.includes("Form validation failed")
+          ? "Form validation failed"
+          : "Something went wrong",
+      );
+    },
+  });
   // Create mutation for updating the form title
-  const { mutate: updateFormMutation, isPending: isPendingUpdate } =
-    useMutation({
-      mutationFn: (workspaceDetails: EditorJSData) =>
-        updateForm(id || "", workspaceDetails),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-        toast.success("Form updated successfully");
-      },
-      onError: (error: AxiosError<{ message: string }>) => {
-        // An error happened!
-        toast.error(
-          error.response?.data?.message?.includes("Form validation failed")
-            ? "Form validation failed"
-            : "Something went wrong"
-        );
-      },
-    });
+  const { mutate: updateFormMutation, isPending: isPendingUpdate } = useMutation({
+    mutationFn: (workspaceDetails: EditorJSData) => updateForm(id || "", workspaceDetails),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success("Form updated successfully");
+    },
+    onError: (error: AxiosError<{ message: string }>) => {
+      // An error happened!
+      toast.error(
+        error.response?.data?.message?.includes("Form validation failed")
+          ? "Form validation failed"
+          : "Something went wrong",
+      );
+    },
+  });
 
   const handleSubmit = () => {
-    console.log({ state });
     if (id) {
-      updateFormMutation({ title, ...state.editorData });
+      updateFormMutation({ ...state.editorData, title });
     } else {
       createFormMutation(state.editorData);
     }
@@ -130,7 +110,7 @@ const FormPage = () => {
                   <span className="flex">
                     <Button
                       size="sm"
-                      className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
+                      className="font-bold tracking-normal  min-w-20"
                       disabled
                     >
                       PUBLISH
@@ -144,16 +124,10 @@ const FormPage = () => {
             ) : (
               <Button
                 size="sm"
-                className="font-bold tracking-normal bg-blue-500 hover:bg-blue-600 min-w-20"
+                className="font-bold tracking-normal  min-w-20"
                 onClick={handleSubmit}
               >
-                <div>
-                  {isPendingCreate || isPendingUpdate ? (
-                    <LoadingSpinner />
-                  ) : (
-                    "PUBLISH"
-                  )}
-                </div>
+                <div>{isPendingCreate || isPendingUpdate ? <LoadingSpinner /> : "PUBLISH"}</div>
               </Button>
             )}
           </TooltipProvider>

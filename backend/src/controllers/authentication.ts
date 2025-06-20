@@ -1,15 +1,11 @@
 import { Request, Response } from "express";
-import {
-  loginUser,
-  registerGoogleUser,
-  registerNewUser,
-} from "../services/authentication";
+import { loginUser, registerGoogleUser, registerNewUser } from "../services/authentication";
 import { errorResponse, validate } from "../helpers";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, email, password } = req.body;
-    validate(req, res);
+    validate(req);
 
     // Call the service to register the user
     const { user, token } = await registerNewUser({
@@ -34,7 +30,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
 export const login = async (req: Request, res: Response) => {
   // Check for validation errors
-  validate(req, res);
+  validate(req);
   const { email, password } = req.body;
   try {
     const { token, user } = await loginUser({ email, password });
@@ -51,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
       message: "Login successful",
       user,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     errorResponse(error, res);
   }
 };
@@ -60,7 +56,7 @@ export const google = async (req: Request, res: Response): Promise<void> => {
   try {
     // If user doesn't exist, register them
     const { user, token } = await registerGoogleUser(
-      req.body.code // Store Google user ID for future logins
+      req.body.code, // Store Google user ID for future logins
     );
     res.cookie("jwt", token, {
       httpOnly: true,

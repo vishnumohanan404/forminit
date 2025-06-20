@@ -1,27 +1,24 @@
 import User, { UserInterface } from "../models/user";
 import bcrypt from "bcrypt";
 
-export const findUser = async (
-  userId: string
-): Promise<Partial<UserInterface> | null> => {
+export const findUser = async (userId: string): Promise<Partial<UserInterface> | null> => {
   const user: UserInterface | null = await User.findById(userId);
   return user;
 };
 export const findUserAndUpdate = async (
   userId: string,
-  usedData: Partial<UserInterface>
+  usedData: Partial<UserInterface>,
 ): Promise<Partial<UserInterface> | null> => {
-  const user: UserInterface | null = await User.findByIdAndUpdate(
-    userId,
-    usedData,
-    { new: true, runValidators: true }
-  );
+  const user: UserInterface | null = await User.findByIdAndUpdate(userId, usedData, {
+    new: true,
+    runValidators: true,
+  });
   return user;
 };
 export const findUserAndUpdatePassword = async (
   userId: string,
   currentPassword: string | null,
-  newPassword: string
+  newPassword: string,
 ): Promise<Partial<UserInterface> | null> => {
   const user = await User.findById(userId).select("+password");
   if (!user) {

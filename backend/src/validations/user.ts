@@ -4,9 +4,7 @@ import { body } from "express-validator";
 export const signupValidation = [
   body("fullName").notEmpty().withMessage("Name is required"),
   body("email").isEmail().withMessage("Invalid email"),
-  body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
+  body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
   // TODO: uncheck in production
   // .matches(/\d/)
   // .withMessage("Password must contain at least one number")

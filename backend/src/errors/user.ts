@@ -29,5 +29,3 @@ export class UnauthorizedError extends ErrorBase<ErrorName> {
     });
   }
 }
-
-

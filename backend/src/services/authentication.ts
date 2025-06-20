@@ -1,12 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/user"; // Mongoose model for User
-import {
-  ConflictError,
-  UnauthorizedError,
-  UserNotFoundError,
-} from "../errors/user";
+import { ConflictError, UnauthorizedError, UserNotFoundError } from "../errors/user";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { NotFoundError } from "../errors/common";
 import Dashboard from "../models/dashboard";
 import mongoose from "mongoose";
 import { OAuth2Client } from "google-auth-library";
@@ -20,11 +15,7 @@ interface UserInput {
 const tokenExpiry: SignOptions = { expiresIn: "1h" };
 
 // Service function for registering a new user
-export const registerNewUser = async ({
-  fullName,
-  email,
-  password,
-}: UserInput) => {
+export const registerNewUser = async ({ fullName, email, password }: UserInput) => {
   // Check if the user already exists (e.g., by email)
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -50,12 +41,11 @@ export const registerNewUser = async ({
       },
     ],
   });
-  const savedDashboard = await newDashboard.save();
-  console.log("User workspaces created:", savedDashboard);
+  await newDashboard.save();
   const token = jwt.sign(
     { _id: user._id, email: user.email }, // Payload
     JWT_SECRET,
-    tokenExpiry // Token expiration
+    tokenExpiry, // Token expiration
   );
   return { user, token };
 };
@@ -87,7 +77,7 @@ export const loginUser = async ({ email, password }: LoginInput) => {
   const token = jwt.sign(
     { _id: user._id, email: user.email }, // Payload
     JWT_SECRET,
-    tokenExpiry // Token expiration
+    tokenExpiry, // Token expiration
   );
 
   return { token, user };
@@ -95,7 +85,7 @@ export const loginUser = async ({ email, password }: LoginInput) => {
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "postmessage"
+  "postmessage",
 );
 export const registerGoogleUser = async (code: string) => {
   const { tokens } = await oAuth2Client.getToken(code); // exchange code for tokens
@@ -107,7 +97,7 @@ export const registerGoogleUser = async (code: string) => {
     idToken: tokens.id_token,
     audience: process.env.GOOGLE_CLIENT_ID,
   });
-  console.log("googleUser.getPayload() :>> ", googleUser.getPayload());
+
   const { email, name, sub, picture } = googleUser.getPayload() || {};
   if (!email) {
     throw new UnauthorizedError("USER_NOT_AUTHORIZED");
@@ -118,7 +108,7 @@ export const registerGoogleUser = async (code: string) => {
     const token = jwt.sign(
       { _id: existingUser._id, email: existingUser.email }, // Payload
       JWT_SECRET,
-      tokenExpiry // Token expiration
+      tokenExpiry, // Token expiration
     );
     return { user: existingUser, token };
   } else {
@@ -140,12 +130,11 @@ export const registerGoogleUser = async (code: string) => {
         },
       ],
     });
-    const savedDashboard = await newDashboard.save();
-    console.log("User workspaces created:", savedDashboard);
+    await newDashboard.save();
     const token = jwt.sign(
       { _id: user._id, email: user.email }, // Payload
       JWT_SECRET,
-      tokenExpiry // Token expiration
+      tokenExpiry, // Token expiration
     );
     return { user, token };
   }

@@ -1,10 +1,6 @@
 import axiosClient from ".";
 
-export const signup = async (data: {
-  fullName: string;
-  email: string;
-  password: string;
-}) => {
+export const signup = async (data: { fullName: string; email: string; password: string }) => {
   const response = await axiosClient.post("/api/auth/signup", data);
   return response?.data;
 };

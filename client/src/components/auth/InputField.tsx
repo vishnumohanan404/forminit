@@ -23,7 +23,7 @@ const InputField = ({
   placeholder,
 }: {
   register: UseFormRegister<AuthFormFields>;
-  errorMessage: String | undefined;
+  errorMessage: string | undefined;
   fieldType: "fullName" | "email" | "password" | "confirmPassword";
   fieldTitle: string;
   validationOptions: RegisterOptions<AuthFormFields>;

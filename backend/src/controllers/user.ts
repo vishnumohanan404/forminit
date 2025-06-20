@@ -1,15 +1,11 @@
 import { Request, Response } from "express";
 import { errorResponse } from "../helpers";
-import {
-  findUser,
-  findUserAndUpdate,
-  findUserAndUpdatePassword,
-} from "../services/user";
+import { findUser, findUserAndUpdate, findUserAndUpdatePassword } from "../services/user";
 
 export const getUser = async (req: Request, res: Response) => {
   try {
-    const { user } = req;
-    const userData = await findUser(user._id);
+    const user = req.user!;
+    const userData = await findUser(String(user._id));
     if (!userData) {
       res.status(404).send("User not found");
       return;
@@ -21,8 +17,9 @@ export const getUser = async (req: Request, res: Response) => {
 };
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const { user, body } = req;
-    const updatedUserData = await findUserAndUpdate(user._id, body);
+    const { body } = req;
+    const user = req.user!;
+    const updatedUserData = await findUserAndUpdate(String(user._id), body);
     if (!updatedUserData) {
       res.status(404).send("User not found");
       return;
@@ -35,21 +32,15 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const updatePassword = async (req: Request, res: Response) => {
   try {
-    const { user } = req;
+    const user = req.user!;
     const { currentPwd, newPwd } = req.body;
 
     if (!newPwd || newPwd.length < 6) {
-      res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long." });
+      res.status(400).json({ message: "Password must be at least 6 characters long." });
       return;
     }
 
-    const updatedUser = await findUserAndUpdatePassword(
-      user._id,
-      currentPwd,
-      newPwd
-    );
+    const updatedUser = await findUserAndUpdatePassword(String(user._id), currentPwd, newPwd);
     if (updatedUser) {
       res.status(200).json({ message: "Password updated successfully." });
       return;

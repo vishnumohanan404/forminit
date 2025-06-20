@@ -1,21 +1,18 @@
 import PageTitle from "@/components/common/PageTitle";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import HomeFormsListItem from "@/layouts/dashboard/HomeFormsListItem";
 import HomeStatsCard from "@/layouts/dashboard/HomeStatsCard";
 import HomeWorkspaceCard from "@/layouts/dashboard/HomeWorkspaceCard";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, LinkIcon, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
@@ -28,22 +25,20 @@ const DashboardPage = () => {
     queryFn: fetchDashboard,
     staleTime: 10000,
   });
-  const publishedForms: FormType[] = dashboard?.workspaces?.flatMap(
-    (workspace: WorkspaceType) =>
-      workspace.forms
-        .filter((form) => form.published)
-        .map((form) => ({ ...form, workspaceId: workspace._id }))
+  // const publishedForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
+  //   workspace.forms
+  //     .filter(form => form.published)
+  //     .map(form => ({ ...form, workspaceId: workspace._id })),
+  // );
+  const allForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
+    workspace.forms.map(form => ({ ...form, workspaceId: workspace._id })),
   );
-  const allForms: FormType[] = dashboard?.workspaces?.flatMap(
-    (workspace: WorkspaceType) =>
-      workspace.forms.map((form) => ({ ...form, workspaceId: workspace._id }))
-  );
-  const draftedForms: FormType[] = dashboard?.workspaces?.flatMap(
-    (workspace: WorkspaceType) =>
-      workspace.forms
-        .filter((form) => !form.published)
-        .map((form) => ({ ...form, workspaceId: workspace._id })) // Only include forms that are not published
-  );
+  // const draftedForms: FormType[] = dashboard?.workspaces?.flatMap(
+  //   (workspace: WorkspaceType) =>
+  //     workspace.forms
+  //       .filter(form => !form.published)
+  //       .map(form => ({ ...form, workspaceId: workspace._id })), // Only include forms that are not published
+  // );
   return (
     <div className="px-5">
       <PageTitle>Home</PageTitle>
@@ -60,22 +55,85 @@ const DashboardPage = () => {
             />
           </div>
         )}
-        <Tabs defaultValue="all" className="mt-12">
+        <Tabs
+          defaultValue="all"
+          className="mt-12"
+        >
           <TabsList>
             <TabsTrigger value="all">All Forms</TabsTrigger>
-            <TabsTrigger value="published" disabled>
+            <TabsTrigger
+              value="published"
+              disabled
+            >
               Published
             </TabsTrigger>
-            <TabsTrigger value="drafts" disabled>
+            <TabsTrigger
+              value="drafts"
+              disabled
+            >
               Drafts
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="all" className="mt-4">
+          <TabsContent
+            value="all"
+            className="mt-4"
+          >
             <div className="grid gap-4">
               {!isError && allForms?.length > 0 ? (
-                allForms.map((form) => (
-                  <HomeFormsListItem form={form} key={form._id} />
-                ))
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[20%]">Name</TableHead>
+                      {/* <TableHead className="w-[20%]">Status</TableHead> */}
+                      <TableHead className="w-[20%]">Submissions</TableHead>
+                      <TableHead className="w-[20%]">Created</TableHead>
+                      <TableHead className="w-[20%] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allForms.map(form => (
+                      <TableRow
+                        key={form._id}
+                        className="group"
+                      >
+                        <TableCell className="w-[20%] font-bold">
+                          <Link
+                            to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
+                            onClick={e => e.stopPropagation()}
+                            className="group-hover:underline"
+                          >
+                            {form.name}
+                          </Link>
+                        </TableCell>
+                        {/* <TableCell className="w-[20%]">
+                          {form.published ? "Published" : "Draft"}
+                        </TableCell> */}
+                        <TableCell className="w-[20%]">{form.submissions}</TableCell>
+                        <TableCell className="w-[20%]">
+                          {new Date(form.created).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="w-[20%] text-right space-x-3 font-semibold text-primary">
+                          <Link
+                            to={`/view-form/${form.form_id}`}
+                            target="_blank"
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            View
+                          </Link>
+
+                          <Link
+                            to={`/form/${form.form_id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            Edit
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <p className="text-2xl mx-auto w-fit my-16 font-semibold text-muted-foreground">
                   No published forms available
@@ -83,7 +141,10 @@ const DashboardPage = () => {
               )}
             </div>
           </TabsContent>
-          <TabsContent value="published" className="mt-4">
+          <TabsContent
+            value="published"
+            className="mt-4"
+          >
             {/* <div className="grid gap-4">
               {!isError && publishedForms?.length > 0 ? (
                 publishedForms.map((form) => (
@@ -123,7 +184,10 @@ const DashboardPage = () => {
               )}
             </div> */}
           </TabsContent>
-          <TabsContent value="drafts" className="mt-4">
+          <TabsContent
+            value="drafts"
+            className="mt-4"
+          >
             {/* <div className="grid gap-4">
               {!isError && draftedForms?.length > 0 ? (
                 draftedForms.map((form) => (

@@ -13,13 +13,10 @@ export const authentication = (salt: string, password: string) => {
     .update(String(process.env.JWT_SECRET));
 };
 
-export const validate = (req: Request, res: Response) => {
+export const validate = (req: Request) => {
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    throw new RequestValidationError(
-      "REQUEST_VALIDATION_ERROR",
-      result.array()
-    );
+    throw new RequestValidationError("REQUEST_VALIDATION_ERROR", result.array());
   }
 };
 

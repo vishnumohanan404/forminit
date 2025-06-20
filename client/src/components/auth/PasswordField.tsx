@@ -27,7 +27,7 @@ const PasswordField = ({
   validationOptions,
 }: {
   register: UseFormRegister<AuthFormFields>;
-  errorMessage: String | undefined;
+  errorMessage: string | undefined;
   fieldType: "fullName" | "email" | "password" | "confirmPassword";
   fieldTitle: string;
   validationOptions: RegisterOptions<AuthFormFields>;
@@ -55,9 +55,7 @@ const PasswordField = ({
           ) : (
             <Eye className="h-4 w-4 text-muted-foreground" />
           )}
-          <span className="sr-only">
-            {showPassword ? "Hide password" : "Show password"}
-          </span>
+          <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
         </Button>
       </div>
       {errorMessage && <FormError>{errorMessage}</FormError>}

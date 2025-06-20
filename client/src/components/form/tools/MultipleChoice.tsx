@@ -29,7 +29,6 @@ export default class MultipleChoiceTool {
     block: BlockAPI;
     data: MultipleChoiceDataInterface;
   }) {
-    console.log("data :>> ", data);
     this.api = api;
     this.block = block;
     this.data = Object.keys(data).length
@@ -48,13 +47,10 @@ export default class MultipleChoiceTool {
     // Insert Title Block
     const onKeyDown = (
       event: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
-      idx: number | undefined
+      idx: number | undefined,
     ) => {
       if (event.key === "Backspace") {
-        if (
-          this.data.options.length > 0 &&
-          this.data.options[0].optionValue === ""
-        ) {
+        if (this.data.options.length > 0 && this.data.options[0].optionValue === "") {
           if (this.data.title === "") {
             // Prevent default backspace behavior and remove the block
 
@@ -63,13 +59,7 @@ export default class MultipleChoiceTool {
             setTimeout(() => {
               if (currentIndex > 0) {
                 const previousIndex = currentIndex - 1;
-                console.log(
-                  "Moving focus to previous block index: ",
-                  previousIndex
-                );
                 this.api.caret.setToBlock(previousIndex, "end");
-              } else {
-                console.log("No previous block to move to.");
               }
             }, 0);
           }
@@ -84,7 +74,7 @@ export default class MultipleChoiceTool {
       <div>
         <QuestionTitle
           placeholder={"Type your question here"}
-          onInput={(value) => {
+          onInput={value => {
             this.data.title = value;
           }}
           onKeyDown={onKeyDown}
@@ -94,19 +84,18 @@ export default class MultipleChoiceTool {
         <MultipleChoiceOption
           optionsProp={this.data.options}
           onLastOptionKeyDown={onKeyDown}
-          onAddNewOption={(options) => {
+          onAddNewOption={options => {
             this.data.options = options;
           }}
-          onInputChange={(options) => {
+          onInputChange={options => {
             this.data.options = options;
           }}
         />
-      </div>
+      </div>,
     );
     return this.wrapper; // This block itself doesn't need content
   }
-  save(blockContent: HTMLElement): {} {
-    console.log({ blockContent });
+  save(): MultipleChoiceDataInterface {
     // No need to save anything for the parent tool
     return { ...this.data };
   }

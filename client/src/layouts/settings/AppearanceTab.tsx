@@ -12,7 +12,10 @@ const AppearanceTab = () => {
   return (
     <div className="space-y-2">
       <Label htmlFor="language">Language</Label>
-      <Select value={language} onValueChange={setLanguage}>
+      <Select
+        value={language}
+        onValueChange={setLanguage}
+      >
         <SelectTrigger id="language">
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>

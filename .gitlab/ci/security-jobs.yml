@@ -1,0 +1,55 @@
+trivy_fs_scan:
+  stage: security
+  image: node:18
+  before_script:
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+  script:
+    - ./bin/trivy fs . --exit-code 1 --severity HIGH,CRITICAL
+  rules:
+    - if:
+        '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME ==
+        "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")'
+      when: always
+    - when: never
+
+owasp_dep_check:
+  stage: security
+  image: owasp/dependency-check:latest
+  before_script: []
+  script:
+    - mkdir -p owasp-report
+    - dependency-check.sh --project "my-app" --scan . --format HTML --out owasp-report/
+  artifacts:
+    paths:
+      - owasp-report/
+    expire_in: 1 week
+  rules:
+    - if:
+        '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME ==
+        "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")'
+      when: always
+    - when: never
+
+trivy_image_scan:
+  stage: security
+  image: docker:24.0.7
+  services:
+    - docker:24.0.7-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apk add --no-cache curl bash
+    - docker builder prune -a --force
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+  script:
+    - docker build --no-cache -f backend/Dockerfile.prod -t backend-image .
+    - docker build --no-cache -f client/Dockerfile.prod -t client-image .
+    - ./bin/trivy image --exit-code 1 --severity HIGH,CRITICAL backend-image
+    - ./bin/trivy image --exit-code 1 --severity HIGH,CRITICAL client-image
+  rules:
+    - if:
+        '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME ==
+        "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")'
+      when: always
+    - when: never
