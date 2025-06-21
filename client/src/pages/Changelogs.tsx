@@ -1,72 +1,99 @@
-import PageTitle from "@/components/common/PageTitle";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Star, Zap, Bug } from "lucide-react";
+import { ChevronDown, ChevronUp, GitCommit } from "lucide-react";
+import { fetchChangelogs } from "@/services/changelogs";
+import { useQuery } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import PageTitle from "@/components/common/PageTitle";
 
 interface ChangelogEntry {
   version: string;
-  date: string;
   changes: {
-    type: "feature" | "improvement" | "bugfix";
+    id: string;
     description: string;
   }[];
 }
-type TabType = "all" | "feature" | "improvement" | "bugfix";
-
-const changelogs: ChangelogEntry[] = [
-  {
-    version: "1.5.2",
-    date: "2024-02-10",
-    changes: [
-      {
-        type: "bugfix",
-        description: "Fixed form validation errors on certain field types",
-      },
-      {
-        type: "improvement",
-        description: "Enhanced performance of form template loading",
-      },
-    ],
-  },
-  {
-    version: "1.5.0",
-    date: "2024-01-05",
-    changes: [
-      {
-        type: "feature",
-        description: "Introduced conditional logic for form fields",
-      },
-      {
-        type: "feature",
-        description: "Added support for file uploads in forms",
-      },
-      {
-        type: "improvement",
-        description: "Enhanced mobile responsiveness of forms",
-      },
-    ],
-  },
-];
 
 const ChangelogsPage = () => {
-  const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
+  const [changelogs, setChangelogs] = useState<ChangelogEntry[]>([]);
   const [expandedVersions, setExpandedVersions] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<"all" | "feature" | "improvement" | "bugfix">("all");
 
-  const filteredChangelogs = selectedVersion
-    ? changelogs.filter(log => log.version === selectedVersion)
-    : changelogs;
+  // Parse markdown changelog content
+  const parseChangelog = (content: string): ChangelogEntry[] => {
+    const entries: ChangelogEntry[] = [];
+    const lines = content.split("\n");
+
+    let currentEntry: Partial<ChangelogEntry> | null = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      // Match version headers like "## 0.6.0"
+      const versionMatch = line.match(/^##\s+(\d+\.\d+\.\d+)/);
+
+      if (versionMatch) {
+        // Save previous entry if exists
+        if (currentEntry && currentEntry.version) {
+          entries.push({
+            version: currentEntry.version,
+            changes: currentEntry.changes || [],
+          });
+        }
+
+        // Start new entry
+        currentEntry = {
+          version: versionMatch[1],
+          changes: [],
+        };
+      }
+
+      // Match change entries like "- e4f4ae8: fixed manifest path"
+      if (currentEntry && line.match(/^-\s+[a-f0-9]+:/)) {
+        const changeMatch = line.match(/^-\s+([a-f0-9]+):\s+(.+)/);
+        if (changeMatch) {
+          currentEntry.changes = currentEntry.changes || [];
+          currentEntry.changes.push({
+            id: changeMatch[1],
+            description: changeMatch[2].trim(),
+          });
+        }
+      }
+    }
+
+    // Don't forget the last entry
+    if (currentEntry && currentEntry.version) {
+      entries.push({
+        version: currentEntry.version,
+        changes: currentEntry.changes || [],
+      });
+    }
+
+    return entries;
+  };
+
+  // Fetch from public folder
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["changelogs"],
+    queryFn: fetchChangelogs,
+    staleTime: 10_000,
+  });
+
+  useEffect(() => {
+    if (response) {
+      const parsed = parseChangelog(response);
+      if (parsed.length !== 0) {
+        setChangelogs(parsed);
+        setExpandedVersions([parsed[0].version]);
+      }
+    }
+  }, [response, isError]);
 
   const toggleExpand = (version: string) => {
     setExpandedVersions(prev =>
@@ -74,67 +101,27 @@ const ChangelogsPage = () => {
     );
   };
 
-  useEffect(() => {
-    if (filteredChangelogs.length > 0) {
-      setExpandedVersions([filteredChangelogs[0].version]);
-    }
-  }, [selectedVersion, filteredChangelogs]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[500px]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-  const getIcon = (type: "feature" | "improvement" | "bugfix") => {
-    switch (type) {
-      case "feature":
-        return <Star className="w-4 h-4" />;
-      case "improvement":
-        return <Zap className="w-4 h-4" />;
-      case "bugfix":
-        return <Bug className="w-4 h-4" />;
-    }
-  };
   return (
     <div className="px-5">
       <PageTitle>Changelogs</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container">
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <Select onValueChange={value => setSelectedVersion(value === "all" ? null : value)}>
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filter by version" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Versions</SelectItem>
-              {changelogs.map(log => (
-                <SelectItem
-                  key={log.version}
-                  value={log.version}
-                >
-                  Version {log.version}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Tabs
-            value={activeTab}
-            onValueChange={(value: string) => setActiveTab(value as TabType)}
-            className="w-full sm:w-auto"
-          >
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="feature">Features</TabsTrigger>
-              <TabsTrigger value="improvement">Improvements</TabsTrigger>
-              <TabsTrigger value="bugfix">Bugfixes</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
         <div className="space-y-6">
           <AnimatePresence>
-            {filteredChangelogs.map(log => (
+            {changelogs.map((log, index) => (
               <motion.div
                 key={log.version}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <Card className="overflow-hidden border-l-4 border-l-primary shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <CardHeader
@@ -142,11 +129,16 @@ const ChangelogsPage = () => {
                     onClick={() => toggleExpand(log.version)}
                   >
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-2xl font-bold">Version {log.version}</CardTitle>
+                      <div className="flex items-center gap-3">
+                        <CardTitle className="text-2xl font-bold">v{log.version}</CardTitle>
+                        <Badge
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          {log.changes.length} change{log.changes.length !== 1 ? "s" : ""}
+                        </Badge>
+                      </div>
                       <div className="flex items-center space-x-2">
-                        <CardDescription className="text-sm font-medium">
-                          {log.date}
-                        </CardDescription>
                         {expandedVersions.includes(log.version) ? (
                           <ChevronUp className="w-5 h-5 text-primary" />
                         ) : (
@@ -157,34 +149,25 @@ const ChangelogsPage = () => {
                   </CardHeader>
                   {expandedVersions.includes(log.version) && (
                     <CardContent className="pt-4">
-                      <ul className="space-y-3">
-                        {log.changes
-                          .filter(change => activeTab === "all" || change.type === activeTab)
-                          .map((change, index) => (
-                            <motion.li
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.1 }}
-                              className="flex items-start space-x-3 bg-muted/30 p-3 rounded-md hover:bg-muted/50 transition-colors duration-200"
-                            >
-                              <Badge
-                                variant={
-                                  change.type === "feature"
-                                    ? "default"
-                                    : change.type === "improvement"
-                                      ? "secondary"
-                                      : "destructive"
-                                }
-                                className="mt-0.5 flex items-center space-x-1 px-2 py-1"
-                              >
-                                {getIcon(change.type)}
-                                <span className="capitalize">{change.type}</span>
-                              </Badge>
-                              <span className="flex-1">{change.description}</span>
-                            </motion.li>
-                          ))}
-                      </ul>
+                      <div className="space-y-3">
+                        {log.changes.map((change, changeIndex) => (
+                          <motion.div
+                            key={change.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: changeIndex * 0.1 }}
+                            className="flex items-start space-x-3 bg-muted/30 p-3 rounded-md hover:bg-muted/50 transition-colors duration-200"
+                          >
+                            <div className="flex items-center space-x-2 min-w-0">
+                              <GitCommit className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <code className="text-xs bg-muted px-2 py-1 rounded font-mono text-muted-foreground">
+                                {change.id}
+                              </code>
+                            </div>
+                            <span className="flex-1 text-sm">{change.description}</span>
+                          </motion.div>
+                        ))}
+                      </div>
                     </CardContent>
                   )}
                 </Card>
@@ -192,10 +175,9 @@ const ChangelogsPage = () => {
             ))}
           </AnimatePresence>
         </div>
-        {filteredChangelogs.length === 0 && (
-          <p className="text-center text-muted-foreground mt-8">
-            No changelogs found for the selected version.
-          </p>
+
+        {changelogs.length === 0 && (
+          <p className="text-center text-muted-foreground mt-8">No changelogs found.</p>
         )}
 
         <div className="mt-8 text-center">

@@ -4,6 +4,7 @@ import userRoutes from "./user";
 import dashboardRoutes from "./dashboard";
 import workspaceRoutes from "./workspace";
 import formRoutes from "./form";
+import changelogsRoutes from "./changelogs";
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ router.use("/user", userRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/workspace", workspaceRoutes);
 router.use("/form", formRoutes);
+router.use("/changelogs", changelogsRoutes);
 
 export default router;
