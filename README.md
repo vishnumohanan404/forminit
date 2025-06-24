@@ -2,7 +2,7 @@
 
 A modern notion-like form builder.
 
-![Project Logo](https://gitlab.com/forminit/forminit-app/-/blob/main/client/public/thumbnail.png?ref_type=heads)
+![Project Logo](https://gitlab.com/forminit/forminit-app/-/raw/6c6c2b7276472f62eb4296ed232862fe07267762/client/public/thumbnail.png)
 
 ## Table of Contents
 
