@@ -17,6 +17,7 @@ owasp_dep_check:
   image: owasp/dependency-check:latest
   before_script: []
   script:
+    - ls
     - mkdir -p owasp-report
     - |
       dependency-check.sh \
