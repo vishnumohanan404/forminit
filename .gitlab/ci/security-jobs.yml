@@ -14,19 +14,26 @@ trivy_fs_scan:
 
 owasp_dep_check:
   stage: security
-  image: owasp/dependency-check:latest
+  image:
+    name: owasp/dependency-check:latest
+    entrypoint: [""]
   before_script: []
   script:
     - |
       cd "$CI_PROJECT_DIR"
       mkdir -p owasp-report
-      dependency-check.sh \
+      echo "Current directory: $(pwd)"
+      echo "Scanning directory contents:"
+      ls -la ./client || echo "Client directory not found"
+      /usr/share/dependency-check/bin/dependency-check.sh \
         --project "forminit" \
         --scan ./client \
+        --scan ./backend \
         --format HTML \
         --out owasp-report/ \
         --nvdApiKey "${NVD_API_KEY}"
-
+      echo "Scan completed, checking output:"
+      ls -la owasp-report/
   artifacts:
     paths:
       - owasp-report/
