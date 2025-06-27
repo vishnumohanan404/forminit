@@ -17,17 +17,16 @@ owasp_dep_check:
   image: owasp/dependency-check:latest
   before_script: []
   script:
-    - ls
-    - mkdir -p owasp-report
-    - cd /builds/forminit/forminit-app 
     - |
+      cd "$CI_PROJECT_DIR"
+      mkdir -p owasp-report
       dependency-check.sh \
-      --project "forminit" \
-      --scan ./client \
-      --scan ./backend \
-      --format HTML \
-      --out owasp-report/ \
-      --nvdApiKey "${NVD_API_KEY}"
+        --project "forminit" \
+        --scan ./client \
+        --format HTML \
+        --out owasp-report/ \
+        --nvdApiKey "${NVD_API_KEY}"
+
   artifacts:
     paths:
       - owasp-report/
