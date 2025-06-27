@@ -19,8 +19,15 @@ owasp_dep_check:
   script:
     - mkdir -p owasp-report
     - |
-      dependency-check.sh --project "forminit" --scan client/package-lock.json \
-       --scan backend/package-lock.json --format HTML --out owasp-report/
+      dependency-check.sh \
+      --project "forminit" \
+      --scan ./package-lock.json \
+      --format HTML \
+      --out owasp-report/ \
+      --nvdApiKey "${NVD_API_KEY}"
+  volumes:
+    - name: nvd-database
+      path: /usr/share/dependency-check/data
   artifacts:
     paths:
       - owasp-report/
