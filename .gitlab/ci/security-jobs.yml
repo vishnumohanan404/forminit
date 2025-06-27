@@ -21,7 +21,8 @@ owasp_dep_check:
     - |
       dependency-check.sh \
       --project "forminit" \
-      --scan ./package-lock.json \
+      --scan ./client \
+      --scan ./backend \
       --format HTML \
       --out owasp-report/ \
       --nvdApiKey "${NVD_API_KEY}"
