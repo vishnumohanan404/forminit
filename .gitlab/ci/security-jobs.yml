@@ -19,6 +19,7 @@ owasp_dep_check:
   script:
     - ls
     - mkdir -p owasp-report
+    - cd /builds/forminit/forminit-app 
     - |
       dependency-check.sh \
       --project "forminit" \
