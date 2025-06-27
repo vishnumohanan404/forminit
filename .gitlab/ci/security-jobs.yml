@@ -25,9 +25,6 @@ owasp_dep_check:
       --format HTML \
       --out owasp-report/ \
       --nvdApiKey "${NVD_API_KEY}"
-  volumes:
-    - name: nvd-database
-      path: /usr/share/dependency-check/data
   artifacts:
     paths:
       - owasp-report/
