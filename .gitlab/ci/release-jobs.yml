@@ -93,7 +93,12 @@ docker_push:
         exit 0
       fi
     - echo "Using version $VERSION"
-    - docker build -f ./client/Dockerfile.prod -t $ECR_REGISTRY/forminit-client:$VERSION .
+    - |
+      docker build -f ./client/Dockerfile.prod \
+      --build-arg VITE_GOOGLE_CLIENT_ID="$VITE_GOOGLE_CLIENT_ID" \
+      --build-arg VITE_BACKEND_URL="$VITE_BACKEND_URL" \
+      --build-arg NODE_ENV="production" \
+      -t $ECR_REGISTRY/forminit-client:$VERSION .
     - docker build -f ./backend/Dockerfile.prod -t $ECR_REGISTRY/forminit-backend:$VERSION .
     - docker push $ECR_REGISTRY/forminit-client:$VERSION
     - docker push $ECR_REGISTRY/forminit-backend:$VERSION
@@ -135,12 +140,12 @@ update_manifests:
 
     # Update frontend image tag
     - |
-      yq eval '.spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-client:'$VERSION'"' \
+      yq eval 'select(.kind == "Deployment") | .spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-client:'$VERSION'"' \
         -i manifests/k8s/client.yaml
 
     # Update backend image tag
     - |
-      yq eval '.spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-backend:'$VERSION'"' \
+      yq eval 'select(.kind == "Deployment") | .spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-backend:'$VERSION'"' \
         -i manifests/k8s/backend.yaml
 
     # Commit and push changes
