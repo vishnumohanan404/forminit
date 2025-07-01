@@ -55,6 +55,13 @@ owasp_dep_check:
           echo "=== End Log ==="
           exit 1
         }
+      SCAN_PID=$!
+      while kill -0 $SCAN_PID 2>/dev/null; do
+        echo "Scan still running... $(date)"
+        ps aux | grep dependency-check || true
+        sleep 30
+      done
+      wait $SCAN_PID
       echo "Scan completed, checking output:"
       ls -la owasp-report/
   services: []
