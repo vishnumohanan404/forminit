@@ -49,7 +49,8 @@ trivy_image_scan:
   stage: security
   image: docker:24.0.7
   services:
-    - docker:24.0.7-dind
+    - name: docker:24.0.7-dind
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_TLS_CERTDIR: ""
