@@ -48,20 +48,25 @@ owasp_dep_check:
         --exclude "**/tests/**" \
         --exclude "**/*.min.js" \
         --exclude "**/coverage/**" \
-        --log /tmp/dependency-check.log || {
-          echo "Dependency check failed"
-          echo "=== Dependency Check Log ==="
-          cat /tmp/dependency-check.log || echo "No log file found"
-          echo "=== End Log ==="
-          exit 1
-        }
+        --log /tmp/dependency-check.log \
+        &
+
       SCAN_PID=$!
       while kill -0 $SCAN_PID 2>/dev/null; do
         echo "Scan still running... $(date)"
-        ps aux | grep dependency-check || true
+        ps aux | grep "[d]ependency-check" || true
         sleep 30
       done
       wait $SCAN_PID
+      EXIT_CODE=$?
+
+      if [[ $EXIT_CODE -ne 0 ]]; then
+        echo "Dependency check failed"
+        echo "=== Dependency Check Log ==="
+        cat /tmp/dependency-check.log || echo "No log file found"
+        echo "=== End Log ==="
+        exit $EXIT_CODE
+      fi
       echo "Scan completed, checking output:"
       ls -la owasp-report/
   services: []
