@@ -45,6 +45,7 @@ owasp_dep_check:
       when: always
     - when: never
 
+
 trivy_image_scan:
   stage: security
   image: docker:24.0.7
