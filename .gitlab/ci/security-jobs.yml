@@ -17,6 +17,10 @@ owasp_dep_check:
   image:
     name: owasp/dependency-check:latest
     entrypoint: [""]
+  variables:
+    JAVA_OPTS: "-Xmx4g"
+    # Path to your cached NVD database on the runner host
+    NVD_CACHE_HOST_PATH: "/opt/nvd-cache"
   before_script: []
   script:
     - |
@@ -25,15 +29,37 @@ owasp_dep_check:
       echo "Current directory: $(pwd)"
       echo "Scanning directory contents:"
       ls -la ./client || echo "Client directory not found"
+      ls -la /nvd-cache/ || echo "NVD cache not found"
+
+      # Run dependency-check with pre-cached database (no updates)
       /usr/share/dependency-check/bin/dependency-check.sh \
         --project "forminit" \
         --scan ./client \
         --scan ./backend \
         --format HTML \
+        --format JSON \
         --out owasp-report/ \
-        --nvdApiKey "${NVD_API_KEY}"
+        --data /nvd-cache \
+        --noupdate \
+        --enableExperimental \
+        --failOnCVSS 7 \
+        --exclude "**/node_modules/**" \
+        --exclude "**/test/**" \
+        --exclude "**/tests/**" \
+        --exclude "**/*.min.js" \
+        --exclude "**/coverage/**" \
+        --log /tmp/dependency-check.log || {
+          echo "Dependency check failed"
+          echo "=== Dependency Check Log ==="
+          cat /tmp/dependency-check.log || echo "No log file found"
+          echo "=== End Log ==="
+          exit 1
+        }
       echo "Scan completed, checking output:"
       ls -la owasp-report/
+  services: []
+  variables:
+    DOCKER_DRIVER: overlay2
   artifacts:
     paths:
       - owasp-report/
@@ -44,7 +70,6 @@ owasp_dep_check:
         "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main")'
       when: always
     - when: never
-
 
 trivy_image_scan:
   stage: security
