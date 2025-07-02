@@ -85,9 +85,9 @@ owasp_dep_check:
 
 trivy_image_scan:
   stage: security
-  image: docker:latest
+  image: docker:24.0.7
   services:
-    - name: docker:dind
+    - name: docker:24.0.7-dind
       alias: docker
   variables:
     DOCKER_TLS_CERTDIR: ""
