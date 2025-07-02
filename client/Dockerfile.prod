@@ -6,6 +6,7 @@ WORKDIR /app
 
 ARG VITE_GOOGLE_CLIENT_ID
 ARG VITE_BACKEND_URL
+ARG NODE_ENV=production
 
 # Copy package.json and package-lock.json files
 COPY package*.json ./
@@ -15,6 +16,7 @@ COPY packages/types ./packages/types
 
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV NODE_ENV=$NODE_ENV
 
 # Install production dependencies (without devDependencies)
 RUN npm install --workspace=client
