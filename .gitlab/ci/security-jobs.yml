@@ -14,11 +14,64 @@ trivy_fs_scan:
 
 owasp_dep_check:
   stage: security
-  image: owasp/dependency-check:latest
+  image:
+    name: owasp/dependency-check:latest
+    entrypoint: [""]
+  variables:
+    JAVA_OPTS: "-Xmx4g"
+    # Path to your cached NVD database on the runner host
+    NVD_CACHE_HOST_PATH: "/opt/nvd-cache"
   before_script: []
   script:
-    - mkdir -p owasp-report
-    - dependency-check.sh --project "my-app" --scan . --format HTML --out owasp-report/
+    - |
+      cd "$CI_PROJECT_DIR"
+      mkdir -p owasp-report
+      echo "Current directory: $(pwd)"
+      echo "Scanning directory contents:"
+      ls -la ./client || echo "Client directory not found"
+      ls -la /nvd-cache/ || echo "NVD cache not found"
+
+      # Run dependency-check with pre-cached database (no updates)
+      /usr/share/dependency-check/bin/dependency-check.sh \
+        --project "forminit" \
+        --scan ./client \
+        --scan ./backend \
+        --format HTML \
+        --format JSON \
+        --out owasp-report/ \
+        --data /nvd-cache \
+        --noupdate \
+        --enableExperimental \
+        --failOnCVSS 7 \
+        --exclude "**/node_modules/**" \
+        --exclude "**/test/**" \
+        --exclude "**/tests/**" \
+        --exclude "**/*.min.js" \
+        --exclude "**/coverage/**" \
+        --log /tmp/dependency-check.log \
+        &
+
+      SCAN_PID=$!
+      while kill -0 $SCAN_PID 2>/dev/null; do
+        echo "Scan still running... $(date)"
+        ps aux | grep "[d]ependency-check" || true
+        sleep 30
+      done
+      wait $SCAN_PID
+      EXIT_CODE=$?
+
+      if [[ $EXIT_CODE -ne 0 ]]; then
+        echo "Dependency check failed"
+        echo "=== Dependency Check Log ==="
+        cat /tmp/dependency-check.log || echo "No log file found"
+        echo "=== End Log ==="
+        exit $EXIT_CODE
+      fi
+      echo "Scan completed, checking output:"
+      ls -la owasp-report/
+  services: []
+  variables:
+    DOCKER_DRIVER: overlay2
   artifacts:
     paths:
       - owasp-report/
@@ -32,11 +85,11 @@ owasp_dep_check:
 
 trivy_image_scan:
   stage: security
-  image: docker:24.0.7
+  image: docker:28.1.1
   services:
-    - docker:24.0.7-dind
+    - name: docker:28.1.1-dind
+      alias: docker
   variables:
-    DOCKER_HOST: tcp://docker:2375/
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - apk add --no-cache curl bash
