@@ -18,7 +18,7 @@ version:
 
     # Run version bump
     - echo "✅ Bumping version using changeset..."
-    - npx changeset version
+    - npx @changesets/cli version
 
     # Get new version
     - VERSION=$(jq -r '.version' client/package.json)

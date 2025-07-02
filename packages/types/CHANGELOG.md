@@ -1,5 +1,11 @@
 # @shared/types
 
+## 0.7.0
+
+### Minor Changes
+
+- 643e41e: fix client args in ci
+
 ## 0.6.0
 
 ### Minor Changes
