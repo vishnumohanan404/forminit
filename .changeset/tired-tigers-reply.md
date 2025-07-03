@@ -1,7 +1,7 @@
 ---
-"backend": minor
 "client": minor
+"backend": minor
 "@shared/types": minor
 ---
 
-fix client args in ci
+production ready tailwind fix
