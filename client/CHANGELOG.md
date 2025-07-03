@@ -1,5 +1,12 @@
 # client
 
+## 0.9.0
+
+### Minor Changes
+
+- a51d066: changelogs in production
+- a51d066: production ready tailwind fix
+
 ## 0.8.0
 
 ### Minor Changes
