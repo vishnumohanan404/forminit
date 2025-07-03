@@ -1,5 +1,11 @@
 # backend
 
+## 0.8.0
+
+### Minor Changes
+
+- 605c8a8: production ready tailwind fix
+
 ## 0.7.0
 
 ### Minor Changes
