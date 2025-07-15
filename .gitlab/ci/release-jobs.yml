@@ -140,26 +140,24 @@ update_manifests:
 
     # Update frontend image tag
     - |
-      yq eval 'select(.kind == "Deployment") | .spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-client:'$VERSION'"' \
-        -i manifests/k8s/client.yaml
+      yq eval '.frontend.image.tag = "'$VERSION'"' -i charts/forminit/values.yaml
 
     # Update backend image tag
     - |
-      yq eval 'select(.kind == "Deployment") | .spec.template.spec.containers[0].image = "'$ECR_REGISTRY'/forminit-backend:'$VERSION'"' \
-        -i manifests/k8s/backend.yaml
+      yq eval '.backend.image.tag = "'$VERSION'"' -i charts/forminit/values.yaml
 
     # Commit and push changes
     - git add .
     - |
       if git diff --staged --quiet; then
-        echo "❌ No changes to commit in manifests."
+        echo "❌ No changes to commit in Helm chart."
         exit 0
       fi
 
     - |
       git commit -m "chore(release): update image tag v$VERSION [skip ci]"
     - git push origin $MANIFEST_REPO_BRANCH
-    - echo "✅ Successfully updated manifests with version $VERSION"
+    - echo "✅ Successfully updated Helm chart with version $VERSION"
 
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
