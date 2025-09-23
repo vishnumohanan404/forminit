@@ -71,8 +71,8 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
           <DialogTitle>Create workspace</DialogTitle>
           <DialogDescription>Click save once you're done.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+        <div className="grid gap-6 py-4">
+          <div className="flex flex-col items-start gap-2">
             <Label
               htmlFor="name"
               className="sm:text-right"
@@ -88,7 +88,7 @@ const CreateWorkspaceDialog = ({ children }: { children: ReactNode }) => {
               maxLength={20}
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+          <div className="flex flex-col items-start gap-2">
             <Label
               htmlFor="description"
               className="sm:text-right"
