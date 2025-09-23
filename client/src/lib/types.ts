@@ -36,6 +36,7 @@ export type WorkspaceType = {
   name: string;
   forms: FormType[];
   _id: string;
+  created: string;
 };
 
 export type DashboardDataTypes = {
