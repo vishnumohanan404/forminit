@@ -2,7 +2,7 @@ format:
   stage: code-quality
   resource_group: code-quality
   script:
-    - npm ci
+    - npm ci --workspace .
     - npm run format
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
