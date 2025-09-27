@@ -1,5 +1,13 @@
 # client
 
+## 0.11.0
+
+### Minor Changes
+
+- ddc2a32: changelogs in production
+- ddc2a32: Stable beta version ready for prod
+- ddc2a32: production ready tailwind fix
+
 ## 0.10.0
 
 ### Minor Changes
