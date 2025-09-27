@@ -54,9 +54,6 @@
       "@commitlint/config-conventional"
     ]
   },
-  "dependencies": {
-    "@types/mongoose": "^5.11.97"
-  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",

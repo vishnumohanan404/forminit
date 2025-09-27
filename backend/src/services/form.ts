@@ -64,7 +64,7 @@ export const updateExistingForm = async (
 ): Promise<FormDataInterface | null> => {
   const formObjectId = new mongoose.Types.ObjectId(id); // Convert the ID to ObjectId
   const updatedForm = await Form.findByIdAndUpdate(formObjectId, formData, {
-    new: true, // Return the updated document
+    returnDocument: "after", // Return the updated document
     runValidators: true, // Run validation on the updated data
   });
   if (updatedForm) {
@@ -77,7 +77,7 @@ export const updateExistingForm = async (
         },
       },
       {
-        new: true, // Return the updated document
+        returnDocument: "after", // Return the updated document
         arrayFilters: [
           { "workspace.forms.form_id": formObjectId }, // Filter to match the correct form
           { "form.form_id": formObjectId }, // Filter to match the correct workspace form
@@ -119,7 +119,7 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
       $inc: { "workspaces.$[].forms.$[form].submissions": 1 }, // Increment the submissions count in the matching form
     },
     {
-      new: true, // Return the updated document
+      returnDocument: "after", // Return the updated document
       arrayFilters: [{ "form.form_id": formObjectId }], // Filter to target the correct form inside the workspace
     },
   );
@@ -226,7 +226,6 @@ export const toggleFormDisabled = async (formId: string) => {
         },
       },
       {
-        new: true,
         arrayFilters: [{ "form.form_id": formObjectId }],
       },
     );
