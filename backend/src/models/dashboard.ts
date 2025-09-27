@@ -21,6 +21,7 @@ const formSchema = new mongoose.Schema({
 const workspaceSchema = new mongoose.Schema({
   name: { type: String, required: true },
   forms: [formSchema], // Array of forms
+  created: { type: Date, default: Date.now },
 });
 
 const dashboardSchema = new mongoose.Schema({

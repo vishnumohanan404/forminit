@@ -10,7 +10,7 @@ export const findUserAndUpdate = async (
   usedData: Partial<UserInterface>,
 ): Promise<Partial<UserInterface> | null> => {
   const user: UserInterface | null = await User.findByIdAndUpdate(userId, usedData, {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   });
   return user;

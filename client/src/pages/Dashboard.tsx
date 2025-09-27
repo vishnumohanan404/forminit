@@ -39,6 +39,8 @@ const DashboardPage = () => {
   //       .filter(form => !form.published)
   //       .map(form => ({ ...form, workspaceId: workspace._id })), // Only include forms that are not published
   // );
+
+  const workspaces: WorkspaceType[] = dashboard?.workspaces || [];
   return (
     <div className="px-5">
       <PageTitle>Home</PageTitle>
@@ -55,6 +57,81 @@ const DashboardPage = () => {
             />
           </div>
         )}
+        <Tabs
+          defaultValue="all"
+          className="mt-12"
+        >
+          <TabsList>
+            <TabsTrigger value="all">Workspaces</TabsTrigger>
+          </TabsList>
+          <TabsContent
+            value="all"
+            className="mt-4"
+          >
+            <div className="grid gap-4">
+              {!isError && dashboard?.workspaces?.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[20%]">Name</TableHead>
+                      {/* <TableHead className="w-[20%]">Status</TableHead> */}
+                      <TableHead className="w-[20%]">Forms</TableHead>
+                      <TableHead className="w-[20%]">Created</TableHead>
+                      <TableHead className="w-[20%] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {workspaces.map(workspace => (
+                      <TableRow
+                        key={workspace._id}
+                        className="group"
+                      >
+                        <TableCell className="w-[20%] font-bold">
+                          <Link
+                            to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                            onClick={e => e.stopPropagation()}
+                            className="group-hover:underline"
+                          >
+                            {workspace.name}
+                          </Link>
+                        </TableCell>
+                        {/* <TableCell className="w-[20%]">
+                          {form.published ? "Published" : "Draft"}
+                        </TableCell> */}
+                        <TableCell className="w-[20%]">{workspace.forms.length}</TableCell>
+                        <TableCell className="w-[20%]">
+                          {new Date(workspace.created).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="w-[20%] text-right space-x-3 font-semibold text-primary">
+                          <Link
+                            to={`/form?workspaceId=${workspace._id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            Create Form
+                          </Link>
+
+                          {/* <Link
+                            to={`/form/${workspace.form_id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            Edit
+                          </Link> */}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-2xl mx-auto w-fit my-16 font-semibold text-muted-foreground">
+                  No workspaces available
+                </p>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+        {/* Forms overview table */}
         <Tabs
           defaultValue="all"
           className="mt-12"
