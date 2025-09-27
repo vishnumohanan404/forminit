@@ -7,9 +7,11 @@ default:
 variables:
   NODE_ENV: test
   NPM_CONFIG_CACHE: .npm
+  NPM_CONFIG_PRODUCTION: "false"   
 
 before_script:
   - npm ci
+  - npm ls --depth=0
 
 stages:
   - code-quality
