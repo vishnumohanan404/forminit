@@ -2,7 +2,6 @@ format:
   stage: code-quality
   resource_group: code-quality
   script:
-    - npm ci --workspace .
     - npm run format
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -12,7 +11,6 @@ lint:
   stage: code-quality
   resource_group: code-quality
   script:
-    - npm ci
     - npm run lint
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -21,7 +19,6 @@ typecheck:
   stage: code-quality
   resource_group: code-quality
   script:
-    - npm ci
     - npm run tsc
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -30,7 +27,6 @@ unit_test:
   stage: unit-test
   image: node:18
   script:
-    - npm ci
     - npm run test:coverage
   artifacts:
     paths:
