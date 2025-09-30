@@ -1,7 +1,8 @@
 import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoutes";
 import SuccessFormSubmitPage from "./pages/SuccessFormSubmit";
+import Landing from "./pages/Landing";
 const DashboardPage = React.lazy(() => import("./pages/Dashboard"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const Auth = React.lazy(() => import("./pages/Auth"));
@@ -17,12 +18,7 @@ const FormSummaryPage = React.lazy(() => import("./pages/FormSummary"));
 export const routes = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <Navigate
-        to="/dashboard"
-        replace
-      />
-    ),
+    element: <Landing />,
     errorElement: <NotFoundPage />,
   },
   {

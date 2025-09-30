@@ -95,7 +95,7 @@ const Auth = () => {
       const response = await googleSignIn(codeResponse);
       setUser(response.user);
       setIsLoading(false);
-      navigate("/");
+      navigate("/dashboard");
     },
     onError: tokenResponse => {
       setError("root", {
