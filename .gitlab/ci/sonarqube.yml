@@ -11,6 +11,10 @@ sonarqube-analysis:
       -Dsonar.exclusions=**/tests/**,**/node_modules/**,**/dist/**,**/build/**,**/*.min.js,**/*.d.ts,**/coverage/**
       -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,client/coverage/lcov.info
       -Dsonar.host.url=https://sonarcloud.io
+      -Dsonar.ws.timeout=300
+      -Dsonar.scanner.socketTimeout=300
+      -Dsonar.scanner.responseTimeout=300
+      -Dhttp.connectionTimeout=60000
   dependencies:
     - unit_test
   rules:
