@@ -41,7 +41,7 @@ const HomeStatsCard = ({ isLoading }: { isLoading: boolean }) => {
           <CardHeader className="pb-7">
             <CardTitle>Total Submissions</CardTitle>
           </CardHeader>
-          <CardContent className="">
+          <CardContent className="p-3">
             <ChartContainer
               config={chartConfig}
               className="h-[110px] w-[256px]"
