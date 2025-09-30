@@ -1,5 +1,13 @@
 # @shared/types
 
+## 0.12.0
+
+### Minor Changes
+
+- 0fd9e44: changelogs in production
+- 0fd9e44: Stable beta version ready for prod
+- 0fd9e44: production ready tailwind fix
+
 ## 0.11.0
 
 ### Minor Changes
