@@ -145,6 +145,7 @@ const FormViewPage = () => {
                           <div className="py-2">
                             {block.data.options?.map((option: MCQOptions) => (
                               <button
+                                type="button"
                                 key={option.optionMarker}
                                 className={`relative cursor-pointer inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2`}
                                 onClick={() => {

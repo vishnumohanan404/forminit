@@ -46,15 +46,12 @@ const DashboardPage = () => {
       <PageTitle>Home</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container ">
         {!isError && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <HomeWorkspaceCard
-              showSkeleton={!isError && isLoading}
-              workspaceCount={dashboard?.workspaces?.length}
-            />
-            <HomeStatsCard
-              isLoading={isLoading}
-              workspaces={dashboard?.workspaces}
-            />
+          <div className="">
+            <h1 className="text-lg font-semibold">Quickstart</h1>
+            <div className="flex gap-2 mt-4">
+              <HomeWorkspaceCard />
+              <HomeStatsCard isLoading={isLoading} />
+            </div>
           </div>
         )}
         <Tabs
