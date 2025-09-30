@@ -1,5 +1,21 @@
 # backend
 
+## 0.11.0
+
+### Minor Changes
+
+- ddc2a32: changelogs in production
+- ddc2a32: Stable beta version ready for prod
+- ddc2a32: production ready tailwind fix
+
+## 0.10.0
+
+### Minor Changes
+
+- 8499184: changelogs in production
+- 8499184: Stable beta version ready for prod
+- 8499184: production ready tailwind fix
+
 ## 0.9.0
 
 ### Minor Changes
