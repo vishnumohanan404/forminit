@@ -1,6 +1,12 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import React, { useEffect, useState } from "react";
-
+import img1 from "/src/assets/landing/1.png";
+import img2 from "/src/assets/landing/2.png";
+import img3 from "/src/assets/landing/3.png";
+import img4 from "/src/assets/landing/4.png";
+import img5 from "/src/assets/landing/5.png";
+import img6 from "/src/assets/landing/6.png";
+import img7 from "/src/assets/landing/7.png";
 interface CardRotateProps {
   children: React.ReactNode;
   onSendToBack: () => void;
@@ -44,17 +50,37 @@ export default function SwipeableStackCards() {
     {
       id: 1,
       z: 4,
-      img: "https://i.pinimg.com/736x/d7/bd/94/d7bd94a0231456ac7f6885de1eccd943.jpg",
+      img: img1,
     },
     {
       id: 2,
       z: 3,
-      img: "https://i.pinimg.com/236x/fd/5d/14/fd5d146cf06e32d30139e4e3f37c993c.jpg",
+      img: img2,
     },
     {
       id: 3,
       z: 2,
-      img: "https://i.pinimg.com/564x/c6/f8/e9/c6f8e988912e469686c431cc680ef49e.jpg",
+      img: img3,
+    },
+    {
+      id: 4,
+      z: 2,
+      img: img4,
+    },
+    {
+      id: 5,
+      z: 2,
+      img: img5,
+    },
+    {
+      id: 6,
+      z: 2,
+      img: img6,
+    },
+    {
+      id: 7,
+      z: 2,
+      img: img7,
     },
   ];
   const [cards, setCards] = useState(initialCards);

@@ -1,3 +1,4 @@
+import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 import { Plus } from "lucide-react";
 
 const HomeWorkspaceCard = () => {
@@ -11,7 +12,9 @@ const HomeWorkspaceCard = () => {
 
       {/* Hover Overlay */}
       <div className="absolute rounded-xl inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center cursor-pointer">
-        <span className="text-white font-medium text-lg">Create workspace</span>
+        <CreateWorkspaceDialog>
+          <span className="text-white font-medium text-lg">Create workspace</span>
+        </CreateWorkspaceDialog>
       </div>
     </div>
   );

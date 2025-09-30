@@ -49,9 +49,9 @@ const Landing = () => {
           </nav>
         </div>
       </header>
-      <section className="container mx-auto grid max-w-[1300px] px-4 py-16 md:grid-cols-2 md:gap-10 md:py-24">
+      <section className="container mx-auto grid max-w-[1050px] px-4 py-16 md:grid-cols-2 md:gap-10 md:py-24">
         <div className="flex flex-col justify-center gap-2">
-          <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="text-balance text-4xl font-semibold md:text-5xl">
             <motion.div
               className="mx-auto max-w-[670px] flex flex-col gap-10"
               initial="hidden"
@@ -66,7 +66,7 @@ const Landing = () => {
               </motion.div>
             </motion.div>
           </h1>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="text-balance text-4xl font-semibold md:text-5xl">
             <motion.div
               className="mx-auto max-w-[670px] flex flex-col gap-10"
               initial="hidden"
@@ -81,7 +81,7 @@ const Landing = () => {
               </motion.div>
             </motion.div>
           </h1>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="text-balance text-4xl font-semibold md:text-5xl">
             <motion.div
               className="mx-auto max-w-[670px] flex flex-col gap-10"
               initial="hidden"
