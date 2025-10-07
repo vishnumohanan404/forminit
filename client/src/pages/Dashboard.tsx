@@ -13,7 +13,17 @@ import HomeWorkspaceCard from "@/layouts/dashboard/HomeWorkspaceCard";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const DashboardPage = () => {
   const {
@@ -25,6 +35,8 @@ const DashboardPage = () => {
     queryFn: fetchDashboard,
     staleTime: 10000,
   });
+  const navigate = useNavigate();
+
   // const publishedForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
   //   workspace.forms
   //     .filter(form => form.published)
@@ -41,6 +53,10 @@ const DashboardPage = () => {
   // );
 
   const workspaces: WorkspaceType[] = dashboard?.workspaces || [];
+
+  const handleClick = () => {
+    navigate(`/form?workspaceId=${workspaces[0]._id}`); // Replace with your desired route
+  };
   return (
     <div className="px-5">
       <PageTitle>Home</PageTitle>
@@ -209,9 +225,22 @@ const DashboardPage = () => {
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-2xl mx-auto w-fit my-16 font-semibold text-muted-foreground">
-                  No published forms available
-                </p>
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <FileText />
+                    </EmptyMedia>
+                  </EmptyHeader>
+                  <EmptyTitle>No Forms Yet</EmptyTitle>
+                  <EmptyDescription>
+                    You haven&apos;t created any forms yet. Get started by creating your first form.
+                  </EmptyDescription>
+                  <EmptyContent>
+                    <div className="flex gap-2">
+                      <Button onClick={handleClick}>Create Form</Button>
+                    </div>
+                  </EmptyContent>
+                </Empty>
               )}
             </div>
           </TabsContent>

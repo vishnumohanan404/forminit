@@ -12,14 +12,11 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
   response => response, // If the response is fine, just return it
   error => {
-    const { response } = error;
+    const { response, config } = error;
     // Check if the response indicates an expired token
-    if (response && response.status === 401) {
-      // Log out the user
-      // Implement this function to clear user data and redirect
-      // localStorage.setItem("user", "");
-      localStorage.removeItem("user"); // <-- add your var
-      location.replace("/");
+    if (response && response.status === 401 && !config.url.includes("/login")) {
+      localStorage.removeItem("user");
+      location.replace("/"); // or handle with router
     }
 
     return Promise.reject(error);
