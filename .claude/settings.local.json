@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(ls /Users/vishnumohan/Projects/baked-bash/personal/epic/forminit/client/.env*)",
+      "Bash(ls /Users/vishnumohan/Projects/baked-bash/personal/epic/forminit/backend/.env*)",
+      "Bash(npm run:*)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''SCRIPTS:'''', json.dumps\\(d.get\\(''''scripts'''',{}\\), indent=2\\)\\)\")",
+      "Bash(mongosh --eval \"db.runCommand\\({ping:1}\\)\")",
+      "Bash(npx nodemon:*)",
+      "Bash(npm --version)",
+      "Bash(docker compose:*)",
+      "Bash(sort -t: -k2 -n)",
+      "Bash(find /Users/vishnumohan/Projects/baked-bash/personal/epic/forminit -maxdepth 2 -name *.md -o -name ARCHITECTURE*)",
+      "Bash(find /Users/vishnumohan/Projects/baked-bash/personal/epic/forminit -maxdepth 2 -type f \\\\\\(-name *.env* -o -name docker-compose* -o -name Dockerfile* \\\\\\))",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/vishnumohan/Projects/baked-bash/personal/epic/forminit/backend/src/routes/**)",
+      "Bash(done)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Bash(git branch:*)",
+      "Bash(security find-internet-password:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh api:*)",
+      "Bash(docker system:*)",
+      "Bash(docker exec:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
