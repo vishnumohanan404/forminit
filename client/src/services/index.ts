@@ -1,4 +1,5 @@
 import axios from "axios";
+import { routes } from "../Routes";
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:3000",
@@ -16,7 +17,7 @@ axiosClient.interceptors.response.use(
     // Check if the response indicates an expired token
     if (response && response.status === 401 && !config.url.includes("/login")) {
       localStorage.removeItem("user");
-      location.replace("/"); // or handle with router
+      routes.navigate("/");
     }
 
     return Promise.reject(error);
