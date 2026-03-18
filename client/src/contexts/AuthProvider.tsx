@@ -38,7 +38,7 @@ export const getUserFromContext = () => {
   if (!context) {
     throw new Error("Context must be used within a Provider");
   }
-  return context.setUser;
+  return context.user;
 };
 
 export default AuthProvider;
