@@ -10,8 +10,13 @@ const AuthContext = createContext<AuthProviderProps | null>(null);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem("user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
   });
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(user));
