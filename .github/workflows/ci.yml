@@ -1,0 +1,211 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [main]
+
+jobs:
+  # ── Code Quality (PRs only) ──────────────────────────────────────────────────
+  format:
+    name: Format check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run format
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run tsc
+
+  # ── Tests (PRs only) ─────────────────────────────────────────────────────────
+  unit-test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            backend/coverage/lcov.info
+            client/coverage/lcov.info
+
+  # ── Code Analysis (PRs targeting dev or main) ────────────────────────────────
+  sonarcloud:
+    name: SonarCloud analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: unit-test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage
+      - uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=vishnumohanan404
+            -Dsonar.projectKey=vishnumohanan404_forminit
+            -Dsonar.sources=backend/src,client/src,packages/types
+            -Dsonar.tests=backend/src/tests,client/src/tests
+            -Dsonar.exclusions=**/tests/**,**/node_modules/**,**/dist/**,**/build/**,**/*.min.js,**/*.d.ts,**/coverage/**
+            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,client/coverage/lcov.info
+
+  # ── Security (PRs targeting dev or main) ─────────────────────────────────────
+  trivy-fs:
+    name: Trivy filesystem scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          exit-code: 1
+          severity: HIGH,CRITICAL
+
+  trivy-image:
+    name: Trivy image scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: |
+          docker build -f backend/Dockerfile.prod -t backend-image .
+          docker build -f client/Dockerfile.prod -t client-image .
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: backend-image
+          exit-code: 1
+          severity: HIGH,CRITICAL
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: client-image
+          exit-code: 1
+          severity: HIGH,CRITICAL
+
+  # ── Release (push to main only) ───────────────────────────────────────────────
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check for changesets
+        id: changesets
+        run: |
+          if [ -z "$(find .changeset -name '*.md' ! -name 'README.md')" ]; then
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Version bump
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: |
+          git config user.email "ci@github.com"
+          git config user.name "CI Bot"
+          npx @changesets/cli version
+          VERSION=$(node -p "require('./client/package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          git add .
+          git commit -m "chore(release): v$VERSION [skip ci]"
+          git tag "v$VERSION"
+          git push origin main --tags
+
+      - name: Configure AWS credentials
+        if: env.VERSION != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::283773803331:role/forminit-role
+          aws-region: ap-south-1
+
+      - name: Login to ECR
+        if: env.VERSION != ''
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker images
+        if: env.VERSION != ''
+        run: |
+          docker build -f client/Dockerfile.prod \
+            --build-arg VITE_GOOGLE_CLIENT_ID="${{ secrets.VITE_GOOGLE_CLIENT_ID }}" \
+            --build-arg VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}" \
+            --build-arg NODE_ENV=production \
+            -t ${{ secrets.ECR_REGISTRY }}/forminit-client:$VERSION .
+          docker build -f backend/Dockerfile.prod \
+            -t ${{ secrets.ECR_REGISTRY }}/forminit-backend:$VERSION .
+          docker push ${{ secrets.ECR_REGISTRY }}/forminit-client:$VERSION
+          docker push ${{ secrets.ECR_REGISTRY }}/forminit-backend:$VERSION
+
+      - name: Update Helm manifests
+        if: env.VERSION != ''
+        run: |
+          git clone https://x-access-token:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/vishnumohanan404/forminit-manifests.git manifest-repo
+          cd manifest-repo
+          yq eval ".frontend.image.tag = \"$VERSION\"" -i charts/forminit/values.yaml
+          yq eval ".backend.image.tag = \"$VERSION\"" -i charts/forminit/values.yaml
+          git config user.email "ci@github.com"
+          git config user.name "CI Bot"
+          git add .
+          git diff --staged --quiet || git commit -m "chore(release): update image tag v$VERSION [skip ci]"
+          git push origin main

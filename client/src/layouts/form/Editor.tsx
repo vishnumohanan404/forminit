@@ -7,11 +7,14 @@ import { useFormContext } from "@/contexts/FormContext.tsx"; // Import the conte
 import { fetchForm } from "@/services/form.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import ShortAnswerTool from "../../components/form/tools/ShortAnswer.tsx";
-import LongAnswerTool from "../../components/form/tools/LongAnswer.tsx";
+import ShortAnswerTool from "../../components/form/tools/ShortAnswerTool.tsx";
+import LongAnswerTool from "../../components/form/tools/LongAnswerTool.tsx";
 import MultipleChoiceTool from "../../components/form/tools/MultipleChoice.tsx";
 import CustomParagraph from "../../components/form/custom-blocks/CustomParagraph.tsx";
 import { FormDataInterface } from "@shared/types";
+import QuestionTitleTool from "@/components/form/tools/QuestionTitleTool.tsx";
+import ShortAnswerCompositeTool from "@/components/form/tools/ShortAnswerCompositeTool.tsx";
+import LongAnswerCompositeTool from "@/components/form/tools/LongAnswerCompositeTool.tsx";
 
 const Editor = () => {
   const { id } = useParams();
@@ -33,10 +36,15 @@ const Editor = () => {
         minHeight: 30,
         tools: {
           paragraph: { class: CustomParagraph, inlineToolbar: true },
-          // custom tools - most tools are built using multiple custom blocks
-          shortAnswerTool: ShortAnswerTool,
+          // Individual tools (hidden from toolbox by removing static toolbox getter)
+          questionTitle: QuestionTitleTool,
+          shortAnswer: ShortAnswerTool,
           longAnswerTool: LongAnswerTool,
+          // Other tools
           multipleChoiceTool: MultipleChoiceTool,
+          // Composite tool (visible in toolbox)
+          shortAnswerQuestion: ShortAnswerCompositeTool,
+          longAnswerQuestion: LongAnswerCompositeTool,
         },
         onChange: throttle(() => {
           editorInstance.current
