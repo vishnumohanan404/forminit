@@ -14,7 +14,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import AppSidebarHeader from "./AppSidebarHeader";
-import AppSidebarFooter from "./AppSidebarFooter";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -23,7 +22,7 @@ import { fetchDashboard } from "@/services/dashboard";
 import { sidebarApplicationItems, productItems } from "@/assets/sidebar";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -47,14 +46,13 @@ export function AppSidebar() {
     queryFn: fetchDashboard,
     staleTime: 10000,
   });
-  const { open } = useSidebar();
+  const { open, toggleSidebar } = useSidebar();
   const [showTrash, setShowTrash] = useState("");
   const queryClient = useQueryClient();
 
   const { mutate: deleteWorkspaceMutate } = useMutation({
     mutationFn: (workspaceDetails: string) => deleteWorkspace(workspaceDetails),
     onSuccess: () => {
-      // Boom baby!
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       navigate("/dashboard");
     },
@@ -62,17 +60,19 @@ export function AppSidebar() {
       toast.error("Workspace deletion failed");
     },
   });
-  const handleDeleteWorkspace = (workspaceId: string) => {
-    deleteWorkspaceMutate(workspaceId);
-  };
+
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar
+      collapsible="icon"
+      className="top-12 h-[calc(100svh-3rem)]"
+    >
       <SidebarHeader>
         <AppSidebarHeader />
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          {open && <SidebarGroupLabel>Application</SidebarGroupLabel>}
+          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {!isError &&
@@ -83,117 +83,96 @@ export function AppSidebar() {
                         defaultOpen
                         className="group/collapsible"
                       >
-                        <>
-                          <div className="flex">
-                            <CollapsibleTrigger asChild>
-                              <SidebarMenuButton>
-                                <item.icon />
-                                <span>{item.title}</span>
-                              </SidebarMenuButton>
-                            </CollapsibleTrigger>
+                        <div className="flex">
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton>
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          {open && (
                             <CreateWorkspaceDialog>
-                              {open && (
-                                <Button
-                                  className=""
-                                  variant={"ghost"}
-                                  size="sm"
-                                  onClick={() => {}}
-                                >
-                                  <PlusIcon className="" />
-                                </Button>
-                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                              >
+                                <PlusIcon />
+                              </Button>
                             </CreateWorkspaceDialog>
-                          </div>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {!isError && dashboard ? (
-                                dashboard.workspaces?.map(
-                                  (workspace: {
-                                    name: string;
-                                    _id: string;
-                                    forms: Array<string>;
-                                  }) => {
-                                    return (
-                                      <SidebarMenuButton
-                                        asChild
-                                        key={workspace._id}
-                                        onMouseOver={() => {
-                                          setShowTrash(workspace._id);
-                                        }}
-                                        onMouseOut={() => {
-                                          setShowTrash("");
-                                        }}
+                          )}
+                        </div>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {!isError && dashboard ? (
+                              dashboard.workspaces?.map(
+                                (workspace: {
+                                  name: string;
+                                  _id: string;
+                                  forms: Array<string>;
+                                }) => (
+                                  <SidebarMenuButton
+                                    asChild
+                                    key={workspace._id}
+                                    isActive={currentWorkspaceId === workspace._id}
+                                    onMouseOver={() => setShowTrash(workspace._id)}
+                                    onMouseOut={() => setShowTrash("")}
+                                  >
+                                    <div className="flex truncate justify-between items-center w-full px-2 py-1 rounded-md">
+                                      <Link
+                                        to={`/workspaces/${workspace._id}?name=${workspace.name}`}
+                                        className="w-full"
                                       >
-                                        <div
-                                          className={`flex truncate justify-between items-center w-full px-2 py-1 rounded-md ${
-                                            currentWorkspaceId === workspace._id
-                                              ? "bg-muted text-primary font-medium"
-                                              : ""
-                                          }`}
-                                        >
-                                          <Link
-                                            to={`/workspaces/${workspace._id}?name=${workspace.name}`}
-                                            className="w-full"
-                                          >
-                                            <span className="w-full">{workspace.name}</span>
-                                          </Link>
-                                          {showTrash === workspace._id && (
-                                            <Dialog>
-                                              <DialogTrigger asChild>
-                                                <Trash2Icon className="cursor-pointer stroke-current hover:stroke-muted-foreground w-4 h-4" />
-                                              </DialogTrigger>
-                                              <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
-                                                <DialogHeader>
-                                                  <DialogTitle>Deleting workspace</DialogTitle>
-                                                  <DialogDescription>
-                                                    All your forms will be deleted
-                                                  </DialogDescription>
-                                                </DialogHeader>
-                                                <DialogFooter className="gap-3">
-                                                  <Button
-                                                    variant={"destructive"}
-                                                    onClick={() =>
-                                                      handleDeleteWorkspace(workspace._id)
-                                                    }
-                                                  >
-                                                    Delete
-                                                  </Button>
-                                                  <DialogClose asChild>
-                                                    <Button variant="secondary">Cancel</Button>
-                                                  </DialogClose>
-                                                </DialogFooter>
-                                              </DialogContent>
-                                            </Dialog>
-                                          )}
-                                        </div>
-                                      </SidebarMenuButton>
-                                    );
-                                  },
-                                )
-                              ) : (
-                                <>
-                                  <SidebarMenuButton asChild>
-                                    <SidebarMenuSkeleton className="h-8 w-[150px]" />
+                                        <span className="w-full">{workspace.name}</span>
+                                      </Link>
+                                      {showTrash === workspace._id && (
+                                        <Dialog>
+                                          <DialogTrigger asChild>
+                                            <Trash2Icon className="cursor-pointer stroke-current hover:stroke-muted-foreground w-4 h-4 shrink-0" />
+                                          </DialogTrigger>
+                                          <DialogContent className="sm:max-w-[425px] max-w-[90%] rounded-md">
+                                            <DialogHeader>
+                                              <DialogTitle>Deleting workspace</DialogTitle>
+                                              <DialogDescription>
+                                                All your forms will be deleted
+                                              </DialogDescription>
+                                            </DialogHeader>
+                                            <DialogFooter className="gap-3">
+                                              <Button
+                                                variant="destructive"
+                                                onClick={() => deleteWorkspaceMutate(workspace._id)}
+                                              >
+                                                Delete
+                                              </Button>
+                                              <DialogClose asChild>
+                                                <Button variant="secondary">Cancel</Button>
+                                              </DialogClose>
+                                            </DialogFooter>
+                                          </DialogContent>
+                                        </Dialog>
+                                      )}
+                                    </div>
                                   </SidebarMenuButton>
-                                  <SidebarMenuButton asChild>
-                                    <SidebarMenuSkeleton className="h-8 w-[150px]" />
-                                  </SidebarMenuButton>
-                                </>
-                              )}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </>
+                                ),
+                              )
+                            ) : (
+                              <>
+                                <SidebarMenuButton asChild>
+                                  <SidebarMenuSkeleton className="h-8 w-[150px]" />
+                                </SidebarMenuButton>
+                                <SidebarMenuButton asChild>
+                                  <SidebarMenuSkeleton className="h-8 w-[150px]" />
+                                </SidebarMenuButton>
+                              </>
+                            )}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
                       </Collapsible>
                     ) : (
-                      <SidebarMenuButton asChild>
-                        <Link
-                          to={item.url}
-                          className={`flex items-center gap-2 w-full px-2 py-1 rounded-md ${
-                            location.pathname === item.url
-                              ? "bg-muted text-primary font-medium"
-                              : ""
-                          }`}
-                        >
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === item.url}
+                      >
+                        <Link to={item.url}>
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>
@@ -204,19 +183,18 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
         <SidebarGroup>
-          {open && <SidebarGroupLabel>Product</SidebarGroupLabel>}
+          <SidebarGroupLabel>Product</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {productItems.map(item => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      className={`flex items-center gap-2 w-full px-2 py-1 rounded-md ${
-                        location.pathname === item.url ? "bg-muted text-primary font-medium" : ""
-                      }`}
-                    >
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.url}
+                  >
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -227,8 +205,20 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
-        <AppSidebarFooter />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={toggleSidebar}
+              className="text-muted-foreground hover:text-foreground"
+              tooltip={open ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              {open ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
+              <span>Collapse</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
