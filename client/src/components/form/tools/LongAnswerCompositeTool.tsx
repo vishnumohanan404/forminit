@@ -16,30 +16,32 @@ export default class LongAnswerCompositeTool {
     this.wrapper = undefined;
   }
 
-  async render() {
+  render() {
     this.wrapper = document.createElement("div");
 
-    setTimeout(async () => {
-      const currentIndex = this.api.blocks.getCurrentBlockIndex();
+    requestAnimationFrame(() => {
+      void (async () => {
+        const currentIndex = this.api.blocks.getCurrentBlockIndex();
 
-      // Insert question title at current position
-      await this.api.blocks.insert("questionTitle", { title: "" }, {}, currentIndex, false);
+        // Insert question title at current position
+        await this.api.blocks.insert("questionTitle", { title: "" }, {}, currentIndex, false);
 
-      // Insert long answer input below it
-      await this.api.blocks.insert(
-        "longAnswerTool",
-        { placeholder: "", required: false },
-        {},
-        currentIndex + 1,
-        false,
-      );
+        // Insert long answer input below it
+        await this.api.blocks.insert(
+          "longAnswerTool",
+          { placeholder: "", required: false },
+          {},
+          currentIndex + 1,
+          false,
+        );
 
-      // Delete this composite block
-      this.api.blocks.delete(currentIndex + 2);
+        // Delete this composite block
+        this.api.blocks.delete(currentIndex + 2);
 
-      // Focus on the question title
-      this.api.caret.setToBlock(currentIndex, "start");
-    }, 0);
+        // Focus on the question title
+        this.api.caret.setToBlock(currentIndex, "start");
+      })();
+    });
 
     return this.wrapper;
   }

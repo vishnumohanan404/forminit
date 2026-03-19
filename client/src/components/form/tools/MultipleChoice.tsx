@@ -56,12 +56,12 @@ export default class MultipleChoiceTool {
 
             const currentIndex = this.api.blocks.getCurrentBlockIndex();
             this.api.blocks.delete(currentIndex);
-            setTimeout(() => {
+            requestAnimationFrame(() => {
               if (currentIndex > 0) {
                 const previousIndex = currentIndex - 1;
                 this.api.caret.setToBlock(previousIndex, "end");
               }
-            }, 0);
+            });
           }
         } else {
           this.data.options.filter((_, index) => index !== idx);
