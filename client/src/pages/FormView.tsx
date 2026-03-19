@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { submitForm, SubmitFormData, viewForm } from "@/services/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -12,6 +19,7 @@ import { Loader2Icon } from "lucide-react";
 import { BlockData } from "@shared/types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import RatingInput from "@/components/form/ui/RatingInput";
 
 interface Form {
   _id: string;
@@ -46,26 +54,20 @@ const FormViewPage = () => {
   const handleChange = (blockId: string, value: string, type: string) => {
     const newFormState = formState.map(block => {
       if (block._id === blockId) {
-        if (type === "shortAnswerTool" || type === "longAnswerTool") {
-          return {
-            ...block,
-            data: {
-              ...block.data,
-              value: value, // Assuming you're updating the placeholder field
-            },
-          };
-        } else if (type === "multipleChoiceTool") {
-          return {
-            ...block,
-            data: {
-              ...block.data,
-              selectedOption: value, // Store the selected option marker
-              // Assuming you're updating the options array
-            },
-          };
+        if (
+          type === "shortAnswerTool" ||
+          type === "longAnswerTool" ||
+          type === "emailTool" ||
+          type === "dateTool"
+        ) {
+          return { ...block, data: { ...block.data, value } };
+        } else if (type === "multipleChoiceTool" || type === "dropdownTool") {
+          return { ...block, data: { ...block.data, selectedOption: value } };
+        } else if (type === "ratingTool") {
+          return { ...block, data: { ...block.data, value } };
         }
       }
-      return block; // If _id doesn't match, return block unchanged
+      return block;
     });
     setFormState(newFormState);
   };
@@ -187,6 +189,68 @@ const FormViewPage = () => {
                                 </div>
                               </button>
                             ))}
+                          </div>
+                        </div>
+                      );
+                    case "emailTool":
+                      return (
+                        <div key={block._id}>
+                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
+                          <Input
+                            type="email"
+                            placeholder="Email address"
+                            className="focus-visible:ring-0 my-2 w-[60%]"
+                            value={block.data?.value || ""}
+                            onChange={e => handleChange(block._id, e.target.value, block.type)}
+                          />
+                        </div>
+                      );
+                    case "dateTool":
+                      return (
+                        <div key={block._id}>
+                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
+                          <Input
+                            type="date"
+                            className="focus-visible:ring-0 my-2 w-[60%]"
+                            value={block.data?.value || ""}
+                            onChange={e => handleChange(block._id, e.target.value, block.type)}
+                          />
+                        </div>
+                      );
+                    case "ratingTool":
+                      return (
+                        <div key={block._id}>
+                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
+                          <RatingInput
+                            value={Number(block.data?.value) || 0}
+                            maxRating={block.data?.maxRating || 5}
+                            onChange={val => handleChange(block._id, String(val), block.type)}
+                          />
+                        </div>
+                      );
+                    case "dropdownTool":
+                      return (
+                        <div key={block._id}>
+                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
+                          <div className="my-2 w-[60%]">
+                            <Select
+                              value={block.data?.selectedOption || ""}
+                              onValueChange={val => handleChange(block._id, val, block.type)}
+                            >
+                              <SelectTrigger className="focus:ring-0">
+                                <SelectValue placeholder="Select an option" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {block.data.options?.map((option: MCQOptions) => (
+                                  <SelectItem
+                                    key={option.optionMarker}
+                                    value={option.optionMarker}
+                                  >
+                                    {option.optionValue}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       );
