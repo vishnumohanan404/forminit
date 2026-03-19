@@ -188,3 +188,200 @@ describe("DELETE /api/form/:id", () => {
     expect(res.statusCode).toBe(401);
   });
 });
+
+describe("GET /api/form/analytics/:formId", () => {
+  const makeRatingFormPayload = (workspaceId: string) => ({
+    title: "Analytics Test Form",
+    time: Date.now(),
+    version: "2.30.6",
+    workspaceId,
+    blocks: [
+      {
+        type: "ratingTool",
+        data: { title: "Rate your experience", required: false },
+      },
+      {
+        type: "multipleChoiceTool",
+        data: {
+          title: "Favourite colour",
+          required: false,
+          options: [
+            { optionMarker: "A", optionValue: "Red" },
+            { optionMarker: "B", optionValue: "Blue" },
+          ],
+        },
+      },
+      {
+        type: "shortAnswerTool",
+        data: { title: "Any comments?", placeholder: "", required: false },
+      },
+    ],
+  });
+
+  it("should return 401 without authentication", async () => {
+    const res = await request(app).get("/api/form/analytics/000000000000000000000000");
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("should return 404 for a non-existent form", async () => {
+    const { cookie } = await signupAndGetWorkspaceId();
+    const res = await request(app)
+      .get("/api/form/analytics/000000000000000000000000")
+      .set("Cookie", cookie);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("should return zero submissions and empty arrays for a new form", async () => {
+    const { cookie, workspaceId } = await signupAndGetWorkspaceId();
+    const createRes = await request(app)
+      .post("/api/form")
+      .set("Cookie", cookie)
+      .send(makeFormPayload(workspaceId));
+    const formId = createRes.body._id as string;
+
+    const res = await request(app).get(`/api/form/analytics/${formId}`).set("Cookie", cookie);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.totalSubmissions).toBe(0);
+    expect(res.body.submissionsOverTime).toEqual([]);
+    expect(Array.isArray(res.body.blockAnalytics)).toBe(true);
+  });
+
+  it("should increment totalSubmissions to 1 after one submission", async () => {
+    const { cookie, workspaceId } = await signupAndGetWorkspaceId();
+    const createRes = await request(app)
+      .post("/api/form")
+      .set("Cookie", cookie)
+      .send(makeFormPayload(workspaceId));
+    const form = createRes.body;
+
+    await request(app)
+      .post("/api/form/submit-form")
+      .send({
+        _id: form._id,
+        title: form.title,
+        blocks: form.blocks.map((b: { type: string; data: object }) => ({
+          ...b,
+          data: { ...b.data, value: "Alice" },
+        })),
+      });
+
+    const res = await request(app).get(`/api/form/analytics/${form._id}`).set("Cookie", cookie);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.totalSubmissions).toBe(1);
+  });
+
+  it("should compute rating average and distribution", async () => {
+    const { cookie, workspaceId } = await signupAndGetWorkspaceId();
+    const createRes = await request(app)
+      .post("/api/form")
+      .set("Cookie", cookie)
+      .send(makeRatingFormPayload(workspaceId));
+    const form = createRes.body;
+
+    // Submit two ratings: 4 and 2
+    for (const rating of [4, 2]) {
+      await request(app)
+        .post("/api/form/submit-form")
+        .send({
+          _id: form._id,
+          title: form.title,
+          blocks: [
+            { type: "ratingTool", data: { value: String(rating) } },
+            { type: "multipleChoiceTool", data: { selectedOption: "A" } },
+            { type: "shortAnswerTool", data: { value: "" } },
+          ],
+        });
+    }
+
+    const res = await request(app).get(`/api/form/analytics/${form._id}`).set("Cookie", cookie);
+
+    expect(res.statusCode).toBe(200);
+    const ratingBlock = res.body.blockAnalytics.find(
+      (b: { type: string }) => b.type === "ratingTool",
+    );
+    expect(ratingBlock).toBeDefined();
+    expect(ratingBlock.analytics.average).toBe(3);
+    expect(typeof ratingBlock.analytics.distribution).toBe("object");
+  });
+
+  it("should compute option counts for multiple-choice block", async () => {
+    const { cookie, workspaceId } = await signupAndGetWorkspaceId();
+    const createRes = await request(app)
+      .post("/api/form")
+      .set("Cookie", cookie)
+      .send(makeRatingFormPayload(workspaceId));
+    const form = createRes.body;
+
+    // Submit: A, A, B
+    for (const marker of ["A", "A", "B"]) {
+      await request(app)
+        .post("/api/form/submit-form")
+        .send({
+          _id: form._id,
+          title: form.title,
+          blocks: [
+            { type: "ratingTool", data: { value: "3" } },
+            { type: "multipleChoiceTool", data: { selectedOption: marker } },
+            { type: "shortAnswerTool", data: { value: "" } },
+          ],
+        });
+    }
+
+    const res = await request(app).get(`/api/form/analytics/${form._id}`).set("Cookie", cookie);
+
+    expect(res.statusCode).toBe(200);
+    const choiceBlock = res.body.blockAnalytics.find(
+      (b: { type: string }) => b.type === "multipleChoiceTool",
+    );
+    expect(choiceBlock).toBeDefined();
+    const options = choiceBlock.analytics.options as Array<{ label: string; count: number }>;
+    const redOpt = options.find(o => o.label === "Red");
+    const blueOpt = options.find(o => o.label === "Blue");
+    expect(redOpt?.count).toBe(2);
+    expect(blueOpt?.count).toBe(1);
+  });
+
+  it("should return responseCount for text block", async () => {
+    const { cookie, workspaceId } = await signupAndGetWorkspaceId();
+    const createRes = await request(app)
+      .post("/api/form")
+      .set("Cookie", cookie)
+      .send(makeRatingFormPayload(workspaceId));
+    const form = createRes.body;
+
+    // One submission with a comment, one without
+    await request(app)
+      .post("/api/form/submit-form")
+      .send({
+        _id: form._id,
+        title: form.title,
+        blocks: [
+          { type: "ratingTool", data: { value: "5" } },
+          { type: "multipleChoiceTool", data: { selectedOption: "A" } },
+          { type: "shortAnswerTool", data: { value: "Great!" } },
+        ],
+      });
+    await request(app)
+      .post("/api/form/submit-form")
+      .send({
+        _id: form._id,
+        title: form.title,
+        blocks: [
+          { type: "ratingTool", data: { value: "3" } },
+          { type: "multipleChoiceTool", data: { selectedOption: "B" } },
+          { type: "shortAnswerTool", data: { value: "" } },
+        ],
+      });
+
+    const res = await request(app).get(`/api/form/analytics/${form._id}`).set("Cookie", cookie);
+
+    expect(res.statusCode).toBe(200);
+    const textBlock = res.body.blockAnalytics.find(
+      (b: { type: string }) => b.type === "shortAnswerTool",
+    );
+    expect(textBlock).toBeDefined();
+    expect(textBlock.analytics.responseCount).toBe(1);
+  });
+});
