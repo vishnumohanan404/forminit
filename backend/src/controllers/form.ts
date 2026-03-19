@@ -82,11 +82,13 @@ export const submitForm = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const fetchSubmissions = async (req: Request, res: Response) => {
-  const { formId } = req.params; // Extract formId from URL parameters
+  const { formId } = req.params;
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
 
   try {
-    const submissions = await getSubmissionsByFormId(formId);
-    res.status(200).json(submissions); // Return the submissions as JSON
+    const result = await getSubmissionsByFormId(formId, page, limit);
+    res.status(200).json(result);
   } catch (error) {
     errorResponse(error, res);
   }

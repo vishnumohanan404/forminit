@@ -1,7 +1,7 @@
 import PageTitle from "@/components/common/PageTitle";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { EditIcon, DownloadIcon } from "lucide-react";
+import { EditIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { OptionsBlockData } from "@shared/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchSubmissions, viewForm } from "@/services/form";
@@ -11,20 +11,31 @@ import { AxiosError } from "axios";
 import SubmissionsTable, { SubmissionData } from "@/layouts/form-summary/SubmissionsTable";
 import ShareTab from "@/layouts/form-summary/ShareTab";
 import SettingsTab from "@/layouts/form-summary/SettingsTab";
+import { useState } from "react";
+
+const PAGE_SIZE = 10;
+
+interface SubmissionsResponse {
+  submissions: SubmissionData[];
+  total: number;
+}
 
 const FormSummaryPage = () => {
   const [searchParams] = useSearchParams();
   const { formId } = useParams();
+  const [page, setPage] = useState(1);
+
   const {
-    data: submissions,
+    data: submissionsData,
     isError: isSubmissionsError,
     isLoading: isSubmissionsLoading,
     error: submissionsError,
-  } = useQuery<SubmissionData[], AxiosError>({
-    queryKey: ["submissions", formId],
-    queryFn: () => fetchSubmissions(formId || ""),
+  } = useQuery<SubmissionsResponse, AxiosError>({
+    queryKey: ["submissions", formId, page],
+    queryFn: () => fetchSubmissions(formId || "", page, PAGE_SIZE),
     staleTime: 10000,
   });
+
   const {
     data: formView,
     isError: isFormViewError,
@@ -38,9 +49,16 @@ const FormSummaryPage = () => {
   const navigate = useNavigate();
   const isLoading = isSubmissionsLoading || isFormViewLoading;
 
+  const submissions = submissionsData?.submissions;
+  const total = submissionsData?.total ?? 0;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+
   const handleExportCSV = () => {
     if (!submissions || !formView) return;
-    const headers = ["Submitted At", ...formView.blocks.map(b => b.data?.title || "")];
+    const headers = [
+      "Submitted At",
+      ...formView.blocks.map((b: { data?: { title?: string } }) => b.data?.title || ""),
+    ];
     const rows = submissions.map(sub => [
       new Date(sub.createdAt).toLocaleString(),
       ...sub.blocks.map(block =>
@@ -62,6 +80,7 @@ const FormSummaryPage = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
+
   return (
     <div className="px-5">
       <PageTitle>
@@ -95,12 +114,12 @@ const FormSummaryPage = () => {
                 <Skeleton className="w-full h-6" />
                 <Skeleton className="w-full h-6" />
               </div>
-            ) : isSubmissionsError || isFormViewError || (submissions && submissions.length < 1) ? (
+            ) : isSubmissionsError || isFormViewError || !submissions?.length ? (
               <div className="text-center py-10">
                 <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                   No data available
                 </p>
-                {submissionsError?.response?.status === 404 ? (
+                {(submissionsError as AxiosError)?.response?.status === 404 ? (
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     Your form hasn't received any submissions. Share your form to start collecting
                     responses!
@@ -113,7 +132,10 @@ const FormSummaryPage = () => {
               </div>
             ) : (
               <div>
-                <div className="flex justify-end mb-3">
+                <div className="flex justify-between items-center mb-3">
+                  <p className="text-sm text-muted-foreground">
+                    {total} submission{total !== 1 ? "s" : ""}
+                  </p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -127,6 +149,29 @@ const FormSummaryPage = () => {
                   formView={formView}
                   submissions={submissions}
                 />
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-end gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => p - 1)}
+                      disabled={page === 1}
+                    >
+                      <ChevronLeftIcon className="w-4 h-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {page} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => p + 1)}
+                      disabled={page === totalPages}
+                    >
+                      <ChevronRightIcon className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>
