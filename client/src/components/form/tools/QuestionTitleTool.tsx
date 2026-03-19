@@ -41,11 +41,11 @@ export default class QuestionTitleTool {
       if (event.key === "Backspace" && this.data.title === "") {
         const currentIndex = this.api.blocks.getCurrentBlockIndex();
         this.api.blocks.delete(currentIndex);
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           if (currentIndex > 0) {
             this.api.caret.setToBlock(currentIndex - 1, "end");
           }
-        }, 0);
+        });
       }
     };
 

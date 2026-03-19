@@ -11,31 +11,34 @@ import { Toaster } from "./components/ui/sonner";
 import { routes } from "./Routes";
 import { Suspense } from "react";
 import SuspenseLayout from "./layouts/SuspenseLayout";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <ThemeProvider
-      defaultTheme="dark"
-      storageKey="vite-ui-theme"
-    >
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <FormProvider>
-          <Layout>
-            <QueryClientProvider client={queryClient}>
-              <AuthProvider>
-                <Suspense fallback={<SuspenseLayout />}>
-                  <RouterProvider router={routes} />
-                </Suspense>
-              </AuthProvider>
-              <ReactQueryDevtools initialIsOpen={false} />
-              <Toaster />
-            </QueryClientProvider>
-          </Layout>
-        </FormProvider>
-      </GoogleOAuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider
+        defaultTheme="dark"
+        storageKey="vite-ui-theme"
+      >
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <FormProvider>
+            <Layout>
+              <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                  <Suspense fallback={<SuspenseLayout />}>
+                    <RouterProvider router={routes} />
+                  </Suspense>
+                </AuthProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
+                <Toaster />
+              </QueryClientProvider>
+            </Layout>
+          </FormProvider>
+        </GoogleOAuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

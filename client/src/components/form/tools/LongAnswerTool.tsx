@@ -28,11 +28,11 @@ export default class LongAnswerTool {
       if (event.key === "Backspace" && this.data.placeholder === "") {
         const currentIndex = this.api.blocks.getCurrentBlockIndex();
         this.api.blocks.delete(currentIndex);
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           if (currentIndex > 0) {
             this.api.caret.setToBlock(currentIndex - 1, "end");
           }
-        }, 0);
+        });
       }
     };
 

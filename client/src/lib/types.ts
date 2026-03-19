@@ -1,12 +1,7 @@
-import { BlockData } from "@shared/types";
+import { BlockData, User } from "@shared/types";
 
-export type User = {
-  _id: string;
-  fullName: string;
-  email: string;
-  bio?: string;
-  googleId: string;
-};
+export type { User };
+
 export interface UserProfile {
   fullName: string;
   email: string;
