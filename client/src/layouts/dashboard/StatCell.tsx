@@ -13,7 +13,12 @@ const StatCell = ({ label, value, loading }: StatCellProps) => {
       {loading ? (
         <Skeleton className="h-8 w-16" />
       ) : (
-        <span className="text-2xl font-semibold tabular-nums">{value}</span>
+        <span
+          className="text-2xl font-semibold tabular-nums"
+          data-testid={`stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          {value}
+        </span>
       )}
     </div>
   );

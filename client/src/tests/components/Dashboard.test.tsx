@@ -70,9 +70,9 @@ describe("DashboardPage", () => {
   it("renders stat bar with correct counts", async () => {
     renderDashboard();
     // Total Forms = 2, Total Submissions = 7, Active Forms = 1
-    expect(await screen.findByText("2")).toBeInTheDocument();
-    expect(await screen.findByText("7")).toBeInTheDocument();
-    expect(await screen.findByText("1")).toBeInTheDocument();
+    expect(await screen.findByTestId("stat-total-forms")).toHaveTextContent("2");
+    expect(await screen.findByTestId("stat-total-submissions")).toHaveTextContent("7");
+    expect(await screen.findByTestId("stat-active-forms")).toHaveTextContent("1");
   });
 
   it("renders Workspace column header in the forms table", async () => {
