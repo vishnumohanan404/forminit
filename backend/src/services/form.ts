@@ -282,11 +282,15 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
         { $match: { formId } },
         {
           $project: {
-            blockValue: { $arrayElemAt: ["$blocks.data.value", index] },
+            blockValue: {
+              $let: {
+                vars: { blk: { $arrayElemAt: ["$blocks", index] } },
+                in: "$$blk.data.value",
+              },
+            },
           },
         },
-        { $match: { blockValue: { $ne: null, $exists: true } } },
-        { $match: { blockValue: { $ne: "" } } },
+        { $match: { blockValue: { $nin: [null, ""] } } },
       ]);
 
       const dist: Record<string, number> = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
@@ -318,11 +322,15 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
         { $match: { formId } },
         {
           $project: {
-            blockValue: { $arrayElemAt: ["$blocks.data.selectedOption", index] },
+            blockValue: {
+              $let: {
+                vars: { blk: { $arrayElemAt: ["$blocks", index] } },
+                in: "$$blk.data.selectedOption",
+              },
+            },
           },
         },
-        { $match: { blockValue: { $ne: null, $exists: true } } },
-        { $match: { blockValue: { $ne: "" } } },
+        { $match: { blockValue: { $nin: [null, ""] } } },
         { $group: { _id: "$blockValue", count: { $sum: 1 } } },
       ]);
 
