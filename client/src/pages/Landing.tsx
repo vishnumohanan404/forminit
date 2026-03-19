@@ -1,6 +1,7 @@
 import Logo from "@/components/svg/Logo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthProvider";
 import {
   LayoutTemplate,
   Share2,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 const Landing = () => {
+  const { user } = useAuth();
   return (
     <main className="bg-background text-foreground">
       {/* ── Navbar ───────────────────────────────────────────────── */}
@@ -51,7 +53,7 @@ const Landing = () => {
               Features
             </a>
             <Link to="/dashboard">
-              <Button size="sm">Start free</Button>
+              <Button size="sm">{user ? "Dashboard" : "Start free"}</Button>
             </Link>
           </nav>
         </div>
