@@ -139,33 +139,10 @@ Fields: `title`, `formId`, `blocks[]` (type + data, same structure as Form block
 
 ---
 
-## Known Landmines (Fix in Prioritized Sprints)
+## Known Landmines
 
-### Critical
-
-1. `getUserFromContext()` returns `setUser` instead of `user` —
-   `client/src/contexts/AuthProvider.tsx:41`
-2. `JSON.parse` without try/catch on localStorage — crashes on corrupted data —
-   `AuthProvider.tsx:14`
-3. `location.replace("/")` on 401 bypasses React Router — full page reload —
-   `client/src/services/index.ts:19`
-
-### Security
-
-4. Password complexity rules commented out — `backend/src/validations/user.ts:8`
-5. JWT secret falls back to hardcoded string — `backend/src/middlewares/authentication.ts:9`
-6. Auth middleware cookie-clearing commented out — `backend/src/middlewares/authentication.ts:42`
-7. ShareTab builds URL from `searchParams.get("url")` with no validation —
-   `client/src/layouts/form-summary/ShareTab.tsx:10`
-
-### Code Quality
-
-8. Hardcoded `localhost:3000` fallback in axios base URL — `client/src/services/index.ts:4`
-9. No React error boundaries anywhere in the component tree
-10. Type duplication: `lib/types.ts` vs `packages/types` — can diverge
-11. `@ts-ignore` in `swipeable-stack-cards.tsx`
-12. Large commented-out filter logic — `client/src/pages/Dashboard.tsx:40-53`
-13. `setTimeout(..., 0)` timing hacks in EditorJS tools
+All 13 items from the original backlog were resolved across three fix sprints (merged to `dev`,
+released in `v0.13.0`). No open landmines as of 2026-03-19.
 
 ---
 
