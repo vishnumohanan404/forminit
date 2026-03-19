@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/empty";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const DashboardPage = () => {
   const {
@@ -172,13 +173,16 @@ const DashboardPage = () => {
                         className="group"
                       >
                         <TableCell className="w-[20%] font-bold">
-                          <Link
-                            to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
-                            onClick={e => e.stopPropagation()}
-                            className="group-hover:underline"
-                          >
-                            {form.name}
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
+                              onClick={e => e.stopPropagation()}
+                              className="group-hover:underline"
+                            >
+                              {form.name}
+                            </Link>
+                            {form.disabled && <Badge variant="secondary">Disabled</Badge>}
+                          </div>
                         </TableCell>
                         <TableCell className="w-[20%]">{form.submissions}</TableCell>
                         <TableCell className="w-[20%]">
