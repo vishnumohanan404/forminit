@@ -9,8 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import AnimatedGradientText from "@/components/ui/animated-gradient-text";
 
 const AppNavbar = () => {
   const { user, setUser } = useAuth();
@@ -27,6 +25,9 @@ const AppNavbar = () => {
           <Logo />
         </div>
         <span className="text-sm font-semibold text-foreground">FormInIt</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5 leading-none">
+          beta
+        </span>
       </Link>
 
       <div className="h-4 w-px bg-border shrink-0" />
@@ -34,18 +35,6 @@ const AppNavbar = () => {
       <span className="text-sm text-muted-foreground capitalize">{section}</span>
 
       <div className="ml-auto flex items-center gap-1">
-        <AnimatedGradientText className="!bg-none !border-none">
-          <Link
-            to="https://gitlab.com/forminit/forminit-app"
-            target="_blank"
-            className={cn(
-              "text-sm font-medium inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent px-2",
-            )}
-          >
-            We&apos;re on beta
-          </Link>
-        </AnimatedGradientText>
-
         <DarkModeToggle />
 
         <DropdownMenu>
