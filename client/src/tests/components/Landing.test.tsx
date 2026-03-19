@@ -29,12 +29,12 @@ describe("Landing page", () => {
   it("renders 6 feature items", () => {
     renderLanding();
     const featureTitles = [
-      "Visual WYSIWYG",
-      "Rich Inputs",
-      "Publish & Collect",
-      "Analytics",
+      "Visual block editor",
+      "Rich input types",
+      "Publish & share",
+      "Response analytics",
       "Workspaces",
-      "Fully Customizable",
+      "Fast by design",
     ];
     featureTitles.forEach(title => {
       expect(screen.getByText(title)).toBeInTheDocument();
