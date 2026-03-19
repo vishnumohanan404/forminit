@@ -16,7 +16,7 @@ const renderLanding = () =>
 describe("Landing page", () => {
   it("renders without crashing", () => {
     renderLanding();
-    expect(screen.getByText(/forminit/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/forminit/i).length).toBeGreaterThan(0);
   });
 
   it("CTA 'Get started' links to /dashboard", () => {
