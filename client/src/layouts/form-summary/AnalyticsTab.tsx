@@ -45,7 +45,7 @@ const AnalyticsTab = ({ formId, enabled }: AnalyticsTabProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-8">
       {/* Stat row */}
       <div className="border border-border rounded-sm p-4 flex items-center gap-2">
         <span className="text-xs text-muted-foreground uppercase tracking-wider">
