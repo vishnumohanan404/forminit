@@ -19,8 +19,7 @@ function CardRotate({ children, onSendToBack, isLoaded }: CardRotateProps) {
   const rotateX = useTransform(y, [-100, 100], [60, -60]);
   const rotateY = useTransform(x, [-100, 100], [-60, 60]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleDragEnd(_: any, info: PanInfo) {
+  function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
     const threshold = 180;
     if (Math.abs(info.offset.x) > threshold || Math.abs(info.offset.y) > threshold) {
       onSendToBack();
