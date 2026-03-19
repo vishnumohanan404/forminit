@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       <AppNavbar />
       <AppSidebar />
       <div className="flex flex-col flex-1 pt-12">
-        <main className="flex flex-col flex-1 overflow-auto">{children}</main>
+        <main className="flex flex-col flex-1 overflow-auto pb-8">{children}</main>
       </div>
     </SidebarProvider>
   ) : (
