@@ -44,8 +44,10 @@ export const submitForm = async (formData: SubmitFormData) => {
   const response = await axiosClient.post(`/api/form/submit-form`, formData);
   return response.data;
 };
-export const fetchSubmissions = async (formId: string) => {
-  const response = await axiosClient.get(`/api/form/submissions/${formId}`);
+export const fetchSubmissions = async (formId: string, page = 1, limit = 10) => {
+  const response = await axiosClient.get(
+    `/api/form/submissions/${formId}?page=${page}&limit=${limit}`,
+  );
   return response.data;
 };
 export const deleteForm = async (id: string | undefined) => {
