@@ -1,7 +1,8 @@
 import PageTitle from "@/components/common/PageTitle";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { EditIcon } from "lucide-react";
+import { EditIcon, DownloadIcon } from "lucide-react";
+import { OptionsBlockData } from "@shared/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchSubmissions, viewForm } from "@/services/form";
 import { useQuery } from "@tanstack/react-query";
@@ -35,8 +36,32 @@ const FormSummaryPage = () => {
   });
 
   const navigate = useNavigate();
-
   const isLoading = isSubmissionsLoading || isFormViewLoading;
+
+  const handleExportCSV = () => {
+    if (!submissions || !formView) return;
+    const headers = ["Submitted At", ...formView.blocks.map(b => b.data?.title || "")];
+    const rows = submissions.map(sub => [
+      new Date(sub.createdAt).toLocaleString(),
+      ...sub.blocks.map(block =>
+        block.type === "multipleChoiceTool"
+          ? block.data.options?.find(
+              (o: OptionsBlockData) => o.optionMarker === block.data.selectedOption,
+            )?.optionValue || ""
+          : block.data.value || "",
+      ),
+    ]);
+    const csv = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${searchParams.get("name") || "submissions"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   return (
     <div className="px-5">
       <PageTitle>
@@ -87,10 +112,22 @@ const FormSummaryPage = () => {
                 )}
               </div>
             ) : (
-              <SubmissionsTable
-                formView={formView}
-                submissions={submissions}
-              />
+              <div>
+                <div className="flex justify-end mb-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportCSV}
+                  >
+                    <DownloadIcon className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
+                <SubmissionsTable
+                  formView={formView}
+                  submissions={submissions}
+                />
+              </div>
             )}
           </TabsContent>
           <TabsContent value="share">
