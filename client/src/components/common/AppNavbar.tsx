@@ -37,7 +37,7 @@ const AppNavbar = () => {
       <div className="ml-auto flex items-center gap-1">
         <DarkModeToggle />
 
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button className="h-7 w-7 rounded-full bg-primary/20 text-primary text-xs font-semibold flex items-center justify-center hover:bg-primary/30 transition-colors ml-1 cursor-pointer">
               {user?.fullName?.charAt(0).toUpperCase() ?? "?"}
