@@ -111,7 +111,6 @@ All routes are prefixed `/api`.
 | GET    | /form/submissions/:formId | JWT  | Fetch all submissions                     |
 | DELETE | /form/:id                 | JWT  | Delete form                               |
 | PUT    | /form/disable/:id         | JWT  | Toggle form disabled status               |
-| GET    | /changelogs               | —    | Fetch changelogs                          |
 
 ---
 

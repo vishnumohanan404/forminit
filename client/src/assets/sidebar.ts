@@ -1,5 +1,5 @@
 import { Home, LayoutDashboard, Settings } from "lucide-react";
-import { Layers3Icon, MessageCircleQuestion } from "lucide-react";
+import { MessageCircleQuestion } from "lucide-react";
 
 export const sidebarApplicationItems = [
   {
@@ -20,11 +20,6 @@ export const sidebarApplicationItems = [
   },
 ];
 export const productItems = [
-  {
-    title: "Changelog",
-    url: "/changelogs",
-    icon: Layers3Icon,
-  },
   {
     title: "Support",
     url: "/support",
