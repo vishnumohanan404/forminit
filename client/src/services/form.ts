@@ -58,3 +58,31 @@ export const disableForm = async (id: string | undefined) => {
   const response = await axiosClient.put(`/api/form/disable/${id}`);
   return response.data;
 };
+
+export interface SubmissionTimePoint {
+  date: string;
+  count: number;
+}
+
+export interface BlockAnalyticsItem {
+  blockIndex: number;
+  type: string;
+  title: string;
+  analytics: {
+    average?: number;
+    distribution?: Record<string, number>;
+    options?: Array<{ label: string; count: number }>;
+    responseCount?: number;
+  };
+}
+
+export interface FormAnalyticsData {
+  totalSubmissions: number;
+  submissionsOverTime: SubmissionTimePoint[];
+  blockAnalytics: BlockAnalyticsItem[];
+}
+
+export const fetchFormAnalytics = async (formId: string): Promise<FormAnalyticsData> => {
+  const response = await axiosClient.get(`/api/form/analytics/${formId}`);
+  return response.data;
+};

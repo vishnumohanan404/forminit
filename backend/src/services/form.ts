@@ -5,6 +5,13 @@ import { SubmitFormDataInterface } from "../types/form";
 import Submission from "../models/submission";
 import { SubmissionInterface } from "../types/submission";
 import { FormDataInterface } from "@shared/types";
+import {
+  BlockAnalyticsItem,
+  ChoiceAnalytics,
+  FormAnalyticsResponse,
+  RatingAnalytics,
+  TextAnalytics,
+} from "../types/analytics";
 
 export const findForm = async (
   userId: Types.ObjectId,
@@ -208,6 +215,105 @@ export const deleteFormById = async (formId: string) => {
     console.error("Error deleting form:", error);
     throw new Error("Error deleting form and its references.");
   }
+};
+
+export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsResponse | null> => {
+  const form = await Form.findById(formId, { blocks: 1 });
+  if (!form) return null;
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [totalSubmissions, submissionsOverTime] = await Promise.all([
+    Submission.countDocuments({ formId }),
+    Submission.aggregate([
+      { $match: { formId, createdAt: { $gte: thirtyDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, date: "$_id", count: 1 } },
+    ]),
+  ]);
+
+  const blockAnalytics: BlockAnalyticsItem[] = [];
+
+  for (let index = 0; index < form.blocks.length; index++) {
+    const block = form.blocks[index];
+    const type = block.type;
+    const title = block.data?.title || `Block ${index + 1}`;
+
+    if (type === "ratingTool") {
+      const rows = await Submission.aggregate([
+        { $match: { formId } },
+        {
+          $project: {
+            blockValue: { $arrayElemAt: ["$blocks.data.value", index] },
+          },
+        },
+        { $match: { blockValue: { $ne: null, $exists: true } } },
+        { $match: { blockValue: { $ne: "" } } },
+      ]);
+
+      const dist: Record<string, number> = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+      let sum = 0;
+      let validCount = 0;
+
+      for (const row of rows) {
+        const val = Number(row.blockValue);
+        if (!isNaN(val) && val >= 1 && val <= 5) {
+          const key = String(Math.round(val));
+          dist[key] = (dist[key] || 0) + 1;
+          sum += val;
+          validCount++;
+        }
+      }
+
+      const analytics: RatingAnalytics = {
+        average: validCount > 0 ? Math.round((sum / validCount) * 10) / 10 : 0,
+        distribution: dist,
+      };
+      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+    } else if (type === "multipleChoiceTool" || type === "dropdownTool") {
+      const options: Array<{ optionValue: string; optionMarker: string }> =
+        block.data?.options || [];
+
+      const rows = await Submission.aggregate([
+        { $match: { formId } },
+        {
+          $project: {
+            blockValue: { $arrayElemAt: ["$blocks.data.selectedOption", index] },
+          },
+        },
+        { $match: { blockValue: { $ne: null, $exists: true } } },
+        { $match: { blockValue: { $ne: "" } } },
+        { $group: { _id: "$blockValue", count: { $sum: 1 } } },
+      ]);
+
+      const markerToLabel = Object.fromEntries(options.map(o => [o.optionMarker, o.optionValue]));
+
+      const analytics: ChoiceAnalytics = {
+        options: rows.map(r => ({
+          label: markerToLabel[r._id] || r._id,
+          count: r.count,
+        })),
+      };
+      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+    } else {
+      const responseCount = await Submission.countDocuments({
+        formId,
+        [`blocks.${index}.data.value`]: { $ne: "" },
+      });
+
+      const analytics: TextAnalytics = { responseCount };
+      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+    }
+  }
+
+  return { totalSubmissions, submissionsOverTime, blockAnalytics };
 };
 
 export const toggleFormDisabled = async (formId: string) => {
