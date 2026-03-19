@@ -10,6 +10,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import NotFoundPage from "./NotFound";
 import { Loader2Icon } from "lucide-react";
 import { BlockData } from "@shared/types";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface Form {
   _id: string;
@@ -25,7 +27,11 @@ interface MCQOptions {
 const FormViewPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useQuery<Form>({
+  const {
+    data,
+    isLoading,
+    isError: isFormError,
+  } = useQuery<Form>({
     queryKey: ["form", id],
     queryFn: () => viewForm(id),
     staleTime: 10000,
@@ -71,6 +77,9 @@ const FormViewPage = () => {
       navigate("/success", { replace: true });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
+    onError: (error: AxiosError<{ message: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to submit form. Please try again.");
+    },
   });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +89,16 @@ const FormViewPage = () => {
       _id: data?._id || "",
     });
   };
+
+  if (isFormError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground">
+          Failed to load form. Please check the link and try again.
+        </p>
+      </div>
+    );
+  }
 
   if (data?.disabled) {
     return <NotFoundPage />;
