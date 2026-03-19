@@ -37,6 +37,14 @@ const DashboardPage = () => {
   });
   const navigate = useNavigate();
 
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-muted-foreground">Failed to load dashboard. Please refresh the page.</p>
+      </div>
+    );
+  }
+
   const allForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
     workspace.forms.map(form => ({ ...form, workspaceId: workspace._id })),
   );
@@ -50,15 +58,13 @@ const DashboardPage = () => {
     <div className="px-5">
       <PageTitle>Home</PageTitle>
       <main className="mx-auto max-w-[1100px] overflow-auto flex-grow container ">
-        {!isError && (
-          <div className="">
-            <h1 className="text-lg font-semibold">Quickstart</h1>
-            <div className="flex gap-2 mt-4">
-              <HomeWorkspaceCard />
-              <HomeStatsCard isLoading={isLoading} />
-            </div>
+        <div className="">
+          <h1 className="text-lg font-semibold">Quickstart</h1>
+          <div className="flex gap-2 mt-4">
+            <HomeWorkspaceCard />
+            <HomeStatsCard isLoading={isLoading} />
           </div>
-        )}
+        </div>
         <Tabs
           defaultValue="all"
           className="mt-12"
@@ -71,7 +77,7 @@ const DashboardPage = () => {
             className="mt-4"
           >
             <div className="grid gap-4">
-              {!isError && dashboard?.workspaces?.length > 0 ? (
+              {dashboard?.workspaces?.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -149,7 +155,7 @@ const DashboardPage = () => {
             className="mt-4"
           >
             <div className="grid gap-4">
-              {!isError && allForms?.length > 0 ? (
+              {allForms?.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>

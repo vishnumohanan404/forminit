@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const ALLOWED_URL_PREFIX = "/view-form/";
 
@@ -17,8 +18,9 @@ const ShareTab = () => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Failed to copy link. Please copy it manually.");
     }
   };
   return (
