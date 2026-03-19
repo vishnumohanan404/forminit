@@ -49,6 +49,8 @@ const DashboardPage = () => {
   const allForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
     workspace.forms.map(form => ({ ...form, workspaceId: workspace._id })),
   );
+  const activeForms = allForms?.filter(f => !f.disabled);
+  const disabledForms = allForms?.filter(f => f.disabled);
 
   const workspaces: WorkspaceType[] = dashboard?.workspaces || [];
 
@@ -138,18 +140,8 @@ const DashboardPage = () => {
         >
           <TabsList>
             <TabsTrigger value="all">All Forms</TabsTrigger>
-            <TabsTrigger
-              value="published"
-              disabled
-            >
-              Published
-            </TabsTrigger>
-            <TabsTrigger
-              value="drafts"
-              disabled
-            >
-              Drafts
-            </TabsTrigger>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="disabled">Disabled</TabsTrigger>
           </TabsList>
           <TabsContent
             value="all"
@@ -231,13 +223,117 @@ const DashboardPage = () => {
             </div>
           </TabsContent>
           <TabsContent
-            value="published"
+            value="active"
             className="mt-4"
-          />
+          >
+            <div className="grid gap-4">
+              {activeForms?.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[20%]">Name</TableHead>
+                      <TableHead className="w-[20%]">Submissions</TableHead>
+                      <TableHead className="w-[20%]">Created</TableHead>
+                      <TableHead className="w-[20%] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {activeForms.map(form => (
+                      <TableRow
+                        key={form._id}
+                        className="group"
+                      >
+                        <TableCell className="w-[20%] font-bold">
+                          <Link
+                            to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
+                            onClick={e => e.stopPropagation()}
+                            className="group-hover:underline"
+                          >
+                            {form.name}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="w-[20%]">{form.submissions}</TableCell>
+                        <TableCell className="w-[20%]">
+                          {new Date(form.created).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="w-[20%] text-right space-x-3 font-semibold text-primary">
+                          <Link
+                            to={`/view-form/${form.form_id}`}
+                            target="_blank"
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            View
+                          </Link>
+                          <Link
+                            to={`/form/${form.form_id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            Edit
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-muted-foreground text-center my-16">No active forms.</p>
+              )}
+            </div>
+          </TabsContent>
           <TabsContent
-            value="drafts"
+            value="disabled"
             className="mt-4"
-          />
+          >
+            <div className="grid gap-4">
+              {disabledForms?.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[20%]">Name</TableHead>
+                      <TableHead className="w-[20%]">Submissions</TableHead>
+                      <TableHead className="w-[20%]">Created</TableHead>
+                      <TableHead className="w-[20%] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {disabledForms.map(form => (
+                      <TableRow
+                        key={form._id}
+                        className="group"
+                      >
+                        <TableCell className="w-[20%] font-bold">
+                          <Link
+                            to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
+                            onClick={e => e.stopPropagation()}
+                            className="group-hover:underline"
+                          >
+                            {form.name}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="w-[20%]">{form.submissions}</TableCell>
+                        <TableCell className="w-[20%]">
+                          {new Date(form.created).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="w-[20%] text-right space-x-3 font-semibold text-primary">
+                          <Link
+                            to={`/form/${form.form_id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            Edit
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-muted-foreground text-center my-16">No disabled forms.</p>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
