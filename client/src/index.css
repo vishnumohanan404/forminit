@@ -9,7 +9,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #0d1117;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,45 +21,46 @@ body {
   margin: 0;
 }
 
-/* shadcn theme */
+/* GitHub Primer design system — shadcn CSS variable mapping */
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 240 5% 15%;
+    /* Light: github.com light theme */
+    --background: 0 0% 100%;           /* #ffffff canvas.default */
+    --foreground: 213 13% 14%;         /* #1f2328 fg.default */
     --card: 0 0% 100%;
-    --card-foreground: 240 5% 15%;
+    --card-foreground: 213 13% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 5% 15%;
-    --primary: 234 52% 57%;
+    --popover-foreground: 213 13% 14%;
+    --primary: 212 92% 44%;            /* #0969da accent.fg */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 240 5% 35%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 240 5% 45%;
-    --accent: 234 52% 93%;
-    --accent-foreground: 234 52% 40%;
-    --destructive: 0 72% 51%;
+    --secondary: 210 17% 97%;          /* #f6f8fa canvas.subtle */
+    --secondary-foreground: 213 13% 14%;
+    --muted: 210 17% 97%;              /* #f6f8fa */
+    --muted-foreground: 212 8% 43%;    /* #656d76 fg.muted */
+    --accent: 212 100% 95%;            /* #dbeafe accent.subtle */
+    --accent-foreground: 212 92% 38%;
+    --destructive: 4 80% 47%;          /* #cf222e danger.fg */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 88%;
-    --input: 0 0% 94%;
-    --ring: 234 52% 57%;
-    --chart-1: 234 52% 57%;
-    --chart-2: 210 40% 55%;
-    --chart-3: 170 40% 45%;
-    --chart-4: 35 80% 55%;
-    --chart-5: 340 60% 55%;
-    --sidebar: 0 0% 96%;
-    --sidebar-foreground: 240 5% 15%;
-    --sidebar-primary: 234 52% 57%;
+    --border: 210 18% 84%;             /* #d0d7de border.default */
+    --input: 210 18% 84%;
+    --ring: 212 92% 44%;
+    --chart-1: 212 92% 44%;
+    --chart-2: 158 64% 35%;
+    --chart-3: 35 91% 53%;
+    --chart-4: 270 60% 55%;
+    --chart-5: 4 80% 47%;
+    --sidebar: 210 17% 97%;            /* #f6f8fa */
+    --sidebar-foreground: 213 13% 14%;
+    --sidebar-primary: 212 92% 44%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 234 52% 93%;
-    --sidebar-accent-foreground: 234 52% 40%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 234 52% 57%;
+    --sidebar-accent: 212 100% 95%;
+    --sidebar-accent-foreground: 212 92% 38%;
+    --sidebar-border: 210 18% 84%;
+    --sidebar-ring: 212 92% 44%;
     --font-sans: Inter, sans-serif;
     --font-serif: Georgia, serif;
-    --font-mono: JetBrains Mono, monospace;
-    --radius: 0.25rem;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --radius: 0.375rem;                /* 6px — GitHub standard */
     --shadow-2xs: none;
     --shadow-xs: none;
     --shadow-sm: none;
@@ -71,42 +72,43 @@ body {
   }
 
   .dark {
-    --background: 0 0% 6.3%;
-    --foreground: 240 5% 90%;
-    --card: 0 0% 9%;
-    --card-foreground: 240 5% 90%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 240 5% 90%;
-    --primary: 234 52% 57%;
+    /* Dark: github.com dark theme */
+    --background: 216 28% 7%;          /* #0d1117 canvas.default */
+    --foreground: 210 36% 93%;         /* #e6edf3 fg.default */
+    --card: 215 21% 11%;               /* #161b22 canvas.subtle */
+    --card-foreground: 210 36% 93%;
+    --popover: 215 21% 11%;
+    --popover-foreground: 210 36% 93%;
+    --primary: 215 92% 58%;            /* #2f81f7 accent.fg */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 13%;
-    --secondary-foreground: 240 5% 70%;
-    --muted: 0 0% 11%;
-    --muted-foreground: 240 5% 55%;
-    --accent: 234 52% 18%;
-    --accent-foreground: 234 52% 75%;
-    --destructive: 0 72% 51%;
+    --secondary: 216 15% 15%;          /* #21262d canvas.inset */
+    --secondary-foreground: 210 36% 93%;
+    --muted: 216 15% 15%;              /* #21262d */
+    --muted-foreground: 213 9% 58%;    /* #8b949e fg.muted */
+    --accent: 215 70% 18%;             /* accent.subtle */
+    --accent-foreground: 215 92% 70%;
+    --destructive: 3 84% 64%;          /* #f85149 danger.fg */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 16%;
-    --input: 0 0% 13%;
-    --ring: 234 52% 57%;
-    --chart-1: 234 52% 57%;
-    --chart-2: 210 40% 55%;
-    --chart-3: 170 40% 45%;
-    --chart-4: 35 80% 55%;
-    --chart-5: 340 60% 55%;
-    --sidebar: 0 0% 8%;
-    --sidebar-foreground: 240 5% 90%;
-    --sidebar-primary: 234 52% 57%;
+    --border: 215 11% 21%;             /* #30363d border.default */
+    --input: 216 15% 15%;              /* #21262d */
+    --ring: 215 92% 58%;
+    --chart-1: 215 92% 58%;
+    --chart-2: 148 63% 47%;
+    --chart-3: 38 90% 55%;
+    --chart-4: 270 50% 65%;
+    --chart-5: 3 84% 64%;
+    --sidebar: 216 28% 9%;             /* slightly lighter than bg */
+    --sidebar-foreground: 210 36% 93%;
+    --sidebar-primary: 215 92% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 234 52% 18%;
-    --sidebar-accent-foreground: 234 52% 75%;
-    --sidebar-border: 0 0% 14%;
-    --sidebar-ring: 234 52% 57%;
+    --sidebar-accent: 215 70% 18%;
+    --sidebar-accent-foreground: 215 92% 70%;
+    --sidebar-border: 215 11% 21%;
+    --sidebar-ring: 215 92% 58%;
     --font-sans: Inter, sans-serif;
     --font-serif: Georgia, serif;
-    --font-mono: JetBrains Mono, monospace;
-    --radius: 0.25rem;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --radius: 0.375rem;
     --shadow-2xs: none;
     --shadow-xs: none;
     --shadow-sm: none;
@@ -117,6 +119,7 @@ body {
     --shadow-2xl: none;
   }
 }
+
 @layer base {
   * {
     @apply border-border;
@@ -127,7 +130,6 @@ body {
 }
 
 /* editorjs */
-/* background on contenteditable */
 .ce-block--selected .ce-block__content {
   background: none;
 }
@@ -140,7 +142,6 @@ body {
   stroke-width: 0.1;
   fill: rgb(63, 63, 70);
 }
-
 .ce-settings .ce-popover__items svg,
 .ce-settings .ce-popover__items path {
   stroke-width: inherit;
@@ -154,27 +155,38 @@ body {
   fill: rgb(63, 63, 70);
   stroke-width: 2;
 }
-/* scrollbar */
+
+/* Scrollbar — GitHub dark style */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #1c1c1c;
+  background: #0d1117;
 }
-
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(80, 80, 80, 0.7);
+  background-color: #30363d;
   border-radius: 4px;
-  border: 2px solid #1c1c1c;
+  border: 2px solid #0d1117;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(100, 100, 100, 0.9);
+  background-color: #3d444d;
 }
-
-/* For Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(80, 80, 80, 0.7) #1c1c1c;
+  scrollbar-color: #30363d #0d1117;
+}
+
+/* Landing hero fade-in */
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero-fade-in {
+  animation: hero-fade-in 0.5s ease forwards;
 }
