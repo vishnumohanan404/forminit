@@ -218,7 +218,7 @@ export const deleteFormById = async (formId: string) => {
 };
 
 export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsResponse | null> => {
-  const form = await Form.findById(formId, { blocks: 1 });
+  const form = await Form.findById(formId, { blocks: 1 }).lean();
   if (!form) return null;
 
   const thirtyDaysAgo = new Date();
