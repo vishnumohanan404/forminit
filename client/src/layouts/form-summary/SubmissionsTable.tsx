@@ -1,7 +1,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -27,7 +26,6 @@ const SubmissionsTable = ({
 }) => {
   return (
     <Table>
-      <TableCaption>A list of your recent Submissions.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Submitted at</TableHead>

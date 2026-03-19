@@ -6,7 +6,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Line, LineChart, XAxis, CartesianGrid } from "recharts";
-import { fetchFormAnalytics, BlockAnalyticsItem, FormAnalyticsData } from "@/services/form";
+import {
+  fetchFormAnalytics,
+  BlockAnalyticsItem,
+  FormAnalyticsData,
+  SubmissionTimePoint,
+} from "@/services/form";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
@@ -155,55 +160,97 @@ const AnalyticsTab = ({ formId, enabled }: AnalyticsTabProps) => {
         </div>
       </div>
 
-      {/* Submissions over time */}
-      <div className="border border-border rounded-sm p-4">
-        <p className="text-sm font-medium mb-3">Submissions over time (last 30 days)</p>
+      {/* Submissions over time — half-width chart + half-width stats */}
+      <div className="border border-border rounded-sm">
         {data.submissionsOverTime.length === 0 ? (
-          <p
-            className="text-sm text-muted-foreground"
-            data-testid="no-timeseries"
-          >
-            No submissions in the last 30 days.
-          </p>
-        ) : (
-          <ChartContainer
-            config={chartConfig}
-            className="h-[180px] w-full"
-          >
-            <LineChart
-              data={data.submissionsOverTime}
-              margin={{ left: 8, right: 8 }}
+          <div className="px-4 py-3">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              Submissions — last 30 days
+            </p>
+            <p
+              className="text-sm text-muted-foreground py-2"
+              data-testid="no-timeseries"
             >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={v => v.slice(5)}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
-              />
-              <Line
-                dataKey="count"
-                type="monotone"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ChartContainer>
+              No submissions in the last 30 days.
+            </p>
+          </div>
+        ) : (
+          <div className="flex divide-x divide-border">
+            <div className="flex-1 px-4 pt-3 pb-2 min-w-0">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                Submissions — last 30 days
+              </p>
+              <ChartContainer
+                config={chartConfig}
+                className="h-[180px] w-full"
+              >
+                <LineChart
+                  data={data.submissionsOverTime}
+                  margin={{ left: 0, right: 0, top: 4, bottom: 0 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={4}
+                    tick={{ fontSize: 10 }}
+                    tickFormatter={v => v.slice(5)}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                  />
+                  <Line
+                    dataKey="count"
+                    type="monotone"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ChartContainer>
+            </div>
+            <TimeseriesStats points={data.submissionsOverTime} />
+          </div>
         )}
       </div>
 
-      {/* Per-block analytics with drop-off */}
-      {data.blockAnalytics.map(block => (
-        <BlockAnalyticsCard
-          key={block.blockIndex}
-          block={block}
-        />
-      ))}
+      {/* Per-block analytics — compact table */}
+      <div className="border border-border rounded-sm divide-y divide-border">
+        <div className="px-4 py-2 grid grid-cols-[1fr_auto] items-center">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Block</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider text-right w-20">
+            Response
+          </p>
+        </div>
+        {data.blockAnalytics.map(block => (
+          <BlockAnalyticsRow
+            key={block.blockIndex}
+            block={block}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TimeseriesStats = ({ points }: { points: SubmissionTimePoint[] }) => {
+  const total = points.reduce((s, p) => s + p.count, 0);
+  const peak = points.reduce((max, p) => (p.count > max.count ? p : max), points[0]);
+  const avg = total / points.length;
+
+  return (
+    <div className="w-[180px] shrink-0 px-4 pt-3 pb-2 flex flex-col gap-4 justify-center">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-xs text-muted-foreground uppercase tracking-wider">Peak day</span>
+        <span className="text-xl font-semibold tabular-nums">{peak.count}</span>
+        <span className="text-xs text-muted-foreground">{peak.date.slice(5)}</span>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-xs text-muted-foreground uppercase tracking-wider">Daily avg</span>
+        <span className="text-xl font-semibold tabular-nums">{avg.toFixed(1)}</span>
+        <span className="text-xs text-muted-foreground">over {points.length} active days</span>
+      </div>
     </div>
   );
 };
@@ -212,131 +259,41 @@ const ResponseRateBar = ({ rate }: { rate: number }) => {
   const color = rate >= 80 ? "bg-emerald-500" : rate >= 50 ? "bg-amber-500" : "bg-destructive";
   return (
     <div
-      className="flex items-center gap-2 mt-2"
+      className="flex items-center gap-1.5"
       data-testid="response-rate-bar"
     >
-      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
         <div
           className={`h-full ${color} transition-all`}
           style={{ width: `${rate}%` }}
         />
       </div>
-      <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
-        {rate}% answered
-      </span>
+      <span className="text-xs text-muted-foreground tabular-nums w-8 text-right">{rate}%</span>
     </div>
   );
 };
 
-const BlockAnalyticsCard = ({ block }: { block: BlockAnalyticsItem }) => {
+const BlockAnalyticsRow = ({ block }: { block: BlockAnalyticsItem }) => {
   const { type, title, analytics, responseRate } = block;
 
+  const summary =
+    type === "ratingTool" && analytics.average !== undefined ? (
+      <span className="text-xs tabular-nums font-medium">{analytics.average} / 5 avg</span>
+    ) : (type === "multipleChoiceTool" || type === "dropdownTool") && analytics.options?.length ? (
+      <span className="text-xs text-muted-foreground truncate max-w-[120px]">
+        top: {analytics.options[0].label}
+      </span>
+    ) : analytics.responseCount !== undefined ? (
+      <span className="text-xs tabular-nums font-medium">{analytics.responseCount} responses</span>
+    ) : null;
+
   return (
-    <div className="border border-border rounded-sm p-4">
-      <p className="text-xs text-muted-foreground uppercase tracking-wider">{title}</p>
+    <div className="px-4 py-3 flex items-center gap-3">
+      <p className="text-sm truncate flex-1 min-w-0">{title}</p>
+      {summary && <div className="shrink-0">{summary}</div>}
       <ResponseRateBar rate={responseRate} />
-
-      <div className="mt-4">
-        {type === "ratingTool" && analytics.average !== undefined && analytics.distribution ? (
-          <RatingBlockView
-            average={analytics.average}
-            distribution={analytics.distribution}
-          />
-        ) : type === "multipleChoiceTool" || type === "dropdownTool" ? (
-          analytics.options ? (
-            <ChoiceBlockView options={analytics.options} />
-          ) : null
-        ) : analytics.responseCount !== undefined ? (
-          <TextBlockView responseCount={analytics.responseCount} />
-        ) : null}
-      </div>
     </div>
   );
 };
-
-const RatingBlockView = ({
-  average,
-  distribution,
-}: {
-  average: number;
-  distribution: Record<string, number>;
-}) => {
-  const maxCount = Math.max(...Object.values(distribution), 1);
-  const stars = ["1", "2", "3", "4", "5"];
-
-  return (
-    <div>
-      <p
-        className="text-3xl font-semibold tabular-nums mb-4"
-        data-testid="rating-average"
-      >
-        {average}
-        <span className="text-base text-muted-foreground font-normal"> / 5</span>
-      </p>
-      <div className="space-y-2">
-        {stars.map(star => {
-          const count = distribution[star] ?? 0;
-          return (
-            <div
-              key={star}
-              className="flex items-center gap-2"
-            >
-              <span className="text-xs w-3 text-muted-foreground">{star}</span>
-              <div className="flex-1 h-2 bg-muted rounded-sm overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${(count / maxCount) * 100}%` }}
-                />
-              </div>
-              <span className="text-xs w-6 text-right text-muted-foreground">{count}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-const ChoiceBlockView = ({ options }: { options: Array<{ label: string; count: number }> }) => {
-  const visible = options.slice(0, 8);
-  const overflow = options.length - 8;
-  const maxCount = Math.max(...options.map(o => o.count), 1);
-
-  return (
-    <div className="space-y-2">
-      {visible.map(opt => (
-        <div
-          key={opt.label}
-          className="flex items-center gap-2"
-          data-testid={`option-${opt.label}`}
-        >
-          <span className="text-xs w-24 truncate text-muted-foreground">{opt.label}</span>
-          <div className="flex-1 h-2 bg-muted rounded-sm overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${(opt.count / maxCount) * 100}%` }}
-            />
-          </div>
-          <span className="text-xs w-6 text-right text-muted-foreground">{opt.count}</span>
-        </div>
-      ))}
-      {overflow > 0 && (
-        <p className="text-xs text-muted-foreground mt-1">+{overflow} more options</p>
-      )}
-    </div>
-  );
-};
-
-const TextBlockView = ({ responseCount }: { responseCount: number }) => (
-  <div>
-    <p
-      className="text-2xl font-semibold tabular-nums"
-      data-testid="response-count"
-    >
-      {responseCount}
-    </p>
-    <p className="text-xs text-muted-foreground">responses</p>
-  </div>
-);
 
 export default AnalyticsTab;

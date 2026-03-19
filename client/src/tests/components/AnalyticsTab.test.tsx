@@ -76,23 +76,22 @@ describe("AnalyticsTab", () => {
     expect(await screen.findByTestId("total-submissions")).toHaveTextContent("10");
   });
 
-  it("renders rating average", async () => {
+  it("renders rating average summary in block row", async () => {
     vi.mocked(fetchFormAnalytics).mockResolvedValue(makeAnalyticsData());
     renderTab();
-    expect(await screen.findByTestId("rating-average")).toHaveTextContent("4.2");
+    expect(await screen.findByText("4.2 / 5 avg")).toBeInTheDocument();
   });
 
-  it("renders option labels for multiple-choice block", async () => {
+  it("renders top choice label for multiple-choice block", async () => {
     vi.mocked(fetchFormAnalytics).mockResolvedValue(makeAnalyticsData());
     renderTab();
-    expect(await screen.findByTestId("option-Red")).toBeInTheDocument();
-    expect(await screen.findByTestId("option-Blue")).toBeInTheDocument();
+    expect(await screen.findByText(/top: Red/)).toBeInTheDocument();
   });
 
   it("renders responseCount for text block", async () => {
     vi.mocked(fetchFormAnalytics).mockResolvedValue(makeAnalyticsData());
     renderTab();
-    expect(await screen.findByTestId("response-count")).toHaveTextContent("7");
+    expect(await screen.findByText("7 responses")).toBeInTheDocument();
   });
 
   it("renders empty state message when submissionsOverTime is empty", async () => {
