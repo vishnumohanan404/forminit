@@ -8,7 +8,6 @@ const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const Auth = React.lazy(() => import("./pages/Auth"));
 const SettingsPage = React.lazy(() => import("./pages/Settings"));
 const SupportPage = React.lazy(() => import("./pages/Support"));
-const ChangelogsPage = React.lazy(() => import("./pages/Changelogs"));
 const FormPage = React.lazy(() => import("./pages/Form"));
 const WorkspacePage = React.lazy(() => import("./pages/Workspace"));
 const FormViewPage = React.lazy(() => import("./pages/FormView"));
@@ -86,14 +85,6 @@ export const routes = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <SupportPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/changelogs",
-    element: (
-      <ProtectedRoute>
-        <ChangelogsPage />
       </ProtectedRoute>
     ),
   },

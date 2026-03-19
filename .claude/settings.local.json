@@ -30,7 +30,9 @@
       "Bash(docker exec:*)",
       "Bash(git add:*)",
       "Bash(git rm:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
