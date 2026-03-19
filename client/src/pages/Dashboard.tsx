@@ -211,13 +211,6 @@ const FormsTable = ({ forms, emptyMessage = "No forms found." }: FormsTableProps
               >
                 Edit
               </Link>
-              <Link
-                to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
-                onClick={e => e.stopPropagation()}
-                className="hover:underline"
-              >
-                Analytics
-              </Link>
             </TableCell>
           </TableRow>
         ))}

@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import SubmissionsTable, { SubmissionData } from "@/layouts/form-summary/SubmissionsTable";
 import ShareTab from "@/layouts/form-summary/ShareTab";
 import SettingsTab from "@/layouts/form-summary/SettingsTab";
+import AnalyticsTab from "@/layouts/form-summary/AnalyticsTab";
 import { useState } from "react";
 
 const PAGE_SIZE = 10;
@@ -24,6 +25,7 @@ const FormSummaryPage = () => {
   const [searchParams] = useSearchParams();
   const { formId } = useParams();
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("submissions");
 
   const {
     data: submissionsData,
@@ -100,11 +102,13 @@ const FormSummaryPage = () => {
         <Tabs
           defaultValue="submissions"
           className="w-full"
+          onValueChange={setActiveTab}
         >
-          <TabsList className="grid max-w-[400px] grid-cols-3 mb-4">
+          <TabsList className="grid max-w-[560px] grid-cols-4 mb-4">
             <TabsTrigger value="submissions">Submissions</TabsTrigger>
             <TabsTrigger value="share">Share</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
           <TabsContent value="submissions">
             {isLoading ? (
@@ -182,6 +186,14 @@ const FormSummaryPage = () => {
           </TabsContent>
           <TabsContent value="settings">
             <SettingsTab disabled={formView?.disabled} />
+          </TabsContent>
+          <TabsContent value="analytics">
+            {formId && (
+              <AnalyticsTab
+                formId={formId}
+                enabled={activeTab === "analytics"}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </main>

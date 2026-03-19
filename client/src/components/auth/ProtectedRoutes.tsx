@@ -21,7 +21,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     <SidebarProvider defaultOpen={true}>
       <AppNavbar />
       <AppSidebar />
-      <main className="flex flex-col flex-1 pt-12 overflow-auto">{children}</main>
+      <div className="flex flex-col flex-1 pt-12">
+        <main className="flex flex-col flex-1 overflow-auto pb-8">{children}</main>
+      </div>
     </SidebarProvider>
   ) : (
     <Navigate to="/auth" />
