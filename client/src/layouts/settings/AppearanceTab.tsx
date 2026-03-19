@@ -6,24 +6,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useTheme } from "@/contexts/ThemeProvider";
+
 const AppearanceTab = () => {
-  const [language, setLanguage] = useState<string>("en");
+  const { theme, setTheme } = useTheme();
   return (
     <div className="space-y-2">
-      <Label htmlFor="language">Language</Label>
+      <Label htmlFor="theme">Theme</Label>
       <Select
-        value={language}
-        onValueChange={setLanguage}
+        value={theme}
+        onValueChange={value => setTheme(value as "light" | "dark" | "system")}
       >
-        <SelectTrigger id="language">
-          <SelectValue placeholder="Select a language" />
+        <SelectTrigger id="theme">
+          <SelectValue placeholder="Select a theme" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="en">English</SelectItem>
-          <SelectItem value="es">Español</SelectItem>
-          <SelectItem value="fr">Français</SelectItem>
-          <SelectItem value="de">Deutsch</SelectItem>
+          <SelectItem value="light">Light</SelectItem>
+          <SelectItem value="dark">Dark</SelectItem>
+          <SelectItem value="system">System</SelectItem>
         </SelectContent>
       </Select>
     </div>
