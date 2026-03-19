@@ -6,6 +6,12 @@ vi.mock("@/components/svg/Logo", () => ({
   default: () => <svg data-testid="logo" />,
 }));
 
+vi.mock("@/contexts/AuthProvider", () => ({
+  useAuth: vi.fn(() => ({ user: null, setUser: vi.fn() })),
+}));
+
+import { useAuth } from "@/contexts/AuthProvider";
+
 const renderLanding = () =>
   render(
     <MemoryRouter>
@@ -14,6 +20,23 @@ const renderLanding = () =>
   );
 
 describe("Landing page", () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it("shows 'Start free' in navbar when logged out", () => {
+    vi.mocked(useAuth).mockReturnValue({ user: null, setUser: vi.fn() });
+    renderLanding();
+    expect(screen.getByRole("button", { name: /start free/i })).toBeInTheDocument();
+  });
+
+  it("shows 'Dashboard' in navbar when logged in", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { _id: "u1", fullName: "Alice", email: "a@b.com", avatar: "" },
+      setUser: vi.fn(),
+    });
+    renderLanding();
+    expect(screen.getByRole("button", { name: /dashboard/i })).toBeInTheDocument();
+  });
+
   it("renders without crashing", () => {
     renderLanding();
     expect(screen.getAllByText(/forminit/i).length).toBeGreaterThan(0);
