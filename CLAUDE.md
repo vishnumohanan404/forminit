@@ -92,26 +92,26 @@ main          ← production, protected, tagged releases (vX.Y.Z)
 
 All routes are prefixed `/api`.
 
-| Method | Path                      | Auth | Description                               |
-| ------ | ------------------------- | ---- | ----------------------------------------- |
-| POST   | /auth/signup              | —    | Register new user                         |
-| POST   | /auth/login               | —    | Login, sets JWT cookie                    |
-| POST   | /auth/google              | —    | Google OAuth                              |
-| GET    | /user                     | JWT  | Get current user                          |
-| PUT    | /user                     | JWT  | Update user profile                       |
-| PUT    | /user/update-password     | JWT  | Change password                           |
-| GET    | /dashboard                | JWT  | Get user's dashboard (workspaces + forms) |
-| POST   | /workspace                | JWT  | Create workspace                          |
-| DELETE | /workspace/:workspaceId   | JWT  | Delete workspace                          |
-| POST   | /form                     | JWT  | Create new form                           |
-| GET    | /form/:formId             | JWT  | Fetch form (editor view)                  |
-| GET    | /form/view-form/:formId   | —    | Public form view                          |
-| PUT    | /form/:id                 | JWT  | Update form content                       |
-| POST   | /form/submit-form         | —    | Submit a response                         |
-| GET    | /form/submissions/:formId | JWT  | Fetch all submissions                     |
-| DELETE | /form/:id                 | JWT  | Delete form                               |
-| PUT    | /form/disable/:id         | JWT  | Toggle form disabled status               |
-| GET    | /form/analytics/:formId   | JWT  | Aggregated analytics for a form           |
+| Method | Path                      | Auth | Description                                                 |
+| ------ | ------------------------- | ---- | ----------------------------------------------------------- |
+| POST   | /auth/signup              | —    | Register new user                                           |
+| POST   | /auth/login               | —    | Login, sets JWT cookie                                      |
+| POST   | /auth/google              | —    | Google OAuth                                                |
+| GET    | /user                     | JWT  | Get current user                                            |
+| PUT    | /user                     | JWT  | Update user profile                                         |
+| PUT    | /user/update-password     | JWT  | Change password                                             |
+| GET    | /dashboard                | JWT  | Get user's dashboard (workspaces + forms)                   |
+| POST   | /workspace                | JWT  | Create workspace                                            |
+| DELETE | /workspace/:workspaceId   | JWT  | Delete workspace                                            |
+| POST   | /form                     | JWT  | Create new form                                             |
+| GET    | /form/:formId             | JWT  | Fetch form (editor view)                                    |
+| GET    | /form/view-form/:formId   | —    | Public form view                                            |
+| PUT    | /form/:id                 | JWT  | Update form content                                         |
+| POST   | /form/submit-form         | —    | Submit a response                                           |
+| GET    | /form/submissions/:formId | JWT  | Fetch all submissions                                       |
+| DELETE | /form/:id                 | JWT  | Delete form                                                 |
+| PUT    | /form/disable/:id         | JWT  | Toggle form disabled status                                 |
+| GET    | /form/analytics/:formId   | JWT  | Aggregated analytics — totals, trends, per-block breakdowns |
 
 ---
 
