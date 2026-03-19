@@ -224,7 +224,20 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const [totalSubmissions, submissionsOverTime] = await Promise.all([
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+  const [
+    totalSubmissions,
+    submissionsOverTime,
+    lastSubmission,
+    thisWeekSubmissions,
+    lastWeekSubmissions,
+    allSubs,
+  ] = await Promise.all([
     Submission.countDocuments({ formId }),
     Submission.aggregate([
       { $match: { formId, createdAt: { $gte: thirtyDaysAgo } } },
@@ -237,7 +250,25 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
       { $sort: { _id: 1 } },
       { $project: { _id: 0, date: "$_id", count: 1 } },
     ]),
+    Submission.findOne({ formId }).sort({ createdAt: -1 }).select("createdAt").lean(),
+    Submission.countDocuments({ formId, createdAt: { $gte: sevenDaysAgo } }),
+    Submission.countDocuments({ formId, createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo } }),
+    Submission.find({ formId }, "blocks").lean(),
   ]);
+
+  // Completion rate: % of submissions where every block has a non-empty answer
+  const completedCount = allSubs.filter(sub =>
+    sub.blocks.every((block: { data?: { value?: unknown; selectedOption?: unknown } }) => {
+      const v = block.data?.value;
+      const s = block.data?.selectedOption;
+      return (v != null && v !== "") || (s != null && s !== "");
+    }),
+  ).length;
+  const completionRate =
+    totalSubmissions > 0 ? Math.round((completedCount / totalSubmissions) * 100) : 0;
+  const lastSubmissionAt = lastSubmission
+    ? (lastSubmission as unknown as { createdAt: Date }).createdAt.toISOString()
+    : null;
 
   const blockAnalytics: BlockAnalyticsItem[] = [];
 
@@ -276,7 +307,9 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
         average: validCount > 0 ? Math.round((sum / validCount) * 10) / 10 : 0,
         distribution: dist,
       };
-      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((validCount / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
     } else if (type === "multipleChoiceTool" || type === "dropdownTool") {
       const options: Array<{ optionValue: string; optionMarker: string }> =
         block.data?.options || [];
@@ -301,7 +334,10 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
           count: r.count,
         })),
       };
-      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+      const totalResponses = rows.reduce((acc: number, r: { count: number }) => acc + r.count, 0);
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((totalResponses / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
     } else {
       const responseCount = await Submission.countDocuments({
         formId,
@@ -309,11 +345,21 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsRes
       });
 
       const analytics: TextAnalytics = { responseCount };
-      blockAnalytics.push({ blockIndex: index, type, title, analytics });
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((responseCount / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
     }
   }
 
-  return { totalSubmissions, submissionsOverTime, blockAnalytics };
+  return {
+    totalSubmissions,
+    lastSubmissionAt,
+    thisWeekSubmissions,
+    lastWeekSubmissions,
+    completionRate,
+    submissionsOverTime,
+    blockAnalytics,
+  };
 };
 
 export const toggleFormDisabled = async (formId: string) => {

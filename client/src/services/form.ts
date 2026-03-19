@@ -74,10 +74,15 @@ export interface BlockAnalyticsItem {
     options?: Array<{ label: string; count: number }>;
     responseCount?: number;
   };
+  responseRate: number;
 }
 
 export interface FormAnalyticsData {
   totalSubmissions: number;
+  lastSubmissionAt: string | null;
+  thisWeekSubmissions: number;
+  lastWeekSubmissions: number;
+  completionRate: number;
   submissionsOverTime: SubmissionTimePoint[];
   blockAnalytics: BlockAnalyticsItem[];
 }

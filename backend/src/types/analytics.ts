@@ -27,6 +27,7 @@ export interface BlockAnalyticsItem {
   type: string;
   title: string;
   analytics: BlockAnalyticsData;
+  responseRate: number; // % of submissions that answered this block
 }
 
 export interface SubmissionTimePoint {
@@ -36,6 +37,10 @@ export interface SubmissionTimePoint {
 
 export interface FormAnalyticsResponse {
   totalSubmissions: number;
+  lastSubmissionAt: string | null;
+  thisWeekSubmissions: number;
+  lastWeekSubmissions: number;
+  completionRate: number; // % of submissions where every block was answered
   submissionsOverTime: SubmissionTimePoint[];
   blockAnalytics: BlockAnalyticsItem[];
 }
