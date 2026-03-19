@@ -2,6 +2,13 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * Supabase-style table:
+ * - Outer border + rounded container (matches their dashboard tables)
+ * - Header: slightly raised bg (bg-card), uppercase xs labels
+ * - Rows: border-b separator, subtle hover
+ * - No extra shadows
+ */
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className="relative w-full overflow-auto rounded-md border border-border">
@@ -21,7 +28,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("bg-muted/50 [&_tr]:border-b [&_tr]:border-border", className)}
+    className={cn("bg-muted/60 [&_tr]:border-b [&_tr]:border-border", className)}
     {...props}
   />
 ));
@@ -46,7 +53,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t border-border bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      "border-t border-border bg-muted/60 font-medium [&>tr]:last:border-b-0",
       className,
     )}
     {...props}

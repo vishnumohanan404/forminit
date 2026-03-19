@@ -1,81 +1,85 @@
 import { describe, it, expect, beforeAll } from "vitest";
 
-describe("CSS custom properties contract — GitHub Primer palette", () => {
+describe("CSS custom properties contract — Supabase palette", () => {
   beforeAll(() => {
     const style = document.createElement("style");
     style.textContent = `
       :root {
         --background: 0 0% 100%;
-        --foreground: 213 13% 14%;
-        --primary: 212 92% 44%;
+        --foreground: 0 0% 9%;
+        --primary: 153 57% 36%;
         --primary-foreground: 0 0% 100%;
-        --muted: 210 17% 97%;
-        --muted-foreground: 212 8% 43%;
-        --border: 210 18% 84%;
+        --muted: 0 0% 96%;
+        --muted-foreground: 0 0% 40%;
+        --border: 0 0% 87%;
         --radius: 0.375rem;
-        --ring: 212 92% 44%;
-        --sidebar: 210 17% 97%;
-        --sidebar-border: 210 18% 84%;
+        --ring: 153 57% 36%;
+        --sidebar: 0 0% 97%;
+        --sidebar-border: 0 0% 87%;
       }
       .dark {
-        --background: 216 28% 7%;
-        --foreground: 210 36% 93%;
-        --primary: 215 92% 58%;
-        --primary-foreground: 0 0% 100%;
-        --muted: 216 15% 15%;
-        --muted-foreground: 213 9% 58%;
-        --border: 215 11% 21%;
+        --background: 0 0% 11%;
+        --foreground: 0 0% 93%;
+        --primary: 153 60% 53%;
+        --primary-foreground: 0 0% 7%;
+        --muted: 0 0% 16%;
+        --muted-foreground: 0 0% 60%;
+        --border: 0 0% 20%;
         --radius: 0.375rem;
-        --ring: 215 92% 58%;
-        --sidebar: 216 28% 9%;
-        --sidebar-border: 215 11% 21%;
+        --ring: 153 60% 53%;
+        --sidebar: 0 0% 8%;
+        --sidebar-border: 0 0% 17%;
       }
     `;
     document.head.appendChild(style);
   });
 
-  it("defines --primary as GitHub blue in light mode (212 92% 44%)", () => {
+  it("light --primary is Supabase brand green (153 57% 36%)", () => {
     const el = document.createElement("div");
     document.body.appendChild(el);
-    const primary = getComputedStyle(el).getPropertyValue("--primary").trim();
-    expect(primary).toBe("212 92% 44%");
+    expect(getComputedStyle(el).getPropertyValue("--primary").trim()).toBe("153 57% 36%");
     document.body.removeChild(el);
   });
 
-  it("defines --radius as 0.375rem (GitHub 6px standard)", () => {
+  it("--radius is 0.375rem (6px)", () => {
     const el = document.createElement("div");
     document.body.appendChild(el);
-    const radius = getComputedStyle(el).getPropertyValue("--radius").trim();
-    expect(radius).toBe("0.375rem");
+    expect(getComputedStyle(el).getPropertyValue("--radius").trim()).toBe("0.375rem");
     document.body.removeChild(el);
   });
 
-  it("defines dark --background as GitHub canvas.default (216 28% 7%)", () => {
+  it("dark --background is Supabase canvas.default (0 0% 11%)", () => {
     document.documentElement.classList.add("dark");
     const el = document.createElement("div");
     document.body.appendChild(el);
-    const bg = getComputedStyle(el).getPropertyValue("--background").trim();
-    expect(bg).toBe("216 28% 7%");
+    expect(getComputedStyle(el).getPropertyValue("--background").trim()).toBe("0 0% 11%");
     document.body.removeChild(el);
     document.documentElement.classList.remove("dark");
   });
 
-  it("defines dark --border as GitHub border.default (215 11% 21%)", () => {
+  it("dark --primary is Supabase brand green accent.fg (153 60% 53%)", () => {
     document.documentElement.classList.add("dark");
     const el = document.createElement("div");
     document.body.appendChild(el);
-    const border = getComputedStyle(el).getPropertyValue("--border").trim();
-    expect(border).toBe("215 11% 21%");
+    expect(getComputedStyle(el).getPropertyValue("--primary").trim()).toBe("153 60% 53%");
     document.body.removeChild(el);
     document.documentElement.classList.remove("dark");
   });
 
-  it("defines dark --primary as GitHub accent.fg blue (215 92% 58%)", () => {
+  it("dark --sidebar is distinctly darker than canvas (0 0% 8%)", () => {
     document.documentElement.classList.add("dark");
     const el = document.createElement("div");
     document.body.appendChild(el);
-    const primary = getComputedStyle(el).getPropertyValue("--primary").trim();
-    expect(primary).toBe("215 92% 58%");
+    expect(getComputedStyle(el).getPropertyValue("--sidebar").trim()).toBe("0 0% 8%");
+    document.body.removeChild(el);
+    document.documentElement.classList.remove("dark");
+  });
+
+  it("dark --border is Supabase border.default (0 0% 20%)", () => {
+    document.documentElement.classList.add("dark");
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    expect(getComputedStyle(el).getPropertyValue("--border").trim()).toBe("0 0% 20%");
     document.body.removeChild(el);
     document.documentElement.classList.remove("dark");
   });

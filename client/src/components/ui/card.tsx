@@ -2,6 +2,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * Supabase-style card: canvas.overlay surface (#212121 dark / #fff light),
+ * subtle border, 6px radius. No shadow.
+ */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div

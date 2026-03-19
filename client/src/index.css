@@ -9,7 +9,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #0d1117;
+  background-color: #1c1c1c;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,46 +21,49 @@ body {
   margin: 0;
 }
 
-/* GitHub Primer design system — shadcn CSS variable mapping */
+/*
+ * Supabase-inspired theme
+ * Design reference: app.supabase.com (Supabase Studio)
+ * Brand green: #3ecf8e  |  Canvas: #1c1c1c  |  Surface: #212121
+ */
 @layer base {
   :root {
-    /* Light: github.com light theme */
-    --background: 0 0% 100%;           /* #ffffff canvas.default */
-    --foreground: 213 13% 14%;         /* #1f2328 fg.default */
+    /* Light mode */
+    --background: 0 0% 100%;           /* #ffffff  clean canvas */
+    --foreground: 0 0% 9%;             /* #171717  fg.default */
     --card: 0 0% 100%;
-    --card-foreground: 213 13% 14%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 213 13% 14%;
-    --primary: 212 92% 44%;            /* #0969da accent.fg */
+    --popover-foreground: 0 0% 9%;
+    --primary: 153 57% 36%;            /* #25a069  brand green (darkened for light contrast) */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 17% 97%;          /* #f6f8fa canvas.subtle */
-    --secondary-foreground: 213 13% 14%;
-    --muted: 210 17% 97%;              /* #f6f8fa */
-    --muted-foreground: 212 8% 43%;    /* #656d76 fg.muted */
-    --accent: 212 100% 95%;            /* #dbeafe accent.subtle */
-    --accent-foreground: 212 92% 38%;
-    --destructive: 4 80% 47%;          /* #cf222e danger.fg */
+    --secondary: 0 0% 96%;             /* #f5f5f5  subtle surface */
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;                 /* #f5f5f5 */
+    --muted-foreground: 0 0% 40%;      /* #666666 */
+    --accent: 153 50% 93%;             /* light green tint for hover */
+    --accent-foreground: 153 57% 28%;
+    --destructive: 0 72% 51%;          /* #e53e3e */
     --destructive-foreground: 0 0% 100%;
-    --border: 210 18% 84%;             /* #d0d7de border.default */
-    --input: 210 18% 84%;
-    --ring: 212 92% 44%;
-    --chart-1: 212 92% 44%;
-    --chart-2: 158 64% 35%;
-    --chart-3: 35 91% 53%;
-    --chart-4: 270 60% 55%;
-    --chart-5: 4 80% 47%;
-    --sidebar: 210 17% 97%;            /* #f6f8fa */
-    --sidebar-foreground: 213 13% 14%;
-    --sidebar-primary: 212 92% 44%;
+    --border: 0 0% 87%;                /* #dedede */
+    --input: 0 0% 95%;                 /* #f2f2f2 */
+    --ring: 153 57% 36%;
+    --chart-1: 153 57% 36%;
+    --chart-2: 215 90% 58%;
+    --chart-3: 35 90% 55%;
+    --chart-4: 280 60% 65%;
+    --chart-5: 0 72% 51%;
+    --sidebar: 0 0% 97%;               /* #f7f7f7  light sidebar */
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 153 57% 36%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 212 100% 95%;
-    --sidebar-accent-foreground: 212 92% 38%;
-    --sidebar-border: 210 18% 84%;
-    --sidebar-ring: 212 92% 44%;
+    --sidebar-accent: 153 50% 93%;
+    --sidebar-accent-foreground: 153 57% 28%;
+    --sidebar-border: 0 0% 87%;
+    --sidebar-ring: 153 57% 36%;
     --font-sans: Inter, sans-serif;
-    --font-serif: Georgia, serif;
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-    --radius: 0.375rem;                /* 6px — GitHub standard */
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --radius: 0.375rem;                /* 6px */
     --shadow-2xs: none;
     --shadow-xs: none;
     --shadow-sm: none;
@@ -72,42 +75,41 @@ body {
   }
 
   .dark {
-    /* Dark: github.com dark theme */
-    --background: 216 28% 7%;          /* #0d1117 canvas.default */
-    --foreground: 210 36% 93%;         /* #e6edf3 fg.default */
-    --card: 215 21% 11%;               /* #161b22 canvas.subtle */
-    --card-foreground: 210 36% 93%;
-    --popover: 215 21% 11%;
-    --popover-foreground: 210 36% 93%;
-    --primary: 215 92% 58%;            /* #2f81f7 accent.fg */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 216 15% 15%;          /* #21262d canvas.inset */
-    --secondary-foreground: 210 36% 93%;
-    --muted: 216 15% 15%;              /* #21262d */
-    --muted-foreground: 213 9% 58%;    /* #8b949e fg.muted */
-    --accent: 215 70% 18%;             /* accent.subtle */
-    --accent-foreground: 215 92% 70%;
-    --destructive: 3 84% 64%;          /* #f85149 danger.fg */
+    /* Dark mode — Supabase Studio palette */
+    --background: 0 0% 11%;            /* #1c1c1c  canvas.default */
+    --foreground: 0 0% 93%;            /* #ededed  fg.default */
+    --card: 0 0% 13%;                  /* #212121  canvas.overlay */
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 153 60% 53%;            /* #3ecf8e  Supabase brand green */
+    --primary-foreground: 0 0% 7%;     /* #121212  dark text on green */
+    --secondary: 0 0% 16%;             /* #292929  raised surface */
+    --secondary-foreground: 0 0% 80%;
+    --muted: 0 0% 16%;                 /* #292929 */
+    --muted-foreground: 0 0% 60%;      /* #999999 */
+    --accent: 153 20% 14%;             /* green-tinted dark hover */
+    --accent-foreground: 153 60% 70%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 11% 21%;             /* #30363d border.default */
-    --input: 216 15% 15%;              /* #21262d */
-    --ring: 215 92% 58%;
-    --chart-1: 215 92% 58%;
-    --chart-2: 148 63% 47%;
-    --chart-3: 38 90% 55%;
-    --chart-4: 270 50% 65%;
-    --chart-5: 3 84% 64%;
-    --sidebar: 216 28% 9%;             /* slightly lighter than bg */
-    --sidebar-foreground: 210 36% 93%;
-    --sidebar-primary: 215 92% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 70% 18%;
-    --sidebar-accent-foreground: 215 92% 70%;
-    --sidebar-border: 215 11% 21%;
-    --sidebar-ring: 215 92% 58%;
+    --border: 0 0% 20%;                /* #333333  border.default */
+    --input: 0 0% 14%;                 /* #242424  input surface */
+    --ring: 153 60% 53%;               /* brand green ring */
+    --chart-1: 153 60% 53%;            /* green */
+    --chart-2: 215 90% 58%;            /* blue */
+    --chart-3: 35 90% 55%;             /* amber */
+    --chart-4: 280 60% 65%;            /* purple */
+    --chart-5: 0 72% 51%;              /* red */
+    --sidebar: 0 0% 8%;                /* #141414  sidebar — distinctly darker than canvas */
+    --sidebar-foreground: 0 0% 75%;
+    --sidebar-primary: 153 60% 53%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 153 20% 14%;
+    --sidebar-accent-foreground: 153 60% 65%;
+    --sidebar-border: 0 0% 17%;        /* #2b2b2b */
+    --sidebar-ring: 153 60% 53%;
     --font-sans: Inter, sans-serif;
-    --font-serif: Georgia, serif;
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --radius: 0.375rem;
     --shadow-2xs: none;
     --shadow-xs: none;
@@ -129,7 +131,7 @@ body {
   }
 }
 
-/* editorjs */
+/* EditorJS overrides */
 .ce-block--selected .ce-block__content {
   background: none;
 }
@@ -156,24 +158,23 @@ body {
   stroke-width: 2;
 }
 
-/* Scrollbar — GitHub dark style */
+/* Scrollbar — Supabase Studio dark style */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d1117;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #30363d;
-  border-radius: 4px;
-  border: 2px solid #0d1117;
+  background-color: #3a3a3a;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #3d444d;
+  background-color: #4a4a4a;
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #30363d #0d1117;
+  scrollbar-color: #3a3a3a transparent;
 }
 
 /* Landing hero fade-in */
