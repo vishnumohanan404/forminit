@@ -11,8 +11,8 @@ import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-// const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-// const ALLOWED_TYPES = ["image/jpeg", "image/jpg"];
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const ProfileTab = ({
   profile,
@@ -32,40 +32,31 @@ const ProfileTab = ({
   const { mutate: updateUser, isPending } = useMutation({
     mutationFn: (userData: UserProfile) => updateUserDetails(userData),
     onSuccess: () => {
-      // Boom baby!
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Profile updated successfully");
     },
     onError: (error: AxiosError<{ message: string }>) => {
-      // An error happened!
-      toast.error(
-        error.response?.data?.message?.includes("User validation failed")
-          ? "User data validation failed"
-          : "Something went wrong",
-      );
+      toast.error(error.response?.data?.message || "Failed to update profile");
     },
   });
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     // Validate file size and type
-  //     if (file.size > MAX_FILE_SIZE) {
-  //       toast.error("File size exceeds 2MB limit");
-  //       return;
-  //     }
-  //     if (!ALLOWED_TYPES.includes(file.type)) {
-  //       toast.error("Only JPG/JPEG files are allowed");
-  //       return;
-  //     }
 
-  //     // If valid, update profile with new avatar
-  //     // const reader = new FileReader();
-  //     // reader.onload = () => {
-  //     //   setProfile({ ...profile, avatar: reader.result as string });
-  //     // };
-  //     // reader.readAsDataURL(file);
-  //   }
-  // };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File size exceeds 2MB limit");
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error("Only JPG, PNG, or WebP files are allowed");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProfile({ ...profile, avatar: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
   return (
     <form
       onSubmit={handleProfileUpdate}
@@ -84,13 +75,11 @@ const ProfileTab = ({
             <AvatarFallback>{profile.fullName?.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
-        {/* {isLoading ? (
-          <Skeleton className="h-[36px] w-[133px]" />
-        ) : (
+        {!isLoading && (
           <>
             <input
               type="file"
-              accept="image/jpeg, image/jpg"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
               style={{ display: "none" }}
               id="avatar-upload"
               onChange={handleFileChange}
@@ -103,7 +92,7 @@ const ProfileTab = ({
               Change Avatar
             </Button>
           </>
-        )} */}
+        )}
       </div>
       <div className="space-y-2">
         {isLoading ? <Skeleton className="h-4 w-20" /> : <Label htmlFor="name">Name </Label>}
