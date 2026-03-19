@@ -34,53 +34,37 @@ describe("CSS custom properties contract — Supabase palette", () => {
     document.head.appendChild(style);
   });
 
+  const root = () => document.documentElement;
+
   it("light --primary is Supabase brand green (153 57% 36%)", () => {
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--primary").trim()).toBe("153 57% 36%");
-    document.body.removeChild(el);
+    expect(getComputedStyle(root()).getPropertyValue("--primary").trim()).toBe("153 57% 36%");
   });
 
   it("--radius is 0.375rem (6px)", () => {
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--radius").trim()).toBe("0.375rem");
-    document.body.removeChild(el);
+    expect(getComputedStyle(root()).getPropertyValue("--radius").trim()).toBe("0.375rem");
   });
 
   it("dark --background is Supabase canvas.default (0 0% 11%)", () => {
-    document.documentElement.classList.add("dark");
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--background").trim()).toBe("0 0% 11%");
-    document.body.removeChild(el);
-    document.documentElement.classList.remove("dark");
+    root().classList.add("dark");
+    expect(getComputedStyle(root()).getPropertyValue("--background").trim()).toBe("0 0% 11%");
+    root().classList.remove("dark");
   });
 
   it("dark --primary is Supabase brand green accent.fg (153 60% 53%)", () => {
-    document.documentElement.classList.add("dark");
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--primary").trim()).toBe("153 60% 53%");
-    document.body.removeChild(el);
-    document.documentElement.classList.remove("dark");
+    root().classList.add("dark");
+    expect(getComputedStyle(root()).getPropertyValue("--primary").trim()).toBe("153 60% 53%");
+    root().classList.remove("dark");
   });
 
   it("dark --sidebar is distinctly darker than canvas (0 0% 8%)", () => {
-    document.documentElement.classList.add("dark");
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--sidebar").trim()).toBe("0 0% 8%");
-    document.body.removeChild(el);
-    document.documentElement.classList.remove("dark");
+    root().classList.add("dark");
+    expect(getComputedStyle(root()).getPropertyValue("--sidebar").trim()).toBe("0 0% 8%");
+    root().classList.remove("dark");
   });
 
   it("dark --border is Supabase border.default (0 0% 20%)", () => {
-    document.documentElement.classList.add("dark");
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(getComputedStyle(el).getPropertyValue("--border").trim()).toBe("0 0% 20%");
-    document.body.removeChild(el);
-    document.documentElement.classList.remove("dark");
+    root().classList.add("dark");
+    expect(getComputedStyle(root()).getPropertyValue("--border").trim()).toBe("0 0% 20%");
+    root().classList.remove("dark");
   });
 });
