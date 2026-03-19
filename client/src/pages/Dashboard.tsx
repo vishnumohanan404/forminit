@@ -37,20 +37,9 @@ const DashboardPage = () => {
   });
   const navigate = useNavigate();
 
-  // const publishedForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
-  //   workspace.forms
-  //     .filter(form => form.published)
-  //     .map(form => ({ ...form, workspaceId: workspace._id })),
-  // );
   const allForms: FormType[] = dashboard?.workspaces?.flatMap((workspace: WorkspaceType) =>
     workspace.forms.map(form => ({ ...form, workspaceId: workspace._id })),
   );
-  // const draftedForms: FormType[] = dashboard?.workspaces?.flatMap(
-  //   (workspace: WorkspaceType) =>
-  //     workspace.forms
-  //       .filter(form => !form.published)
-  //       .map(form => ({ ...form, workspaceId: workspace._id })), // Only include forms that are not published
-  // );
 
   const workspaces: WorkspaceType[] = dashboard?.workspaces || [];
 
@@ -87,7 +76,6 @@ const DashboardPage = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[20%]">Name</TableHead>
-                      {/* <TableHead className="w-[20%]">Status</TableHead> */}
                       <TableHead className="w-[20%]">Forms</TableHead>
                       <TableHead className="w-[20%]">Created</TableHead>
                       <TableHead className="w-[20%] text-right">Actions</TableHead>
@@ -123,14 +111,6 @@ const DashboardPage = () => {
                           >
                             Create Form
                           </Link>
-
-                          {/* <Link
-                            to={`/form/${workspace.form_id}`}
-                            onClick={e => e.stopPropagation()}
-                            className="hover:underline"
-                          >
-                            Edit
-                          </Link> */}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -174,7 +154,6 @@ const DashboardPage = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[20%]">Name</TableHead>
-                      {/* <TableHead className="w-[20%]">Status</TableHead> */}
                       <TableHead className="w-[20%]">Submissions</TableHead>
                       <TableHead className="w-[20%]">Created</TableHead>
                       <TableHead className="w-[20%] text-right">Actions</TableHead>
@@ -195,9 +174,6 @@ const DashboardPage = () => {
                             {form.name}
                           </Link>
                         </TableCell>
-                        {/* <TableCell className="w-[20%]">
-                          {form.published ? "Published" : "Draft"}
-                        </TableCell> */}
                         <TableCell className="w-[20%]">{form.submissions}</TableCell>
                         <TableCell className="w-[20%]">
                           {new Date(form.created).toLocaleDateString("en-US")}
@@ -247,89 +223,11 @@ const DashboardPage = () => {
           <TabsContent
             value="published"
             className="mt-4"
-          >
-            {/* <div className="grid gap-4">
-              {!isError && publishedForms?.length > 0 ? (
-                publishedForms.map((form) => (
-                  <Card key={form._id}>
-                    <CardHeader>
-                      <CardTitle>{form.name}</CardTitle>
-                      <CardDescription>
-                        Status: <span className="capitalize">published</span>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p>Submissions: {form.submissions}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline">
-                        <FileText className="mr-2 h-4 w-4" /> View
-                      </Button>
-                      <div className="flex align-middle gap-5">
-                        {form.published && (
-                          <Button variant={"ghost"}>
-                            <LinkIcon />
-                          </Button>
-                        )}
-                        <Link to={`/form/${form.form_id}`}>
-                          <Button variant="outline">
-                            <Settings className="mr-2 h-4 w-4" /> Edit
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
-                  No published forms available
-                </p>
-              )}
-            </div> */}
-          </TabsContent>
+          />
           <TabsContent
             value="drafts"
             className="mt-4"
-          >
-            {/* <div className="grid gap-4">
-              {!isError && draftedForms?.length > 0 ? (
-                draftedForms.map((form) => (
-                  <Card key={form._id}>
-                    <CardHeader>
-                      <CardTitle>{form.name}</CardTitle>
-                      <CardDescription>
-                        Status: <span className="capitalize">drafted</span>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p>Submissions: {form.submissions}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline">
-                        <FileText className="mr-2 h-4 w-4" /> View
-                      </Button>
-                      <div className="flex align-middle gap-5">
-                        {form.published && (
-                          <Button variant={"ghost"}>
-                            <LinkIcon />
-                          </Button>
-                        )}
-                        <Link to={`/form/${form.form_id}`}>
-                          <Button variant="outline">
-                            <Settings className="mr-2 h-4 w-4" /> Edit
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-2xl mx-auto w-fit mt-28 font-semibold mb-2 text-muted-foreground">
-                  No published forms available
-                </p>
-              )}
-            </div> */}
-          </TabsContent>
+          />
         </Tabs>
       </main>
     </div>
