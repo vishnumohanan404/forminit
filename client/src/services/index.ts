@@ -1,7 +1,8 @@
 import axios from "axios";
+import { routes } from "../Routes";
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:3000",
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,14 +13,11 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
   response => response, // If the response is fine, just return it
   error => {
-    const { response } = error;
+    const { response, config } = error;
     // Check if the response indicates an expired token
-    if (response && response.status === 401) {
-      // Log out the user
-      // Implement this function to clear user data and redirect
-      // localStorage.setItem("user", "");
-      localStorage.removeItem("user"); // <-- add your var
-      location.replace("/");
+    if (response && response.status === 401 && !config.url.includes("/login")) {
+      localStorage.removeItem("user");
+      routes.navigate("/");
     }
 
     return Promise.reject(error);

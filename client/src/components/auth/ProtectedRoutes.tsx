@@ -33,7 +33,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           <div className="flex gap-2 items-center mr-2 py-2">
             <AnimatedGradientText className="!bg-none !border-none">
               <Link
-                to="https://github.com/vishnumohanan404/forminit"
+                to="https://gitlab.com/forminit/forminit-app"
                 target="_blank"
                 className={cn(
                   `text-sm font-medium pr-3 inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent px-2`,

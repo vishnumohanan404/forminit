@@ -12,6 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { FileText } from "lucide-react";
 
 const WorkspacePage = () => {
   const [searchParams] = useSearchParams();
@@ -99,11 +108,22 @@ const WorkspacePage = () => {
             </TableBody>
           </Table>
         ) : (
-          <div className="flex items-center align-middle gap-12 w-full justify-center py-20">
-            <h4 className="scroll-m-20 text-xl font-semibold text-muted-foreground">
-              Looks like it's empty here. Create your first form!
-            </h4>
-          </div>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <FileText />
+              </EmptyMedia>
+            </EmptyHeader>
+            <EmptyTitle>No Forms Yet</EmptyTitle>
+            <EmptyDescription>
+              You haven&apos;t created any forms yet. Get started by creating your first form.
+            </EmptyDescription>
+            <EmptyContent>
+              <div className="flex gap-2">
+                <Button onClick={handleClick}>Create Form</Button>
+              </div>
+            </EmptyContent>
+          </Empty>
         )}
       </main>
     </div>

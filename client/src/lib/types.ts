@@ -1,12 +1,7 @@
-import { BlockData } from "@shared/types";
+import { BlockData, User } from "@shared/types";
 
-export type User = {
-  _id: string;
-  fullName: string;
-  email: string;
-  bio?: string;
-  googleId: string;
-};
+export type { User };
+
 export interface UserProfile {
   fullName: string;
   email: string;
@@ -36,6 +31,7 @@ export type WorkspaceType = {
   name: string;
   forms: FormType[];
   _id: string;
+  created: string;
 };
 
 export type DashboardDataTypes = {

@@ -3,11 +3,20 @@ import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
+const ALLOWED_URL_PREFIX = "/view-form/";
+
+const getSafeShareUrl = (raw: string | null): string => {
+  if (!raw || !raw.startsWith(ALLOWED_URL_PREFIX)) return "";
+  return window.location.origin + raw;
+};
+
 const ShareTab = () => {
   const [searchParams] = useSearchParams();
+  const shareUrl = getSafeShareUrl(searchParams.get("url"));
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.origin + searchParams.get("url") || "");
+      await navigator.clipboard.writeText(shareUrl);
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
@@ -24,12 +33,12 @@ const ShareTab = () => {
         </div>
         <div className="flex gap-2">
           <Input
-            value={window.location.origin + searchParams.get("url") || ""}
+            value={shareUrl}
             readOnly
             className="flex-1"
           />
           <Link
-            to={window.location.origin + searchParams.get("url") || ""}
+            to={shareUrl}
             target="_blank"
           >
             <Button

@@ -6,7 +6,10 @@ import { Types } from "mongoose";
 interface DecodedToken {
   _id: Types.ObjectId;
 }
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is not set");
+}
 
 declare module "express-serve-static-core" {
   export interface Request {
@@ -39,11 +42,11 @@ export const verifyToken = async (
     next(); // Call next middleware
   } catch (error) {
     console.error("Token error", error);
-    // res.clearCookie("jwt", {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production", // Set secure flag in production
-    //   sameSite: "strict", // Adjust based on your needs
-    // });
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
     res.status(401).json({ message: "Invalid token" });
   }
 };

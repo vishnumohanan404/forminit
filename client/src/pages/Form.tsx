@@ -100,7 +100,7 @@ const FormPage = () => {
             onChange={handleTitleChange}
             onKeyDown={handleTitleKeyDown}
             placeholder={!id ? "Untitled" : ""}
-            className="text-4xl font-bold outline-none bg-transparent w-full"
+            className="text-4xl font-bold outline-none bg-transparent w-full placeholder:text-gray-500"
             aria-label="Form title"
           />
           <TooltipProvider>

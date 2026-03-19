@@ -1,12 +1,12 @@
-import fs from "fs/promises";
-import path from "path";
+const GITLAB_CHANGELOG_URL =
+  "https://gitlab.com/forminit/forminit-app/-/raw/main/client/CHANGELOG.md";
 
 export const getChangelogContent = async () => {
-  const changelogPath = path.resolve(process.cwd(), "CHANGELOG.md");
   try {
-    const data = await fs.readFile(changelogPath, "utf-8");
-    return data;
+    const response = await fetch(GITLAB_CHANGELOG_URL);
+    return response.text();
   } catch (err) {
-    throw new Error("Unable to read CHANGELOGS.md");
+    console.error("Failed to fetch changelog from GitLab:", err);
+    throw new Error("Unable to read CHANGELOG.md from any source");
   }
 };
