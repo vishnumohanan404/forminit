@@ -130,11 +130,18 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
   return updatedDashboard; // Return the updated form with updated submissions count
 };
 
-export const getSubmissionsByFormId = async (formId: string): Promise<SubmissionInterface[]> => {
+export const getSubmissionsByFormId = async (
+  formId: string,
+  page: number,
+  limit: number,
+): Promise<{ submissions: SubmissionInterface[]; total: number }> => {
   try {
-    // Find all submissions with the matching formId
-    const submissions = await Submission.find({ formId });
-    return submissions;
+    const skip = (page - 1) * limit;
+    const [submissions, total] = await Promise.all([
+      Submission.find({ formId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Submission.countDocuments({ formId }),
+    ]);
+    return { submissions, total };
   } catch {
     throw new Error(`Error fetching submissions for formId: ${formId}`);
   }

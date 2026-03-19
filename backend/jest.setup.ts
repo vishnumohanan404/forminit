@@ -2,16 +2,15 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import User from "./src/models/user";
 import Dashboard from "./src/models/dashboard";
+import Form from "./src/models/form";
+import Submission from "./src/models/submission";
 
 let mongoServer: MongoMemoryServer;
-jest.mock("jsonwebtoken", () => ({
-  sign: jest.fn(() => "mocked-jwt-token"),
-}));
+
 beforeAll(async () => {
   process.env.MONGOMS_DOWNLOAD_DIR = ".mongodb-binaries";
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
-
   process.env.MONGO_URI = uri;
 
   if (mongoose.connection.readyState === 0) {
@@ -27,4 +26,6 @@ afterAll(async () => {
 beforeEach(async () => {
   await User.deleteMany({});
   await Dashboard.deleteMany({});
+  await Form.deleteMany({});
+  await Submission.deleteMany({});
 });

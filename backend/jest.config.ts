@@ -10,6 +10,7 @@ const config: Config = {
   moduleFileExtensions: ["ts", "js"],
   transformIgnorePatterns: ["<rootDir>/node_modules/"],
   testMatch: ["**/?(*.)+(spec|test).[t]s"],
+  setupFiles: ["<rootDir>/jest.env.ts"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
 

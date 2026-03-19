@@ -15,6 +15,10 @@ import { FormDataInterface } from "@shared/types";
 import QuestionTitleTool from "@/components/form/tools/QuestionTitleTool.tsx";
 import ShortAnswerCompositeTool from "@/components/form/tools/ShortAnswerCompositeTool.tsx";
 import LongAnswerCompositeTool from "@/components/form/tools/LongAnswerCompositeTool.tsx";
+import EmailTool from "@/components/form/tools/EmailTool.tsx";
+import DateTool from "@/components/form/tools/DateTool.tsx";
+import RatingTool from "@/components/form/tools/RatingTool.tsx";
+import DropdownTool from "@/components/form/tools/DropdownTool.tsx";
 
 const Editor = () => {
   const { id } = useParams();
@@ -45,6 +49,11 @@ const Editor = () => {
           // Composite tool (visible in toolbox)
           shortAnswerQuestion: ShortAnswerCompositeTool,
           longAnswerQuestion: LongAnswerCompositeTool,
+          // New block types
+          emailTool: EmailTool,
+          dateTool: DateTool,
+          ratingTool: RatingTool,
+          dropdownTool: DropdownTool,
         },
         onChange: throttle(() => {
           editorInstance.current
