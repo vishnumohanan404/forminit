@@ -62,7 +62,7 @@ describe("FormSummaryPage", () => {
   it("AnalyticsTab mounts when Analytics tab is clicked", async () => {
     renderFormSummary();
     const analyticsTab = screen.getByRole("tab", { name: /analytics/i });
-    fireEvent.click(analyticsTab);
+    fireEvent.mouseDown(analyticsTab);
     expect(await screen.findByTestId("analytics-tab")).toBeInTheDocument();
   });
 });
