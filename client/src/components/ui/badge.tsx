@@ -3,17 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * Supabase-style badges: pill shape, low-opacity bg tint + matching text color.
+ * No border-radius square corners. Small text, compact padding.
+ */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "bg-primary/15 text-primary border border-primary/20",
+        secondary: "bg-muted text-muted-foreground border border-border",
+        destructive: "bg-destructive/15 text-destructive border border-destructive/20",
+        outline: "border border-border text-muted-foreground bg-transparent",
+        success: "bg-primary/15 text-primary border border-primary/20" /* reuse brand green */,
+        warning: "bg-amber-500/15 text-amber-500 border border-amber-500/20",
       },
     },
     defaultVariants: {

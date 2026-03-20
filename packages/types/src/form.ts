@@ -32,8 +32,8 @@ export interface FormData {
 
 export interface FormDataInterface {
   title: string;
-  time: number;
-  version: string;
+  time?: number;
+  version?: string;
   blocks: BlockData[];
   createdAt?: Date;
   updatedAt?: Date;

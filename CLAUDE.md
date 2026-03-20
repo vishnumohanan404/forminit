@@ -7,7 +7,8 @@ create workspaces, add forms, publish them, and collect submissions.
 
 **Tech Stack**
 
-- **Frontend:** React 18, TypeScript, Vite, TailwindCSS, shadcn/ui, EditorJS
+- **Frontend:** React 18, TypeScript, Vite, TailwindCSS, shadcn/ui, custom block editor (cmdk +
+  @dnd-kit)
 - **Backend:** Node.js, Express, TypeScript
 - **Database:** MongoDB via Mongoose
 - **Auth:** JWT in HTTP-only cookies + Google OAuth
@@ -92,26 +93,26 @@ main          ← production, protected, tagged releases (vX.Y.Z)
 
 All routes are prefixed `/api`.
 
-| Method | Path                      | Auth | Description                               |
-| ------ | ------------------------- | ---- | ----------------------------------------- |
-| POST   | /auth/signup              | —    | Register new user                         |
-| POST   | /auth/login               | —    | Login, sets JWT cookie                    |
-| POST   | /auth/google              | —    | Google OAuth                              |
-| GET    | /user                     | JWT  | Get current user                          |
-| PUT    | /user                     | JWT  | Update user profile                       |
-| PUT    | /user/update-password     | JWT  | Change password                           |
-| GET    | /dashboard                | JWT  | Get user's dashboard (workspaces + forms) |
-| POST   | /workspace                | JWT  | Create workspace                          |
-| DELETE | /workspace/:workspaceId   | JWT  | Delete workspace                          |
-| POST   | /form                     | JWT  | Create new form                           |
-| GET    | /form/:formId             | JWT  | Fetch form (editor view)                  |
-| GET    | /form/view-form/:formId   | —    | Public form view                          |
-| PUT    | /form/:id                 | JWT  | Update form content                       |
-| POST   | /form/submit-form         | —    | Submit a response                         |
-| GET    | /form/submissions/:formId | JWT  | Fetch all submissions                     |
-| DELETE | /form/:id                 | JWT  | Delete form                               |
-| PUT    | /form/disable/:id         | JWT  | Toggle form disabled status               |
-| GET    | /changelogs               | —    | Fetch changelogs                          |
+| Method | Path                      | Auth | Description                                                 |
+| ------ | ------------------------- | ---- | ----------------------------------------------------------- |
+| POST   | /auth/signup              | —    | Register new user                                           |
+| POST   | /auth/login               | —    | Login, sets JWT cookie                                      |
+| POST   | /auth/google              | —    | Google OAuth                                                |
+| GET    | /user                     | JWT  | Get current user                                            |
+| PUT    | /user                     | JWT  | Update user profile                                         |
+| PUT    | /user/update-password     | JWT  | Change password                                             |
+| GET    | /dashboard                | JWT  | Get user's dashboard (workspaces + forms)                   |
+| POST   | /workspace                | JWT  | Create workspace                                            |
+| DELETE | /workspace/:workspaceId   | JWT  | Delete workspace                                            |
+| POST   | /form                     | JWT  | Create new form                                             |
+| GET    | /form/:formId             | JWT  | Fetch form (editor view)                                    |
+| GET    | /form/view-form/:formId   | —    | Public form view                                            |
+| PUT    | /form/:id                 | JWT  | Update form content                                         |
+| POST   | /form/submit-form         | —    | Submit a response                                           |
+| GET    | /form/submissions/:formId | JWT  | Fetch all submissions                                       |
+| DELETE | /form/:id                 | JWT  | Delete form                                                 |
+| PUT    | /form/disable/:id         | JWT  | Toggle form disabled status                                 |
+| GET    | /form/analytics/:formId   | JWT  | Aggregated analytics — totals, trends, per-block breakdowns |
 
 ---
 
@@ -124,8 +125,10 @@ unique), timestamps.
 
 ### Form
 
-Fields: `title`, `time`, `version`, `blocks[]` (type + data), `workspaceId`, `disabled`, timestamps.
-Block data is `Mixed` type — flexible for different EditorJS block types.
+Fields: `title`, `blocks[]` (type + data), `workspaceId`, `disabled`, timestamps. `time` and
+`version` are optional legacy EditorJS fields — no longer written by the editor. Block schema: `_id`
+(String — UUID, from custom editor), `type` (String), `data` (Mixed). Block data is `Mixed` type —
+flexible across all block types.
 
 ### Dashboard
 
@@ -139,10 +142,40 @@ Fields: `title`, `formId`, `blocks[]` (type + data, same structure as Form block
 
 ---
 
+## Custom Block Editor
+
+EditorJS was replaced with a custom Tally.so-style block editor (Sprint 8a, 2026-03-20).
+
+**Architecture:**
+
+- `BlockEditor.tsx` — state owner, holds `blocks[]`, DnD context, focus registry
+- `BlockItem.tsx` — per-block wrapper with drag handle and delete button
+- `BlockInsertMenu.tsx` — cmdk-based `/` command palette
+- `blocks/` — one component per block type: `ParagraphBlock`, `HeadingBlock`, `ShortAnswerBlock`,
+  `LongAnswerBlock`, `MultipleChoiceBlock`, `DropdownBlock`, `EmailBlock`, `DateBlock`,
+  `RatingBlock`
+
+**Block types:** `paragraph`, `heading`, `shortAnswerTool`, `longAnswerTool`, `multipleChoiceTool`,
+`dropdownTool`, `emailTool`, `dateTool`, `ratingTool`
+
+**Tally-style pairing:** Input blocks have no embedded title. On submission, `getTitleForBlock()` in
+`FormView.tsx` walks backwards from each input block to find the nearest preceding
+`paragraph`/`heading` as its label.
+
+**Legacy migration:** `normalizeBlocks()` in `BlockEditor.tsx` lazily converts old `questionTitle`
+blocks → `paragraph` and splits monolithic input blocks (with embedded `title`) into `paragraph` +
+input on load — no DB writes.
+
+**Packages added:** `cmdk`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`,
+`@dnd-kit/modifiers` **Packages removed:** all `@editorjs/*`, `editorjs-inline-tool`,
+`editorjs-layout`, `title-editorjs`
+
+---
+
 ## Known Landmines
 
 All 13 items from the original backlog were resolved across three fix sprints (merged to `dev`,
-released in `v0.13.0`). No open landmines as of 2026-03-19.
+released in `v0.13.0`). No open landmines as of 2026-03-20.
 
 ---
 

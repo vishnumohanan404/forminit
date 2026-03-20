@@ -5,6 +5,13 @@ import { SubmitFormDataInterface } from "../types/form";
 import Submission from "../models/submission";
 import { SubmissionInterface } from "../types/submission";
 import { FormDataInterface } from "@shared/types";
+import {
+  BlockAnalyticsItem,
+  ChoiceAnalytics,
+  FormAnalyticsResponse,
+  RatingAnalytics,
+  TextAnalytics,
+} from "../types/analytics";
 
 export const findForm = async (
   userId: Types.ObjectId,
@@ -130,11 +137,18 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
   return updatedDashboard; // Return the updated form with updated submissions count
 };
 
-export const getSubmissionsByFormId = async (formId: string): Promise<SubmissionInterface[]> => {
+export const getSubmissionsByFormId = async (
+  formId: string,
+  page: number,
+  limit: number,
+): Promise<{ submissions: SubmissionInterface[]; total: number }> => {
   try {
-    // Find all submissions with the matching formId
-    const submissions = await Submission.find({ formId });
-    return submissions;
+    const skip = (page - 1) * limit;
+    const [submissions, total] = await Promise.all([
+      Submission.find({ formId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Submission.countDocuments({ formId }),
+    ]);
+    return { submissions, total };
   } catch {
     throw new Error(`Error fetching submissions for formId: ${formId}`);
   }
@@ -201,6 +215,159 @@ export const deleteFormById = async (formId: string) => {
     console.error("Error deleting form:", error);
     throw new Error("Error deleting form and its references.");
   }
+};
+
+export const getFormAnalytics = async (formId: string): Promise<FormAnalyticsResponse | null> => {
+  const form = await Form.findById(formId, { blocks: 1 }).lean();
+  if (!form) return null;
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+  const [
+    totalSubmissions,
+    submissionsOverTime,
+    lastSubmission,
+    thisWeekSubmissions,
+    lastWeekSubmissions,
+    allSubs,
+  ] = await Promise.all([
+    Submission.countDocuments({ formId }),
+    Submission.aggregate([
+      { $match: { formId, createdAt: { $gte: thirtyDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, date: "$_id", count: 1 } },
+    ]),
+    Submission.findOne({ formId }).sort({ createdAt: -1 }).select("createdAt").lean(),
+    Submission.countDocuments({ formId, createdAt: { $gte: sevenDaysAgo } }),
+    Submission.countDocuments({ formId, createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo } }),
+    Submission.find({ formId }, "blocks").lean(),
+  ]);
+
+  // Completion rate: % of submissions where every block has a non-empty answer
+  const completedCount = allSubs.filter(sub =>
+    sub.blocks.every((block: { data?: { value?: unknown; selectedOption?: unknown } }) => {
+      const v = block.data?.value;
+      const s = block.data?.selectedOption;
+      return (v != null && v !== "") || (s != null && s !== "");
+    }),
+  ).length;
+  const completionRate =
+    totalSubmissions > 0 ? Math.round((completedCount / totalSubmissions) * 100) : 0;
+  const lastSubmissionAt = lastSubmission
+    ? (lastSubmission as unknown as { createdAt: Date }).createdAt.toISOString()
+    : null;
+
+  const blockAnalytics: BlockAnalyticsItem[] = [];
+
+  for (let index = 0; index < form.blocks.length; index++) {
+    const block = form.blocks[index];
+    const type = block.type;
+    const title = block.data?.title || `Block ${index + 1}`;
+
+    if (type === "ratingTool") {
+      const rows = await Submission.aggregate([
+        { $match: { formId } },
+        {
+          $project: {
+            blockValue: {
+              $let: {
+                vars: { blk: { $arrayElemAt: ["$blocks", index] } },
+                in: "$$blk.data.value",
+              },
+            },
+          },
+        },
+        { $match: { blockValue: { $nin: [null, ""] } } },
+      ]);
+
+      const dist: Record<string, number> = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+      let sum = 0;
+      let validCount = 0;
+
+      for (const row of rows) {
+        const val = Number(row.blockValue);
+        if (!isNaN(val) && val >= 1 && val <= 5) {
+          const key = String(Math.round(val));
+          dist[key] = (dist[key] || 0) + 1;
+          sum += val;
+          validCount++;
+        }
+      }
+
+      const analytics: RatingAnalytics = {
+        average: validCount > 0 ? Math.round((sum / validCount) * 10) / 10 : 0,
+        distribution: dist,
+      };
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((validCount / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
+    } else if (type === "multipleChoiceTool" || type === "dropdownTool") {
+      const options: Array<{ optionValue: string; optionMarker: string }> =
+        block.data?.options || [];
+
+      const rows = await Submission.aggregate([
+        { $match: { formId } },
+        {
+          $project: {
+            blockValue: {
+              $let: {
+                vars: { blk: { $arrayElemAt: ["$blocks", index] } },
+                in: "$$blk.data.selectedOption",
+              },
+            },
+          },
+        },
+        { $match: { blockValue: { $nin: [null, ""] } } },
+        { $group: { _id: "$blockValue", count: { $sum: 1 } } },
+      ]);
+
+      const markerToLabel = Object.fromEntries(options.map(o => [o.optionMarker, o.optionValue]));
+
+      const analytics: ChoiceAnalytics = {
+        options: rows.map(r => ({
+          label: markerToLabel[r._id] || r._id,
+          count: r.count,
+        })),
+      };
+      const totalResponses = rows.reduce((acc: number, r: { count: number }) => acc + r.count, 0);
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((totalResponses / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
+    } else {
+      const responseCount = await Submission.countDocuments({
+        formId,
+        [`blocks.${index}.data.value`]: { $ne: "" },
+      });
+
+      const analytics: TextAnalytics = { responseCount };
+      const responseRate =
+        totalSubmissions > 0 ? Math.round((responseCount / totalSubmissions) * 100) : 0;
+      blockAnalytics.push({ blockIndex: index, type, title, analytics, responseRate });
+    }
+  }
+
+  return {
+    totalSubmissions,
+    lastSubmissionAt,
+    thisWeekSubmissions,
+    lastWeekSubmissions,
+    completionRate,
+    submissionsOverTime,
+    blockAnalytics,
+  };
 };
 
 export const toggleFormDisabled = async (formId: string) => {

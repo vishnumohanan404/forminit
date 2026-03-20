@@ -44,8 +44,10 @@ export const submitForm = async (formData: SubmitFormData) => {
   const response = await axiosClient.post(`/api/form/submit-form`, formData);
   return response.data;
 };
-export const fetchSubmissions = async (formId: string) => {
-  const response = await axiosClient.get(`/api/form/submissions/${formId}`);
+export const fetchSubmissions = async (formId: string, page = 1, limit = 10) => {
+  const response = await axiosClient.get(
+    `/api/form/submissions/${formId}?page=${page}&limit=${limit}`,
+  );
   return response.data;
 };
 export const deleteForm = async (id: string | undefined) => {
@@ -54,5 +56,38 @@ export const deleteForm = async (id: string | undefined) => {
 };
 export const disableForm = async (id: string | undefined) => {
   const response = await axiosClient.put(`/api/form/disable/${id}`);
+  return response.data;
+};
+
+export interface SubmissionTimePoint {
+  date: string;
+  count: number;
+}
+
+export interface BlockAnalyticsItem {
+  blockIndex: number;
+  type: string;
+  title: string;
+  analytics: {
+    average?: number;
+    distribution?: Record<string, number>;
+    options?: Array<{ label: string; count: number }>;
+    responseCount?: number;
+  };
+  responseRate: number;
+}
+
+export interface FormAnalyticsData {
+  totalSubmissions: number;
+  lastSubmissionAt: string | null;
+  thisWeekSubmissions: number;
+  lastWeekSubmissions: number;
+  completionRate: number;
+  submissionsOverTime: SubmissionTimePoint[];
+  blockAnalytics: BlockAnalyticsItem[];
+}
+
+export const fetchFormAnalytics = async (formId: string): Promise<FormAnalyticsData> => {
+  const response = await axiosClient.get(`/api/form/analytics/${formId}`);
   return response.data;
 };

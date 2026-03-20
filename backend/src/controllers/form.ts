@@ -2,6 +2,7 @@ import { Request, Response } from "express-serve-static-core";
 import { errorResponse } from "../helpers";
 import {
   findForm,
+  getFormAnalytics,
   getSubmissionsByFormId,
   saveNewForm,
   submitFormData,
@@ -82,11 +83,13 @@ export const submitForm = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const fetchSubmissions = async (req: Request, res: Response) => {
-  const { formId } = req.params; // Extract formId from URL parameters
+  const { formId } = req.params;
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
 
   try {
-    const submissions = await getSubmissionsByFormId(formId);
-    res.status(200).json(submissions); // Return the submissions as JSON
+    const result = await getSubmissionsByFormId(formId, page, limit);
+    res.status(200).json(result);
   } catch (error) {
     errorResponse(error, res);
   }
@@ -104,6 +107,20 @@ export const deleteForm = async (req: Request, res: Response) => {
     } else {
       res.status(404).json({ message: result.message });
     }
+  } catch (error) {
+    errorResponse(error, res);
+  }
+};
+
+export const fetchFormAnalytics = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { formId } = req.params;
+    const analytics = await getFormAnalytics(formId);
+    if (!analytics) {
+      res.status(404).send("form not found");
+      return;
+    }
+    res.status(200).json(analytics);
   } catch (error) {
     errorResponse(error, res);
   }

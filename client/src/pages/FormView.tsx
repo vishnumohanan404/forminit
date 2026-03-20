@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { submitForm, SubmitFormData, viewForm } from "@/services/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -10,6 +17,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import NotFoundPage from "./NotFound";
 import { Loader2Icon } from "lucide-react";
 import { BlockData } from "@shared/types";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import RatingInput from "@/components/form/ui/RatingInput";
 
 interface Form {
   _id: string;
@@ -22,47 +32,73 @@ interface MCQOptions {
   optionValue: string;
   optionMarker: string;
 }
+
+const INPUT_TYPES = new Set([
+  "shortAnswerTool",
+  "longAnswerTool",
+  "multipleChoiceTool",
+  "dropdownTool",
+  "emailTool",
+  "dateTool",
+  "ratingTool",
+]);
+
+/**
+ * For each input block, find the nearest preceding paragraph/heading block as its title.
+ * Stops searching if it hits another input block first (Tally-style positional pairing).
+ */
+function getTitleForBlock(blocks: BlockData[], index: number): string {
+  for (let j = index - 1; j >= 0; j--) {
+    const t = blocks[j].type;
+    if (t === "paragraph" || t === "heading") {
+      return (blocks[j].data as Record<string, string>).text || "";
+    }
+    if (INPUT_TYPES.has(t)) break;
+  }
+  return "";
+}
+
 const FormViewPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useQuery<Form>({
+  const {
+    data,
+    isLoading,
+    isError: isFormError,
+  } = useQuery<Form>({
     queryKey: ["form", id],
     queryFn: () => viewForm(id),
     staleTime: 10000,
     enabled: !!id,
   });
+
+  const [formState, setFormState] = useState<Array<BlockData>>([]);
+
   useEffect(() => {
     if (!isLoading && data) setFormState(data.blocks);
-  }, [data]);
+  }, [data, isLoading]);
 
-  // State to store form input values
-  const [formState, setFormState] = useState<Array<BlockData>>([]);
   const handleChange = (blockId: string, value: string, type: string) => {
-    const newFormState = formState.map(block => {
-      if (block._id === blockId) {
-        if (type === "shortAnswerTool" || type === "longAnswerTool") {
-          return {
-            ...block,
-            data: {
-              ...block.data,
-              value: value, // Assuming you're updating the placeholder field
-            },
-          };
-        } else if (type === "multipleChoiceTool") {
-          return {
-            ...block,
-            data: {
-              ...block.data,
-              selectedOption: value, // Store the selected option marker
-              // Assuming you're updating the options array
-            },
-          };
+    setFormState(prev =>
+      prev.map(block => {
+        if (block._id !== blockId) return block;
+        if (
+          type === "shortAnswerTool" ||
+          type === "longAnswerTool" ||
+          type === "emailTool" ||
+          type === "dateTool" ||
+          type === "ratingTool"
+        ) {
+          return { ...block, data: { ...block.data, value } };
         }
-      }
-      return block; // If _id doesn't match, return block unchanged
-    });
-    setFormState(newFormState);
+        if (type === "multipleChoiceTool" || type === "dropdownTool") {
+          return { ...block, data: { ...block.data, selectedOption: value } };
+        }
+        return block;
+      }),
+    );
   };
+
   const queryClient = useQueryClient();
 
   const { mutate: submitFormMutation, isPending } = useMutation({
@@ -71,19 +107,41 @@ const FormViewPage = () => {
       navigate("/success", { replace: true });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
+    onError: (error: AxiosError<{ message: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to submit form. Please try again.");
+    },
   });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Build submission: only input blocks, with title from nearest preceding content block
+    const submissionBlocks = formState
+      .map((block, i) => {
+        if (!INPUT_TYPES.has(block.type)) return null;
+        const title = getTitleForBlock(formState, i);
+        return { ...block, data: { ...block.data, title } };
+      })
+      .filter(Boolean) as BlockData[];
+
     submitFormMutation({
-      blocks: formState,
+      blocks: submissionBlocks,
       title: data?.title || "",
       _id: data?._id || "",
     });
   };
 
-  if (data?.disabled) {
-    return <NotFoundPage />;
+  if (isFormError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground">
+          Failed to load form. Please check the link and try again.
+        </p>
+      </div>
+    );
   }
+
+  if (data?.disabled) return <NotFoundPage />;
 
   if (isLoading) {
     return (
@@ -102,6 +160,7 @@ const FormViewPage = () => {
       </div>
     );
   }
+
   return (
     <div>
       <div className="overflow-y-scroll px-5">
@@ -109,17 +168,41 @@ const FormViewPage = () => {
         <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
           <div className="mx-auto max-w-[650px]">
             <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {formState?.map(block => {
                   switch (block.type) {
+                    // Content blocks render as-is
+                    case "paragraph":
+                      return (
+                        <p
+                          key={block._id}
+                          className="font-semibold py-1"
+                        >
+                          {(block.data as Record<string, string>).text}
+                        </p>
+                      );
+                    case "heading":
+                      return (
+                        <h2
+                          key={block._id}
+                          className="text-2xl font-bold py-1"
+                        >
+                          {(block.data as Record<string, string>).text}
+                        </h2>
+                      );
+
+                    // Legacy — skip phantom title blocks
+                    case "questionTitle":
+                      return null;
+
+                    // Input blocks — no label (the preceding paragraph IS the label)
                     case "shortAnswerTool":
                       return (
                         <div key={block._id}>
-                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
                           <Input
                             type="text"
                             placeholder={block.data?.placeholder}
-                            className="focus-visible:ring-0 my-2 w-[60%]"
+                            className="focus-visible:ring-0 w-[60%]"
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
                           />
@@ -128,10 +211,9 @@ const FormViewPage = () => {
                     case "longAnswerTool":
                       return (
                         <div key={block._id}>
-                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
                           <Textarea
                             placeholder={block.data?.placeholder}
-                            className="focus-visible:ring-0 my-2 resize-none"
+                            className="focus-visible:ring-0 resize-none"
                             rows={4}
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
@@ -141,16 +223,15 @@ const FormViewPage = () => {
                     case "multipleChoiceTool":
                       return (
                         <div key={block._id}>
-                          <label className="font-semibold py-2 px-0">{block.data?.title}</label>
-                          <div className="py-2">
+                          <div className="py-1">
                             {block.data.options?.map((option: MCQOptions) => (
                               <button
                                 type="button"
                                 key={option.optionMarker}
-                                className={`relative cursor-pointer inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2`}
-                                onClick={() => {
-                                  handleChange(block._id, option.optionMarker, block.type);
-                                }}
+                                className="relative cursor-pointer inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2"
+                                onClick={() =>
+                                  handleChange(block._id, option.optionMarker, block.type)
+                                }
                               >
                                 <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
                                   <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
@@ -158,7 +239,7 @@ const FormViewPage = () => {
                                   </span>
                                 </div>
                                 <div
-                                  className={`min-w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 pl-9  ${
+                                  className={`min-w-[60%] flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 ${
                                     block.data.selectedOption === option.optionMarker
                                       ? "border-sky-500"
                                       : ""
@@ -171,8 +252,66 @@ const FormViewPage = () => {
                           </div>
                         </div>
                       );
+                    case "emailTool":
+                      return (
+                        <div key={block._id}>
+                          <Input
+                            type="email"
+                            placeholder="name@example.com"
+                            className="focus-visible:ring-0 w-[60%]"
+                            value={block.data?.value || ""}
+                            onChange={e => handleChange(block._id, e.target.value, block.type)}
+                          />
+                        </div>
+                      );
+                    case "dateTool":
+                      return (
+                        <div key={block._id}>
+                          <Input
+                            type="date"
+                            className="focus-visible:ring-0 w-[60%]"
+                            value={block.data?.value || ""}
+                            onChange={e => handleChange(block._id, e.target.value, block.type)}
+                          />
+                        </div>
+                      );
+                    case "ratingTool":
+                      return (
+                        <div key={block._id}>
+                          <RatingInput
+                            value={Number(block.data?.value) || 0}
+                            maxRating={block.data?.maxRating || 5}
+                            onChange={val => handleChange(block._id, String(val), block.type)}
+                          />
+                        </div>
+                      );
+                    case "dropdownTool":
+                      return (
+                        <div key={block._id}>
+                          <div className="w-[60%]">
+                            <Select
+                              value={block.data?.selectedOption || ""}
+                              onValueChange={val => handleChange(block._id, val, block.type)}
+                            >
+                              <SelectTrigger className="focus:ring-0">
+                                <SelectValue placeholder="Select an option" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {block.data.options?.map((option: MCQOptions) => (
+                                  <SelectItem
+                                    key={option.optionMarker}
+                                    value={option.optionMarker}
+                                  >
+                                    {option.optionValue}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      );
                     default:
-                      break;
+                      return null;
                   }
                 })}
 

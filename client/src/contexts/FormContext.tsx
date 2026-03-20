@@ -1,23 +1,19 @@
-import { EditorJSData } from "@/services/form";
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import { EditorJSData } from "@/services/form";
 
-// Define the form data structure
 interface FormState {
-  editorData: EditorJSData; // The editor data to store
+  editorData: EditorJSData;
 }
 
-// Define action types
 type FormAction = {
   type: "SET_FORM_DATA";
   payload: EditorJSData;
 };
 
-// Create the context
 const FormContext = createContext<
   { state: FormState; dispatch: React.Dispatch<FormAction> } | undefined
 >(undefined);
 
-// Form reducer to manage the state
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
     case "SET_FORM_DATA":
@@ -27,16 +23,14 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
-// Provider component
 export function FormProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(formReducer, {
-    editorData: { title: "", time: 0, blocks: [], workspaceId: "", version: "" },
+    editorData: { title: "", blocks: [], workspaceId: "" },
   });
 
   return <FormContext.Provider value={{ state, dispatch }}>{children}</FormContext.Provider>;
 }
 
-// Custom hook to use the form context
 export function useFormContext() {
   const context = useContext(FormContext);
   if (!context) {

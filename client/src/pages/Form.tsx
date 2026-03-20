@@ -1,5 +1,5 @@
 import PageTitle from "@/components/common/PageTitle";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Editor from "@/layouts/form/Editor";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "@/contexts/FormContext";
@@ -14,6 +14,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/comp
 
 const FormPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { state } = useFormContext();
   const queryClient = useQueryClient();
@@ -28,10 +29,10 @@ const FormPage = () => {
         title,
         workspaceId: searchParams.get("workspaceId") || "",
       }),
-    onSuccess: () => {
-      // Boom baby!
+    onSuccess: (newForm: { _id: string }) => {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast.success("Form saved successfully");
+      navigate(`/form/${newForm._id}`, { replace: true });
     },
     onError: (error: AxiosError<{ message: string }>) => {
       // An error happened!

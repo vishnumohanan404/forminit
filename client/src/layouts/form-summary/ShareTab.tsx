@@ -1,24 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
-
-const ALLOWED_URL_PREFIX = "/view-form/";
-
-const getSafeShareUrl = (raw: string | null): string => {
-  if (!raw || !raw.startsWith(ALLOWED_URL_PREFIX)) return "";
-  return window.location.origin + raw;
-};
+import { Link, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const ShareTab = () => {
-  const [searchParams] = useSearchParams();
-  const shareUrl = getSafeShareUrl(searchParams.get("url"));
+  const { formId } = useParams();
+  const shareUrl = formId ? `${window.location.origin}/view-form/${formId}` : "";
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.error("Failed to copy link. Please copy it manually.");
     }
   };
   return (

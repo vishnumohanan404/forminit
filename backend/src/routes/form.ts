@@ -3,6 +3,7 @@ import { verifyToken } from "../middlewares/authentication";
 import {
   createNewForm,
   fetchForm,
+  fetchFormAnalytics,
   fetchSubmissions,
   submitForm,
   updateForm,
@@ -13,6 +14,7 @@ import {
 const router = Router();
 
 router.post("/", verifyToken, createNewForm);
+router.get("/analytics/:formId", verifyToken, fetchFormAnalytics);
 router.get("/:formId", verifyToken, fetchForm);
 router.get("/view-form/:formId", viewForm);
 router.put("/:id", verifyToken, updateForm);
