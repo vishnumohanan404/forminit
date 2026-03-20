@@ -2,17 +2,21 @@ import { FormDataInterface } from "@shared/types";
 import mongoose from "mongoose";
 
 // Define a schema for individual blocks
-const BlockSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: true,
+const BlockSchema = new mongoose.Schema(
+  {
+    _id: { type: String, required: true },
+    type: {
+      type: String,
+      required: true,
+    },
+    data: {
+      // Use a mixed type to allow flexibility for different block data structures
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+    },
   },
-  data: {
-    // Use a mixed type to allow flexibility for different block data structures
-    type: mongoose.Schema.Types.Mixed,
-    required: true,
-  },
-});
+  { _id: false },
+);
 // Define a schema for the form containing multiple blocks
 const FormSchema = new mongoose.Schema<FormDataInterface>({
   title: {
@@ -21,11 +25,9 @@ const FormSchema = new mongoose.Schema<FormDataInterface>({
   },
   time: {
     type: Number,
-    required: true,
   },
   version: {
     type: String,
-    required: true,
   },
   blocks: {
     type: [BlockSchema], // Array of blocks
