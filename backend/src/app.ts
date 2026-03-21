@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import morgan from "morgan";
 import logger from "./logger";
 import cors from "cors";
@@ -28,5 +29,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 // routes
 app.use("/api", router);
+
+Sentry.setupExpressErrorHandler(app);
 
 export { app };

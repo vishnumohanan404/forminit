@@ -7,6 +7,8 @@ import formRoutes from "./form";
 
 const router = express.Router();
 
+router.get("/health", (_req, res) => res.json({ status: "ok" }));
+
 // Register individual routes with a base path
 router.use("/auth", authRoutes);
 router.use("/user", userRoutes);

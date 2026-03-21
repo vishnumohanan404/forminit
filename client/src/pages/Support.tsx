@@ -133,7 +133,7 @@ const SupportPage = () => {
                 variant="outline"
               >
                 <AlertCircle className="mr-2 h-4 w-4" />
-                support@forminit.com
+                support@lumiform.com
               </Button>
             </div>
           </CardContent>
