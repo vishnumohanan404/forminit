@@ -115,7 +115,7 @@ const SubmissionModel =
 
 async function connect(): Promise<void> {
   const uri =
-    process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb://localhost:27018/forminit";
+    process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb://localhost:27018/lumiform";
   await mongoose.connect(uri);
   console.log(`Connected to MongoDB at ${mongoose.connection.host}`);
 }

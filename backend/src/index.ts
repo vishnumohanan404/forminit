@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./instrument";
 import http from "http";
 import connectDB from "./config/db";
 import { app } from "./app";

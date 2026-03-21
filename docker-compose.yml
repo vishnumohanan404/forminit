@@ -6,7 +6,7 @@ services:
     ports:
       - "5174:5173"
     networks:
-      - forminit
+      - lumiform
     env_file:
       - ./client/.env
     volumes:
@@ -21,7 +21,7 @@ services:
     ports:
       - "3100:3000"
     networks:
-      - forminit
+      - lumiform
     depends_on:
       - mongo
     env_file:
@@ -34,14 +34,14 @@ services:
     image: mongodb/mongodb-community-server:7.0.3-ubi8-20241108T082135Z
     container_name: mongo
     networks:
-      - forminit
+      - lumiform
     ports:
       - "27018:27017"
     volumes:
       - mongo-data:/data/db
 
 networks:
-  forminit:
+  lumiform:
     driver: bridge
 
 volumes:

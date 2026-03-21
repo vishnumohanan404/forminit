@@ -1,17 +1,20 @@
 import mongoose from "mongoose";
 import { SubmissionInterface } from "../types/submission";
 // Define a schema for individual blocks
-const BlockSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: true,
+const BlockSchema = new mongoose.Schema(
+  {
+    _id: { type: String },
+    type: {
+      type: String,
+      required: true,
+    },
+    data: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+    },
   },
-  data: {
-    // Use a mixed type to allow flexibility for different block data structures
-    type: mongoose.Schema.Types.Mixed,
-    required: true,
-  },
-});
+  { _id: false },
+);
 // Define a schema for the form containing multiple blocks
 const SubmissionSchema = new mongoose.Schema({
   title: {

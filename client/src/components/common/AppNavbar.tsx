@@ -24,7 +24,7 @@ const AppNavbar = () => {
         <div className="h-6 w-6">
           <Logo />
         </div>
-        <span className="text-sm font-semibold text-foreground">FormInIt</span>
+        <span className="text-sm font-semibold text-foreground">Lumiform</span>
         <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5 leading-none">
           beta
         </span>

@@ -39,7 +39,7 @@ describe("Landing page", () => {
 
   it("renders without crashing", () => {
     renderLanding();
-    expect(screen.getAllByText(/forminit/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/lumiform/i).length).toBeGreaterThan(0);
   });
 
   it("CTA 'Get started' links to /dashboard", () => {

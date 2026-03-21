@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(
-      String(process.env.MONGO_URI || "mongodb://localhost:27017/forminit"),
+      String(process.env.MONGO_URI || "mongodb://localhost:27017/lumiform"),
     );
     // eslint-disable-next-line no-console
     console.log(`MongoDB connected: ${conn.connection.host}`);

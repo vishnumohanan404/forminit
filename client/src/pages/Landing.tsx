@@ -33,7 +33,7 @@ const Landing = () => {
             <div className="h-8 w-8">
               <Logo />
             </div>
-            <span className="font-semibold">FormInIt</span>
+            <span className="font-semibold">Lumiform</span>
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5 leading-none">
               beta
             </span>
@@ -154,7 +154,7 @@ const Landing = () => {
           Three steps to your first response
         </h2>
         <p className="mt-2 text-muted-foreground max-w-lg">
-          FormInIt keeps the flow simple — spend time on questions, not the tool.
+          Lumiform keeps the flow simple — spend time on questions, not the tool.
         </p>
 
         <div className="mt-12 grid gap-px grid-cols-1 md:grid-cols-3 border border-border rounded-sm overflow-hidden">
@@ -261,7 +261,7 @@ const Landing = () => {
             <div className="h-5 w-5">
               <Logo />
             </div>
-            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} FormInIt</p>
+            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Lumiform</p>
           </div>
           <nav className="flex gap-4 text-sm">
             <a

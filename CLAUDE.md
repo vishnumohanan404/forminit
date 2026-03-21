@@ -1,8 +1,8 @@
-# FormInIt — Claude Context
+# Lumiform — Claude Context
 
 ## Project Overview
 
-FormInIt is a Notion-like form builder where forms are composed of blocks (EditorJS-style). Users
+Lumiform is a Notion-like form builder where forms are composed of blocks (EditorJS-style). Users
 create workspaces, add forms, publish them, and collect submissions.
 
 **Tech Stack**
@@ -39,7 +39,7 @@ Environment files required:
 ## Monorepo Structure
 
 ```
-forminit/
+lumiform/
 ├── client/          # React frontend (Vite)
 │   └── src/
 │       ├── components/
@@ -85,7 +85,7 @@ main          ← production, protected, tagged releases (vX.Y.Z)
 
 **Remotes:**
 
-- `origin` → GitHub (https://github.com/vishnumohanan404/forminit) — source of truth
+- `origin` → GitHub (https://github.com/vishnumohanan404/lumiform) — source of truth
 
 ---
 
@@ -95,6 +95,7 @@ All routes are prefixed `/api`.
 
 | Method | Path                      | Auth | Description                                                 |
 | ------ | ------------------------- | ---- | ----------------------------------------------------------- |
+| GET    | /health                   | —    | Liveness check for container orchestration                  |
 | POST   | /auth/signup              | —    | Register new user                                           |
 | POST   | /auth/login               | —    | Login, sets JWT cookie                                      |
 | POST   | /auth/google              | —    | Google OAuth                                                |

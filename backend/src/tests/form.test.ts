@@ -9,6 +9,7 @@ const makeFormPayload = (workspaceId: string) => ({
   workspaceId,
   blocks: [
     {
+      _id: "block-short-1",
       type: "shortAnswerTool",
       data: { title: "What is your name?", placeholder: "", required: false },
     },
@@ -197,10 +198,12 @@ describe("GET /api/form/analytics/:formId", () => {
     workspaceId,
     blocks: [
       {
+        _id: "block-rating-1",
         type: "ratingTool",
         data: { title: "Rate your experience", required: false },
       },
       {
+        _id: "block-choice-1",
         type: "multipleChoiceTool",
         data: {
           title: "Favourite colour",
@@ -212,6 +215,7 @@ describe("GET /api/form/analytics/:formId", () => {
         },
       },
       {
+        _id: "block-short-2",
         type: "shortAnswerTool",
         data: { title: "Any comments?", placeholder: "", required: false },
       },
