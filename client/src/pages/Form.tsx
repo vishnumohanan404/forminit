@@ -92,7 +92,7 @@ const FormPage = () => {
   };
   return (
     <div className="px-5">
-      <PageTitle>
+      <PageTitle className="max-w-[760px] pt-20">
         <div className="flex justify-between items-center">
           <input
             ref={titleRef}

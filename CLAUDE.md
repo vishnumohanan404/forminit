@@ -145,38 +145,53 @@ Fields: `title`, `formId`, `blocks[]` (type + data, same structure as Form block
 
 ## Custom Block Editor
 
-EditorJS was replaced with a custom Tally.so-style block editor (Sprint 8a, 2026-03-20).
+The custom @dnd-kit/cmdk editor was replaced with a BlockNote-based editor (2026-03-22). BlockNote
+is built on Tiptap/ProseMirror and handles undo/redo, keyboard navigation, IME, paste handling,
+markdown shortcuts, and drag-to-reorder natively.
 
 **Architecture:**
 
-- `BlockEditor.tsx` — state owner, holds `blocks[]`, DnD context, focus registry
-- `BlockItem.tsx` — per-block wrapper with drag handle and delete button
-- `BlockInsertMenu.tsx` — cmdk-based `/` command palette
-- `blocks/` — one component per block type: `ParagraphBlock`, `HeadingBlock`, `ShortAnswerBlock`,
-  `LongAnswerBlock`, `MultipleChoiceBlock`, `DropdownBlock`, `EmailBlock`, `DateBlock`,
-  `RatingBlock`
+- `BlockNoteEditor.tsx` — mounts `<BlockNoteView>`, wires `onChange` to FormContext, hosts the
+  custom slash menu via `SuggestionMenuController`
+- `blockNoteSchema.tsx` — defines all 7 custom block specs using `createReactBlockSpec`; renders
+  interactive inputs (placeholder editable inline), MCQ/dropdown option editors, rating config
+- `blockNoteAdapter.ts` — pure conversion layer: `toBlockNote()` (OurBlock[] → PartialBlock[]),
+  `fromBlockNote()` (Block[] → OurBlock[]), `normalizeBlocks()` (legacy migration)
+- `ui/MultipleChoiceOption.tsx` — reused inside MCQ/dropdown block renders
+- `ui/RatingInput.tsx` — reused inside rating block render and FormView
 
 **Block types:** `paragraph`, `heading`, `shortAnswerTool`, `longAnswerTool`, `multipleChoiceTool`,
 `dropdownTool`, `emailTool`, `dateTool`, `ratingTool`
 
+**Input blocks in editor:** Input blocks are interactive/configurable in the editor (not read-only):
+
+- shortAnswer/longAnswer/email: typing sets the placeholder text
+- multipleChoice/dropdown: options are editable inline
+- rating: `+`/`-` buttons configure max stars
+- All input blocks have a Required toggle inline
+
 **Tally-style pairing:** Input blocks have no embedded title. On submission, `getTitleForBlock()` in
 `FormView.tsx` walks backwards from each input block to find the nearest preceding
-`paragraph`/`heading` as its label.
+`paragraph`/`heading` as its label. Inserting a question block via `/` automatically inserts a
+preceding `paragraph` as the label.
 
-**Legacy migration:** `normalizeBlocks()` in `BlockEditor.tsx` lazily converts old `questionTitle`
-blocks → `paragraph` and splits monolithic input blocks (with embedded `title`) into `paragraph` +
-input on load — no DB writes.
+**DB format:** Unchanged — `{ _id, type, data }`. The adapter converts between this format and
+BlockNote's `{ id, type, props/content }` format on the frontend only. No backend changes.
 
-**Packages added:** `cmdk`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`,
-`@dnd-kit/modifiers` **Packages removed:** all `@editorjs/*`, `editorjs-inline-tool`,
-`editorjs-layout`, `title-editorjs`
+**Legacy migration:** `normalizeBlocks()` in `blockNoteAdapter.ts` lazily converts old
+`questionTitle` blocks → `paragraph` and splits monolithic input blocks (with embedded `title`) into
+`paragraph` + input on load — no DB writes.
+
+**Packages added:** `@blocknote/core`, `@blocknote/react`, `@blocknote/mantine`, `@mantine/core`,
+`@mantine/hooks` **Packages removed:** `cmdk`, `@dnd-kit/core`, `@dnd-kit/sortable`,
+`@dnd-kit/utilities`, `@dnd-kit/modifiers`
 
 ---
 
 ## Known Landmines
 
 All 13 items from the original backlog were resolved across three fix sprints (merged to `dev`,
-released in `v0.13.0`). No open landmines as of 2026-03-20.
+released in `v0.13.0`). No open landmines as of 2026-03-22.
 
 ---
 
