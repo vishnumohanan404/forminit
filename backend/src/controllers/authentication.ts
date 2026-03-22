@@ -15,8 +15,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     });
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
-      sameSite: "strict", // Protects against CSRF attacks
+      secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
+      sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
       maxAge: 3600000, //ms = 1 hour
     });
     res.status(201).json({
@@ -38,8 +38,8 @@ export const login = async (req: Request, res: Response) => {
     // Set the token in an HTTP-only cookie
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
-      sameSite: "strict", // Protects against CSRF attacks
+      secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
+      sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
       maxAge: 3600000, //ms = 1 hour
     });
     // Return the JWT token and user information
@@ -60,8 +60,8 @@ export const google = async (req: Request, res: Response): Promise<void> => {
     );
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Secure flag for production (only HTTPS)
-      sameSite: "strict", // Protects against CSRF attacks
+      secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
+      sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
       maxAge: 3600000, //ms = 1 hour
     });
     res.status(200).json({
