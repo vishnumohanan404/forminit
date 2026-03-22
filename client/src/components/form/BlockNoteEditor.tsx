@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useCreateBlockNote, SuggestionMenuController } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { useTheme } from "@/contexts/ThemeProvider";
+import { GapCursor } from "prosemirror-gapcursor";
+import { NodeSelection } from "prosemirror-state";
 import "@blocknote/mantine/style.css";
 import {
   AlignLeftIcon,
@@ -167,9 +170,17 @@ interface BlockNoteEditorProps {
 
 const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
   const { dispatch } = useFormContext();
+  const { theme } = useTheme();
+  const resolvedTheme =
+    theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme;
 
   const editor = useCreateBlockNote({
     schema: formNoteSchema,
+    trailingBlock: false,
     initialContent: initialData?.blocks?.length
       ? toBlockNote(normalizeBlocks(initialData.blocks))
       : [
@@ -210,6 +221,71 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
     });
   }, [editor, dispatch, initialData?.title, initialData?.workspaceId]);
 
+  // Skip gapcursor gaps and auto-focus native inputs on arrow key navigation
+  useEffect(() => {
+    const tiptap = editor._tiptapEditor;
+
+    const INPUT_TYPES = new Set([
+      "shortAnswerTool",
+      "longAnswerTool",
+      "emailTool",
+      "dateTool",
+      "multipleChoiceTool",
+      "dropdownTool",
+      "ratingTool",
+    ]);
+
+    const focusInputInSelectedNode = () => {
+      const selected = document.querySelector<HTMLElement>(
+        ".bn-block-content.ProseMirror-selectednode",
+      );
+      if (!selected) return;
+      const input = selected.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
+      if (input && document.activeElement !== input) input.focus();
+    };
+
+    // When a GapCursor lands adjacent to a custom input block, skip to NodeSelection
+    const handleSelectionUpdate = () => {
+      const { state, view } = tiptap;
+      if (!(state.selection instanceof GapCursor)) return;
+
+      const $pos = state.selection.$anchor;
+      // Check node after the gap position
+      const nodeAfter = $pos.nodeAfter;
+      if (nodeAfter && INPUT_TYPES.has(nodeAfter.type.name)) {
+        const pos = $pos.pos;
+        const tr = state.tr.setSelection(NodeSelection.create(state.doc, pos));
+        view.dispatch(tr);
+        setTimeout(focusInputInSelectedNode, 0);
+        return;
+      }
+      // Check node before the gap position
+      const nodeBefore = $pos.nodeBefore;
+      if (nodeBefore && INPUT_TYPES.has(nodeBefore.type.name)) {
+        const pos = $pos.pos - nodeBefore.nodeSize;
+        const tr = state.tr.setSelection(NodeSelection.create(state.doc, pos));
+        view.dispatch(tr);
+        setTimeout(focusInputInSelectedNode, 0);
+      }
+    };
+
+    // When a NodeSelection lands on a custom input block, focus its native input
+    const handleNodeSelection = () => {
+      const { state } = tiptap;
+      if (!(state.selection instanceof NodeSelection)) return;
+      if (INPUT_TYPES.has(state.selection.node.type.name)) {
+        setTimeout(focusInputInSelectedNode, 0);
+      }
+    };
+
+    tiptap.on("selectionUpdate", handleSelectionUpdate);
+    tiptap.on("selectionUpdate", handleNodeSelection);
+    return () => {
+      tiptap.off("selectionUpdate", handleSelectionUpdate);
+      tiptap.off("selectionUpdate", handleNodeSelection);
+    };
+  }, [editor]);
+
   const [submitTooltipOpen, setSubmitTooltipOpen] = useState(false);
 
   return (
@@ -217,7 +293,7 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
       <BlockNoteView
         editor={editor}
         onChange={handleChange}
-        theme="dark"
+        theme={resolvedTheme}
         slashMenu={false}
       >
         <SuggestionMenuController

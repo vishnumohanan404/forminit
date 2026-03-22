@@ -1,8 +1,34 @@
+import { useRef, useEffect, type ReactNode } from "react";
 import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import { createReactBlockSpec } from "@blocknote/react";
 import MultipleChoiceOption from "@/components/form/ui/MultipleChoiceOption";
 import RatingInput from "@/components/form/ui/RatingInput";
 import type { OptionsEntry } from "./blockNoteAdapter";
+
+// ---------------------------------------------------------------------------
+// KeyTrap — stops keyboard events from bubbling to ProseMirror
+// React's synthetic onKeyDown fires after ProseMirror's native listener,
+// so we attach a native listener directly via ref to intercept in time.
+// ---------------------------------------------------------------------------
+
+function KeyTrap({ className, children }: { className: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const stop = (e: KeyboardEvent) => e.stopPropagation();
+    el.addEventListener("keydown", stop);
+    return () => el.removeEventListener("keydown", stop);
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className={className}
+    >
+      {children}
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // questionTitle
@@ -82,10 +108,10 @@ const shortAnswerTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <div className="py-1 w-full flex items-center gap-3">
+      <KeyTrap className="py-1 w-full flex items-center gap-3">
         <input
           type="text"
-          className="flex-1 max-w-sm h-10 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder={block.props.placeholder || "Type placeholder…"}
           value={block.props.placeholder}
           onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
@@ -94,7 +120,7 @@ const shortAnswerTool = createReactBlockSpec(
           required={block.props.required}
           onChange={v => editor.updateBlock(block, { props: { required: v } })}
         />
-      </div>
+      </KeyTrap>
     ),
   },
 );
@@ -114,9 +140,9 @@ const longAnswerTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <div className="py-1 w-full flex items-start gap-3">
+      <KeyTrap className="py-1 w-full flex items-start gap-3">
         <textarea
-          className="flex-1 max-w-sm min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+          className="flex-1 max-w-sm min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
           placeholder={block.props.placeholder || "Type placeholder…"}
           value={block.props.placeholder}
           onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
@@ -127,7 +153,7 @@ const longAnswerTool = createReactBlockSpec(
             onChange={v => editor.updateBlock(block, { props: { required: v } })}
           />
         </div>
-      </div>
+      </KeyTrap>
     ),
   },
 );
@@ -147,10 +173,10 @@ const emailTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <div className="py-1 w-full flex items-center gap-3">
+      <KeyTrap className="py-1 w-full flex items-center gap-3">
         <input
           type="text"
-          className="flex-1 max-w-sm h-10 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder={block.props.placeholder || "name@example.com"}
           value={block.props.placeholder}
           onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
@@ -159,7 +185,7 @@ const emailTool = createReactBlockSpec(
           required={block.props.required}
           onChange={v => editor.updateBlock(block, { props: { required: v } })}
         />
-      </div>
+      </KeyTrap>
     ),
   },
 );
@@ -178,17 +204,17 @@ const dateTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <div className="py-1 w-full flex items-center gap-3">
+      <KeyTrap className="py-1 w-full flex items-center gap-3">
         <input
           type="date"
           disabled
-          className="flex-1 max-w-sm h-10 rounded-md border border-input bg-background px-3 text-sm text-muted-foreground focus-visible:outline-none"
+          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground focus-visible:outline-none"
         />
         <RequiredToggle
           required={block.props.required}
           onChange={v => editor.updateBlock(block, { props: { required: v } })}
         />
-      </div>
+      </KeyTrap>
     ),
   },
 );
@@ -223,7 +249,7 @@ const multipleChoiceTool = createReactBlockSpec(
       };
 
       return (
-        <div className="py-1 w-full">
+        <KeyTrap className="py-1 w-full">
           <MultipleChoiceOption
             optionsProp={options}
             onInputChange={updateOptions}
@@ -236,7 +262,7 @@ const multipleChoiceTool = createReactBlockSpec(
               onChange={v => editor.updateBlock(block, { props: { required: v } })}
             />
           </div>
-        </div>
+        </KeyTrap>
       );
     },
   },
@@ -272,7 +298,7 @@ const dropdownTool = createReactBlockSpec(
       };
 
       return (
-        <div className="py-1 w-full">
+        <KeyTrap className="py-1 w-full">
           <MultipleChoiceOption
             optionsProp={options}
             onInputChange={updateOptions}
@@ -285,7 +311,7 @@ const dropdownTool = createReactBlockSpec(
               onChange={v => editor.updateBlock(block, { props: { required: v } })}
             />
           </div>
-        </div>
+        </KeyTrap>
       );
     },
   },
@@ -306,7 +332,7 @@ const ratingTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <div className="py-1 w-full flex items-center gap-4">
+      <KeyTrap className="py-1 w-full flex items-center gap-4">
         <div className="flex items-center gap-3">
           <RatingInput
             value={0}
@@ -316,7 +342,7 @@ const ratingTool = createReactBlockSpec(
           <div className="flex items-center gap-1">
             <button
               type="button"
-              className="w-6 h-6 rounded border border-input text-xs flex items-center justify-center hover:bg-muted"
+              className="w-6 h-6 rounded border border-border text-xs flex items-center justify-center hover:bg-muted"
               onClick={() =>
                 editor.updateBlock(block, {
                   props: { maxRating: Math.max(1, block.props.maxRating - 1) },
@@ -330,7 +356,7 @@ const ratingTool = createReactBlockSpec(
             </span>
             <button
               type="button"
-              className="w-6 h-6 rounded border border-input text-xs flex items-center justify-center hover:bg-muted"
+              className="w-6 h-6 rounded border border-border text-xs flex items-center justify-center hover:bg-muted"
               onClick={() =>
                 editor.updateBlock(block, {
                   props: { maxRating: Math.min(10, block.props.maxRating + 1) },
@@ -345,7 +371,7 @@ const ratingTool = createReactBlockSpec(
           required={block.props.required}
           onChange={v => editor.updateBlock(block, { props: { required: v } })}
         />
-      </div>
+      </KeyTrap>
     ),
   },
 );
