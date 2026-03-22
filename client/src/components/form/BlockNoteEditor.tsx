@@ -2,9 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useCreateBlockNote, SuggestionMenuController } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useTheme } from "@/contexts/ThemeProvider";
-import { GapCursor } from "prosemirror-gapcursor";
-import { NodeSelection } from "prosemirror-state";
-import type { Node as PmNode } from "prosemirror-model";
 import "@blocknote/mantine/style.css";
 import {
   AlignLeftIcon,
@@ -227,10 +224,10 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
     });
   }, [editor, dispatch, initialData?.title, initialData?.workspaceId]);
 
-  // Skip gapcursor gaps and auto-focus native inputs on arrow key navigation
+  // Auto-focus native inputs when arrow navigation lands on a custom input block.
+  // Intercept in capture phase before ProseMirror so we can preventDefault and
+  // directly focus the target — avoiding GapCursor / NodeSelection complexity.
   useEffect(() => {
-    const tiptap = editor._tiptapEditor;
-
     const INPUT_TYPES = new Set([
       "shortAnswerTool",
       "longAnswerTool",
@@ -241,60 +238,41 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
       "ratingTool",
     ]);
 
-    const focusInputInSelectedNode = () => {
-      const selected = document.querySelector<HTMLElement>(
-        ".bn-block-content.ProseMirror-selectednode",
-      );
-      if (!selected) return;
-      const input = selected.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
-      if (input && document.activeElement !== input) input.focus();
-    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-    // True if the node is a blockContainer whose content is one of our input blocks
-    // Gap positions are between blockContainer nodes; the custom type sits one level inside.
-    const isInputContainer = (node: PmNode | null) =>
-      !!node &&
-      node.type.name === "blockContainer" &&
-      !!node.firstChild &&
-      INPUT_TYPES.has(node.firstChild.type.name);
-
-    // When a GapCursor lands adjacent to a custom input block, skip to NodeSelection
-    const handleSelectionUpdate = () => {
-      const { state, view } = tiptap;
-      if (!(state.selection instanceof GapCursor)) return;
-
-      const $pos = state.selection.$anchor;
-      const nodeAfter = $pos.nodeAfter;
-      const nodeBefore = $pos.nodeBefore;
-
-      if (isInputContainer(nodeAfter)) {
-        // $pos.pos is before the blockContainer; +1 steps inside to the blockContent node
-        const tr = state.tr.setSelection(NodeSelection.create(state.doc, $pos.pos + 1));
-        view.dispatch(tr);
-        setTimeout(focusInputInSelectedNode, 0);
-      } else if (isInputContainer(nodeBefore)) {
-        const pos = $pos.pos - (nodeBefore?.nodeSize ?? 0) + 1;
-        const tr = state.tr.setSelection(NodeSelection.create(state.doc, pos));
-        view.dispatch(tr);
-        setTimeout(focusInputInSelectedNode, 0);
+      let currentBlock;
+      try {
+        currentBlock = editor.getTextCursorPosition().block;
+      } catch {
+        return;
       }
+
+      const allBlocks = editor.document;
+      const curIdx = allBlocks.findIndex(b => b.id === currentBlock.id);
+      if (curIdx === -1) return;
+
+      const delta = e.key === "ArrowDown" ? 1 : -1;
+      const targetBlock = allBlocks[curIdx + delta];
+      if (!targetBlock || !INPUT_TYPES.has(targetBlock.type as string)) return;
+
+      // .bn-block-content elements appear in DOM order matching editor.document order
+      const blockEls = Array.from(document.querySelectorAll<HTMLElement>(".bn-block-content"));
+      const targetEl = blockEls[curIdx + delta];
+      if (!targetEl) return;
+
+      const input = targetEl.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
+      if (!input) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      input.focus();
     };
 
-    // When a NodeSelection lands on a custom input block, focus its native input
-    const handleNodeSelection = () => {
-      const { state } = tiptap;
-      if (!(state.selection instanceof NodeSelection)) return;
-      if (INPUT_TYPES.has(state.selection.node.type.name)) {
-        setTimeout(focusInputInSelectedNode, 0);
-      }
-    };
-
-    tiptap.on("selectionUpdate", handleSelectionUpdate);
-    tiptap.on("selectionUpdate", handleNodeSelection);
-    return () => {
-      tiptap.off("selectionUpdate", handleSelectionUpdate);
-      tiptap.off("selectionUpdate", handleNodeSelection);
-    };
+    const domEl = editor._tiptapEditor.view.dom;
+    domEl.addEventListener("keydown", onKeyDown, true);
+    return () => domEl.removeEventListener("keydown", onKeyDown, true);
   }, [editor]);
 
   const [submitTooltipOpen, setSubmitTooltipOpen] = useState(false);
