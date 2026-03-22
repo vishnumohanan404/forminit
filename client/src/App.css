@@ -1,3 +1,15 @@
+@keyframes topbar-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Placeholder for contenteditable blocks */
 [contenteditable][data-placeholder]:empty::before {
   content: attr(data-placeholder);
