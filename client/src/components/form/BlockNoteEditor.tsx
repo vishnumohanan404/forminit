@@ -120,46 +120,51 @@ function getFormSlashMenuItems(
       aliases: ["long", "textarea"],
       onItemClick: () => insertBlock("longAnswerTool"),
     },
-    {
-      title: "Multiple Choice",
-      subtext: "Choose one option",
-      group: "Questions",
-      icon: <ListIcon size={16} />,
-      aliases: ["mcq", "choice", "radio"],
-      onItemClick: () => insertBlock("multipleChoiceTool"),
-    },
-    {
-      title: "Dropdown",
-      subtext: "Select from a list",
-      group: "Questions",
-      icon: <ChevronDownIcon size={16} />,
-      aliases: ["select", "dropdown"],
-      onItemClick: () => insertBlock("dropdownTool"),
-    },
-    {
-      title: "Email",
-      subtext: "Email address input",
-      group: "Questions",
-      icon: <MailIcon size={16} />,
-      aliases: ["email", "mail"],
-      onItemClick: () => insertBlock("emailTool"),
-    },
-    {
-      title: "Date",
-      subtext: "Date picker",
-      group: "Questions",
-      icon: <CalendarIcon size={16} />,
-      aliases: ["date", "calendar"],
-      onItemClick: () => insertBlock("dateTool"),
-    },
-    {
-      title: "Rating",
-      subtext: "Star rating scale",
-      group: "Questions",
-      icon: <StarIcon size={16} />,
-      aliases: ["star", "rating", "scale"],
-      onItemClick: () => insertBlock("ratingTool"),
-    },
+    // --- Questions (feature-flagged) ---
+    ...(import.meta.env.VITE_ENABLE_ALL_BLOCKS === "true"
+      ? [
+          {
+            title: "Multiple Choice",
+            subtext: "Choose one option",
+            group: "Questions",
+            icon: <ListIcon size={16} />,
+            aliases: ["mcq", "choice", "radio"],
+            onItemClick: () => insertBlock("multipleChoiceTool"),
+          },
+          {
+            title: "Dropdown",
+            subtext: "Select from a list",
+            group: "Questions",
+            icon: <ChevronDownIcon size={16} />,
+            aliases: ["select", "dropdown"],
+            onItemClick: () => insertBlock("dropdownTool"),
+          },
+          {
+            title: "Email",
+            subtext: "Email address input",
+            group: "Questions",
+            icon: <MailIcon size={16} />,
+            aliases: ["email", "mail"],
+            onItemClick: () => insertBlock("emailTool"),
+          },
+          {
+            title: "Date",
+            subtext: "Date picker",
+            group: "Questions",
+            icon: <CalendarIcon size={16} />,
+            aliases: ["date", "calendar"],
+            onItemClick: () => insertBlock("dateTool"),
+          },
+          {
+            title: "Rating",
+            subtext: "Star rating scale",
+            group: "Questions",
+            icon: <StarIcon size={16} />,
+            aliases: ["star", "rating", "scale"],
+            onItemClick: () => insertBlock("ratingTool"),
+          },
+        ]
+      : []),
   ];
 }
 
