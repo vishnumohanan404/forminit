@@ -4,6 +4,7 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useTheme } from "@/contexts/ThemeProvider";
 import { GapCursor } from "prosemirror-gapcursor";
 import { NodeSelection } from "prosemirror-state";
+import type { Node as PmNode } from "prosemirror-model";
 import "@blocknote/mantine/style.css";
 import {
   AlignLeftIcon,
@@ -18,7 +19,7 @@ import {
   TagIcon,
 } from "lucide-react";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
-import type { BlockNoteEditor } from "@blocknote/core";
+import type { BlockNoteEditor as BlockNoteEditorType } from "@blocknote/core";
 import { formNoteSchema, type FormNoteSchema } from "./blockNoteSchema";
 import {
   normalizeBlocks,
@@ -37,7 +38,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // ---------------------------------------------------------------------------
 
 function getFormSlashMenuItems(
-  editor: BlockNoteEditor<FormNoteSchema>,
+  editor: BlockNoteEditorType<FormNoteSchema>,
 ): DefaultReactSuggestionItem[] {
   const insertBlock = (type: BlockType) => {
     const currentBlock = editor.getTextCursorPosition().block;
@@ -249,25 +250,30 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
       if (input && document.activeElement !== input) input.focus();
     };
 
+    // True if the node is a blockContainer whose content is one of our input blocks
+    // Gap positions are between blockContainer nodes; the custom type sits one level inside.
+    const isInputContainer = (node: PmNode | null) =>
+      !!node &&
+      node.type.name === "blockContainer" &&
+      !!node.firstChild &&
+      INPUT_TYPES.has(node.firstChild.type.name);
+
     // When a GapCursor lands adjacent to a custom input block, skip to NodeSelection
     const handleSelectionUpdate = () => {
       const { state, view } = tiptap;
       if (!(state.selection instanceof GapCursor)) return;
 
       const $pos = state.selection.$anchor;
-      // Check node after the gap position
       const nodeAfter = $pos.nodeAfter;
-      if (nodeAfter && INPUT_TYPES.has(nodeAfter.type.name)) {
-        const pos = $pos.pos;
-        const tr = state.tr.setSelection(NodeSelection.create(state.doc, pos));
+      const nodeBefore = $pos.nodeBefore;
+
+      if (isInputContainer(nodeAfter)) {
+        // $pos.pos is before the blockContainer; +1 steps inside to the blockContent node
+        const tr = state.tr.setSelection(NodeSelection.create(state.doc, $pos.pos + 1));
         view.dispatch(tr);
         setTimeout(focusInputInSelectedNode, 0);
-        return;
-      }
-      // Check node before the gap position
-      const nodeBefore = $pos.nodeBefore;
-      if (nodeBefore && INPUT_TYPES.has(nodeBefore.type.name)) {
-        const pos = $pos.pos - nodeBefore.nodeSize;
+      } else if (isInputContainer(nodeBefore)) {
+        const pos = $pos.pos - (nodeBefore?.nodeSize ?? 0) + 1;
         const tr = state.tr.setSelection(NodeSelection.create(state.doc, pos));
         view.dispatch(tr);
         setTimeout(focusInputInSelectedNode, 0);
