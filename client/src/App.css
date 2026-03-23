@@ -16,3 +16,49 @@
   color: #6b7280;
   pointer-events: none;
 }
+
+/* Anchor for the React-rendered questionTitle placeholder */
+.bn-block-content[data-content-type="questionTitle"] {
+  position: relative;
+}
+
+/* Editor background — transparent so the app's bg-background shows through */
+.bn-container,
+.bn-editor {
+  background: transparent !important;
+}
+
+/* Editor padding */
+.bn-editor {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  padding-inline: 0.1rem !important;
+}
+
+/* Remove BlockNote's blue node-selection ring on custom blocks */
+.bn-block-content.ProseMirror-selectednode > *,
+.ProseMirror-selectednode > .bn-block-content > * {
+  outline: none !important;
+}
+
+/* Hide ProseMirror gapcursor (blinking _ between blocks) */
+.ProseMirror-gapcursor {
+  display: none !important;
+}
+
+/* Slash menu — wider, fixed scrollable height, spacing between items */
+.bn-suggestion-menu {
+  min-width: 380px !important;
+  max-height: 320px !important;
+  overflow-y: auto !important;
+}
+
+.bn-mantine .bn-suggestion-menu-item {
+  margin-bottom: 2px !important;
+}
+
+/* Override BlockNote's italic placeholder style to match app default */
+.bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before {
+  font-style: normal !important;
+  font-family: inherit !important;
+}

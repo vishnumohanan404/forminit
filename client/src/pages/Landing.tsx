@@ -60,7 +60,7 @@ const Landing = () => {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="container mx-auto grid max-w-[1100px] px-4 py-20 md:grid-cols-2 md:gap-16 md:py-32">
+      <section className="container mx-auto grid max-w-[1100px] px-4 py-20 md:grid-cols-2 md:gap-10 md:py-32">
         <div className="flex flex-col justify-center gap-5 hero-fade-in">
           <div className="inline-flex items-center gap-2 w-fit rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
@@ -90,7 +90,7 @@ const Landing = () => {
 
         {/* Editor mockup */}
         <div className="hidden md:flex items-center justify-center">
-          <div className="border border-border bg-card rounded-sm w-full max-w-[380px] overflow-hidden">
+          <div className="border border-border bg-card rounded-sm w-full overflow-hidden">
             {/* Mockup toolbar */}
             <div className="border-b border-border px-3 py-2 flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-border" />
@@ -99,16 +99,21 @@ const Landing = () => {
               <div className="ml-3 h-2 w-28 bg-muted rounded-sm" />
             </div>
             {/* Mockup form title */}
-            <div className="px-5 pt-5 pb-3 border-b border-border">
-              <div className="h-4 w-40 bg-muted rounded-sm mb-1.5" />
-              <div className="h-2.5 w-24 bg-muted/60 rounded-sm" />
+            <div className="px-5 pt-6 pb-4 border-b border-border">
+              <div className="h-5 w-44 bg-muted rounded-sm mb-2" />
+              <div className="h-2.5 w-28 bg-muted/60 rounded-sm" />
             </div>
             {/* Mockup blocks */}
-            <div className="px-5 py-4 space-y-4">
+            <div className="px-5 py-5 space-y-5">
               <MockBlock
                 icon={<Type className="h-3.5 w-3.5" />}
                 label="Short Answer"
-                inputHeight="h-7"
+                inputHeight="h-8"
+              />
+              <MockBlock
+                icon={<AlignLeft className="h-3.5 w-3.5" />}
+                label="Long Answer"
+                inputHeight="h-14"
               />
               <MockBlock
                 icon={<ListChecks className="h-3.5 w-3.5" />}

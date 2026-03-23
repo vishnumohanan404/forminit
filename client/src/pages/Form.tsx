@@ -21,6 +21,7 @@ const FormPage = () => {
   // Local state for the title
   const [title, setTitle] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
+  const [publishTooltipOpen, setPublishTooltipOpen] = useState(false);
   // Create mutation for creating a new form
   const { mutate: createFormMutation, isPending: isPendingCreate } = useMutation({
     mutationFn: (workspaceDetails: EditorJSData) =>
@@ -92,7 +93,7 @@ const FormPage = () => {
   };
   return (
     <div className="px-5">
-      <PageTitle>
+      <PageTitle className="max-w-[760px] pt-20">
         <div className="flex justify-between items-center">
           <input
             ref={titleRef}
@@ -106,12 +107,21 @@ const FormPage = () => {
           />
           <TooltipProvider>
             {(!state.editorData && title === data?.title) || !title ? (
-              <Tooltip>
+              <Tooltip
+                open={publishTooltipOpen}
+                onOpenChange={setPublishTooltipOpen}
+              >
                 <TooltipTrigger asChild>
-                  <span className="flex">
+                  <span
+                    className="flex"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setPublishTooltipOpen(v => !v)}
+                    onKeyDown={e => e.key === "Enter" && setPublishTooltipOpen(v => !v)}
+                  >
                     <Button
                       size="sm"
-                      className="font-bold tracking-normal  min-w-20"
+                      className="font-bold tracking-normal min-w-20 pointer-events-none"
                       disabled
                     >
                       PUBLISH
@@ -119,7 +129,11 @@ const FormPage = () => {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Update the title to publish this form</p>
+                  <p>
+                    {!title
+                      ? "Add a title to your form before publishing"
+                      : "No changes to publish"}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             ) : (
