@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { fetchForm } from "@/services/form.ts";
 import { FormDataInterface } from "@shared/types";
-import BlockEditor from "@/components/form/BlockEditor";
+import BlockNoteEditor from "@/components/form/BlockNoteEditor";
 
 const Editor = () => {
   const { id } = useParams();
@@ -16,8 +16,8 @@ const Editor = () => {
   if (id && !isFetched) return null;
 
   return (
-    <div className="mx-auto max-w-[1100px] min-h-[300px] overflow-auto flex-grow container">
-      <BlockEditor
+    <div className="mx-auto max-w-[760px] min-h-[300px] overflow-auto flex-grow container">
+      <BlockNoteEditor
         initialData={data}
         formId={id}
       />

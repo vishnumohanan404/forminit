@@ -12,6 +12,7 @@ import { routes } from "./Routes";
 import { Suspense } from "react";
 import SuspenseLayout from "./layouts/SuspenseLayout";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import TopProgressBar from "./components/common/TopProgressBar";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
                     <RouterProvider router={routes} />
                   </Suspense>
                 </AuthProvider>
+                <TopProgressBar />
                 <ReactQueryDevtools initialIsOpen={false} />
                 <Toaster />
               </QueryClientProvider>

@@ -12,7 +12,24 @@ import StatCell from "@/layouts/dashboard/StatCell";
 import { FormType, WorkspaceType } from "@/lib/types";
 import { fetchDashboard } from "@/services/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Empty,
   EmptyContent,
@@ -27,6 +44,66 @@ import { Badge } from "@/components/ui/badge";
 import CreateWorkspaceDialog from "@/components/dashboard/CreateWorkspaceDialog";
 
 type FormWithWorkspace = FormType & { workspaceName: string };
+
+const CreateFormCta = ({ workspaces }: { workspaces: WorkspaceType[] }) => {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState("");
+
+  if (workspaces.length === 1) {
+    return (
+      <Button asChild>
+        <Link to={`/form?workspaceId=${workspaces[0]._id}`}>Create Form</Link>
+      </Button>
+    );
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <DialogTrigger asChild>
+        <Button>Create Form</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Choose a Workspace</DialogTitle>
+          <DialogDescription>Select which workspace to create the form in.</DialogDescription>
+        </DialogHeader>
+        <Select
+          onValueChange={setSelectedWorkspaceId}
+          value={selectedWorkspaceId}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select workspace" />
+          </SelectTrigger>
+          <SelectContent>
+            {workspaces.map(ws => (
+              <SelectItem
+                key={ws._id}
+                value={ws._id}
+              >
+                {ws.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <DialogFooter>
+          <Button
+            disabled={!selectedWorkspaceId}
+            onClick={() => {
+              navigate(`/form?workspaceId=${selectedWorkspaceId}`);
+              setOpen(false);
+            }}
+          >
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const DashboardPage = () => {
   const {
@@ -119,7 +196,12 @@ const DashboardPage = () => {
               value="all"
               className="mt-4"
             >
-              <FormsTable forms={allForms} />
+              <FormsTable
+                forms={allForms}
+                emptyMessage="No forms yet."
+                emptyDescription="Create your first form to start collecting responses."
+                createFormCta={<CreateFormCta workspaces={workspaces} />}
+              />
             </TabsContent>
             <TabsContent
               value="active"
@@ -128,6 +210,7 @@ const DashboardPage = () => {
               <FormsTable
                 forms={activeForms$}
                 emptyMessage="No active forms."
+                emptyDescription="Forms that are enabled will appear here."
               />
             </TabsContent>
             <TabsContent
@@ -137,6 +220,7 @@ const DashboardPage = () => {
               <FormsTable
                 forms={disabledForms$}
                 emptyMessage="No disabled forms."
+                emptyDescription="Forms that have been disabled will appear here."
               />
             </TabsContent>
           </Tabs>
@@ -149,11 +233,29 @@ const DashboardPage = () => {
 interface FormsTableProps {
   forms: FormWithWorkspace[];
   emptyMessage?: string;
+  emptyDescription?: string;
+  createFormCta?: React.ReactNode;
 }
 
-const FormsTable = ({ forms, emptyMessage = "No forms found." }: FormsTableProps) => {
+const FormsTable = ({
+  forms,
+  emptyMessage = "No forms found.",
+  emptyDescription,
+  createFormCta,
+}: FormsTableProps) => {
   if (forms.length === 0) {
-    return <p className="text-muted-foreground text-center my-16">{emptyMessage}</p>;
+    return (
+      <Empty className="mt-8">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FileText />
+          </EmptyMedia>
+        </EmptyHeader>
+        <EmptyTitle>{emptyMessage}</EmptyTitle>
+        {emptyDescription && <EmptyDescription>{emptyDescription}</EmptyDescription>}
+        {createFormCta && <EmptyContent>{createFormCta}</EmptyContent>}
+      </Empty>
+    );
   }
 
   return (

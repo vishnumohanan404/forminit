@@ -50,7 +50,7 @@ const INPUT_TYPES = new Set([
 function getTitleForBlock(blocks: BlockData[], index: number): string {
   for (let j = index - 1; j >= 0; j--) {
     const t = blocks[j].type;
-    if (t === "paragraph" || t === "heading") {
+    if (t === "paragraph" || t === "heading" || t === "questionTitle") {
       return (blocks[j].data as Record<string, string>).text || "";
     }
     if (INPUT_TYPES.has(t)) break;
@@ -191,9 +191,15 @@ const FormViewPage = () => {
                         </h2>
                       );
 
-                    // Legacy — skip phantom title blocks
                     case "questionTitle":
-                      return null;
+                      return (
+                        <p
+                          key={block._id}
+                          className="text-base font-semibold py-1"
+                        >
+                          {(block.data as Record<string, string>).text}
+                        </p>
+                      );
 
                     // Input blocks — no label (the preceding paragraph IS the label)
                     case "shortAnswerTool":
