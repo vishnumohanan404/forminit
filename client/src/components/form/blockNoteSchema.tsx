@@ -1,4 +1,6 @@
-import { useRef, useEffect, type ReactNode } from "react";
+import { useRef, useEffect, useState, type ReactNode } from "react";
+import { ChevronDownIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import { createReactBlockSpec } from "@blocknote/react";
 import MultipleChoiceOption from "@/components/form/ui/MultipleChoiceOption";
@@ -194,6 +196,46 @@ const emailTool = createReactBlockSpec(
 // dateTool
 // ---------------------------------------------------------------------------
 
+function DateToolBlock({
+  block,
+  editor,
+}: {
+  block: Parameters<Parameters<typeof createReactBlockSpec>[1]["render"]>[0]["block"] & {
+    type: "dateTool";
+    props: { required: boolean };
+  };
+  editor: Parameters<Parameters<typeof createReactBlockSpec>[1]["render"]>[0]["editor"];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <KeyTrap className="py-1 w-full flex items-center gap-3">
+      <TooltipProvider>
+        <Tooltip
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <TooltipTrigger asChild>
+            <input
+              type="date"
+              disabled
+              onPointerEnter={() => setOpen(true)}
+              onPointerLeave={() => setOpen(false)}
+              className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground focus-visible:outline-none cursor-default"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Date picker will be available in the published form</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <RequiredToggle
+        required={block.props.required}
+        onChange={v => editor.updateBlock(block, { props: { required: v } })}
+      />
+    </KeyTrap>
+  );
+}
+
 const dateTool = createReactBlockSpec(
   {
     type: "dateTool" as const,
@@ -204,17 +246,10 @@ const dateTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <KeyTrap className="py-1 w-full flex items-center gap-3">
-        <input
-          type="date"
-          disabled
-          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground focus-visible:outline-none"
-        />
-        <RequiredToggle
-          required={block.props.required}
-          onChange={v => editor.updateBlock(block, { props: { required: v } })}
-        />
-      </KeyTrap>
+      <DateToolBlock
+        block={block as never}
+        editor={editor}
+      />
     ),
   },
 );
@@ -299,6 +334,14 @@ const dropdownTool = createReactBlockSpec(
 
       return (
         <KeyTrap className="py-1 w-full">
+          {/* Faux select trigger — shows dropdown shape in editor */}
+          <div className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground pointer-events-none select-none mb-2">
+            <span className="flex-1">Select an option…</span>
+            <ChevronDownIcon
+              size={14}
+              className="shrink-0 opacity-50"
+            />
+          </div>
           <MultipleChoiceOption
             optionsProp={options}
             onInputChange={updateOptions}

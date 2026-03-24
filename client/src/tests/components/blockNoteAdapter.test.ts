@@ -34,11 +34,11 @@ describe("normalizeBlocks", () => {
     expect(result[0]).toMatchObject({ _id: "a", type: "paragraph", data: { text: "Hello" } });
   });
 
-  it("converts old questionTitle blocks to paragraph", () => {
+  it("normalises old questionTitle data.title to data.text, keeps questionTitle type", () => {
     const raw = [makeRaw({ type: "questionTitle", data: { title: "My question", value: "" } })];
     const result = normalizeBlocks(raw);
     expect(result).toHaveLength(1);
-    expect(result[0].type).toBe("paragraph");
+    expect(result[0].type).toBe("questionTitle");
     expect(result[0].data.text).toBe("My question");
   });
 

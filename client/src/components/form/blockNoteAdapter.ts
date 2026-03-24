@@ -45,13 +45,13 @@ export function normalizeBlocks(rawBlocks: FormDataInterface["blocks"]): OurBloc
   const result: OurBlock[] = [];
 
   for (const block of rawBlocks) {
-    // Old questionTitle → paragraph (BlockNote migration)
+    // Old questionTitle (legacy data.title field) → normalise to data.text, keep as questionTitle
     if (block.type === "questionTitle") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = block.data as any;
       result.push({
         _id: block._id || crypto.randomUUID(),
-        type: "paragraph",
+        type: "questionTitle",
         data: { text: d.title ?? d.text ?? "" },
       });
       continue;

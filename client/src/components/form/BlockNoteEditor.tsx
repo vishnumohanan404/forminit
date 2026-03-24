@@ -118,51 +118,46 @@ function getFormSlashMenuItems(
       aliases: ["long", "textarea"],
       onItemClick: () => insertBlock("longAnswerTool"),
     },
-    // --- Questions (feature-flagged) ---
-    ...(import.meta.env.VITE_ENABLE_ALL_BLOCKS === "true"
-      ? [
-          {
-            title: "Multiple Choice",
-            subtext: "Choose one option",
-            group: "Questions",
-            icon: <ListIcon size={16} />,
-            aliases: ["mcq", "choice", "radio"],
-            onItemClick: () => insertBlock("multipleChoiceTool"),
-          },
-          {
-            title: "Dropdown",
-            subtext: "Select from a list",
-            group: "Questions",
-            icon: <ChevronDownIcon size={16} />,
-            aliases: ["select", "dropdown"],
-            onItemClick: () => insertBlock("dropdownTool"),
-          },
-          {
-            title: "Email",
-            subtext: "Email address input",
-            group: "Questions",
-            icon: <MailIcon size={16} />,
-            aliases: ["email", "mail"],
-            onItemClick: () => insertBlock("emailTool"),
-          },
-          {
-            title: "Date",
-            subtext: "Date picker",
-            group: "Questions",
-            icon: <CalendarIcon size={16} />,
-            aliases: ["date", "calendar"],
-            onItemClick: () => insertBlock("dateTool"),
-          },
-          {
-            title: "Rating",
-            subtext: "Star rating scale",
-            group: "Questions",
-            icon: <StarIcon size={16} />,
-            aliases: ["star", "rating", "scale"],
-            onItemClick: () => insertBlock("ratingTool"),
-          },
-        ]
-      : []),
+    {
+      title: "Multiple Choice",
+      subtext: "Choose one option",
+      group: "Questions",
+      icon: <ListIcon size={16} />,
+      aliases: ["mcq", "choice", "radio"],
+      onItemClick: () => insertBlock("multipleChoiceTool"),
+    },
+    {
+      title: "Dropdown",
+      subtext: "Select from a list",
+      group: "Questions",
+      icon: <ChevronDownIcon size={16} />,
+      aliases: ["select", "dropdown"],
+      onItemClick: () => insertBlock("dropdownTool"),
+    },
+    {
+      title: "Email",
+      subtext: "Email address input",
+      group: "Questions",
+      icon: <MailIcon size={16} />,
+      aliases: ["email", "mail"],
+      onItemClick: () => insertBlock("emailTool"),
+    },
+    {
+      title: "Date",
+      subtext: "Date picker",
+      group: "Questions",
+      icon: <CalendarIcon size={16} />,
+      aliases: ["date", "calendar"],
+      onItemClick: () => insertBlock("dateTool"),
+    },
+    {
+      title: "Rating",
+      subtext: "Star rating scale",
+      group: "Questions",
+      icon: <StarIcon size={16} />,
+      aliases: ["star", "rating", "scale"],
+      onItemClick: () => insertBlock("ratingTool"),
+    },
   ];
 }
 
@@ -270,9 +265,52 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
       input.focus();
     };
 
+    // Navigate OUT of native input/textarea blocks using arrow keys.
+    // Runs in capture phase on the editor root so it fires before KeyTrap's
+    // bubbling listener can swallow the event.
+    const onInputKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      const target = e.target;
+      const isInput = target instanceof HTMLInputElement && target.type !== "checkbox";
+      const isTextarea = target instanceof HTMLTextAreaElement;
+      if (!isInput && !isTextarea) return;
+
+      // For textarea, only exit when the cursor is already at the boundary
+      if (isTextarea) {
+        const ta = target as HTMLTextAreaElement;
+        if (e.key === "ArrowUp" && ta.selectionStart !== 0) return;
+        if (e.key === "ArrowDown" && ta.selectionEnd !== ta.value.length) return;
+      }
+
+      const blockEls = Array.from(document.querySelectorAll<HTMLElement>(".bn-block-content"));
+      const ownerEl = blockEls.find(el => el.contains(target as Node));
+      if (!ownerEl) return;
+
+      const curIdx = blockEls.indexOf(ownerEl);
+      const delta = e.key === "ArrowDown" ? 1 : -1;
+      const nextEl = blockEls[curIdx + delta];
+      const nextBlock = editor.document[curIdx + delta];
+      if (!nextEl || !nextBlock) return;
+
+      e.preventDefault();
+
+      const nextNativeInput = nextEl.querySelector<HTMLElement>(
+        "input:not([type='checkbox']), textarea",
+      );
+      if (nextNativeInput) {
+        nextNativeInput.focus();
+      } else {
+        editor.setTextCursorPosition(nextBlock.id, e.key === "ArrowDown" ? "start" : "end");
+      }
+    };
+
     const domEl = editor._tiptapEditor.view.dom;
     domEl.addEventListener("keydown", onKeyDown, true);
-    return () => domEl.removeEventListener("keydown", onKeyDown, true);
+    domEl.addEventListener("keydown", onInputKeyDown, true);
+    return () => {
+      domEl.removeEventListener("keydown", onKeyDown, true);
+      domEl.removeEventListener("keydown", onInputKeyDown, true);
+    };
   }, [editor]);
 
   const [submitTooltipOpen, setSubmitTooltipOpen] = useState(false);
