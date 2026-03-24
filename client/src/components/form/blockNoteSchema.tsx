@@ -8,6 +8,45 @@ import RatingInput from "@/components/form/ui/RatingInput";
 import type { OptionsEntry } from "./blockNoteAdapter";
 
 // ---------------------------------------------------------------------------
+// blockArrowNav — navigate out of a native input/textarea with arrow keys.
+// React's synthetic onKeyDown fires (via root capture) before KeyTrap's native
+// bubbling listener, so we can intercept here and drive BlockNote navigation.
+// ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function blockArrowNav(block: { id: string }, editor: any, isTextarea = false) {
+  return (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+
+    if (isTextarea) {
+      const ta = e.currentTarget as HTMLTextAreaElement;
+      if (e.key === "ArrowUp" && ta.selectionStart !== 0) return;
+      if (e.key === "ArrowDown" && ta.selectionEnd !== ta.value.length) return;
+    }
+
+    e.preventDefault();
+
+    const allBlocks: Array<{ id: string }> = editor.document;
+    const idx = allBlocks.findIndex(b => b.id === block.id);
+    const delta = e.key === "ArrowDown" ? 1 : -1;
+    const nextBlock = allBlocks[idx + delta];
+    if (!nextBlock) return;
+
+    const blockEls = Array.from(document.querySelectorAll<HTMLElement>(".bn-block-content"));
+    const nextEl = blockEls[idx + delta];
+    if (!nextEl) return;
+
+    const nextInput = nextEl.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
+    if (nextInput) {
+      nextInput.focus();
+    } else {
+      editor.setTextCursorPosition(nextBlock.id, e.key === "ArrowDown" ? "start" : "end");
+      editor._tiptapEditor.view.focus();
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
 // KeyTrap — stops keyboard events from bubbling to ProseMirror
 // React's synthetic onKeyDown fires after ProseMirror's native listener,
 // so we attach a native listener directly via ref to intercept in time.
@@ -117,6 +156,7 @@ const shortAnswerTool = createReactBlockSpec(
           placeholder={block.props.placeholder || "Type placeholder…"}
           value={block.props.placeholder}
           onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
+          onKeyDown={blockArrowNav(block, editor)}
         />
         <RequiredToggle
           required={block.props.required}
@@ -148,6 +188,7 @@ const longAnswerTool = createReactBlockSpec(
           placeholder={block.props.placeholder || "Type placeholder…"}
           value={block.props.placeholder}
           onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
+          onKeyDown={blockArrowNav(block, editor, true)}
         />
         <div className="mt-2.5">
           <RequiredToggle
