@@ -16,6 +16,14 @@ const formSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  published: {
+    type: Boolean,
+    default: false,
+  },
+  lastSubmission: {
+    type: Date,
+    default: null,
+  },
 });
 
 const workspaceSchema = new mongoose.Schema({

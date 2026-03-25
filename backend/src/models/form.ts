@@ -49,6 +49,14 @@ const FormSchema = new mongoose.Schema<FormDataInterface>({
     type: Boolean,
     default: false,
   },
+  published: {
+    type: Boolean,
+    default: false,
+  },
+  publishedContent: {
+    title: { type: String },
+    blocks: { type: [BlockSchema] },
+  },
 });
 // Add a pre-save hook to update the updatedAt field
 FormSchema.pre("save", function (next) {

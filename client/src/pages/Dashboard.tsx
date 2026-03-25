@@ -289,8 +289,20 @@ const FormsTable = ({
             <TableCell className="w-[15%]">
               {form.disabled ? (
                 <Badge variant="secondary">Disabled</Badge>
+              ) : form.published ? (
+                <Badge
+                  variant="outline"
+                  className="text-green-600 border-green-400"
+                >
+                  Published
+                </Badge>
               ) : (
-                <Badge variant="outline">Active</Badge>
+                <Badge
+                  variant="outline"
+                  className="text-yellow-600 border-yellow-400"
+                >
+                  Draft
+                </Badge>
               )}
             </TableCell>
             <TableCell className="w-[15%]">{form.submissions}</TableCell>
@@ -299,12 +311,12 @@ const FormsTable = ({
             </TableCell>
             <TableCell className="w-[10%] text-right space-x-3 font-semibold text-primary">
               <Link
-                to={`/view-form/${form.form_id}`}
+                to={form.published ? `/view-form/${form.form_id}` : `/preview-form/${form.form_id}`}
                 target="_blank"
                 onClick={e => e.stopPropagation()}
                 className="hover:underline"
               >
-                View
+                {form.published ? "View" : "Preview"}
               </Link>
               <Link
                 to={`/form/${form.form_id}`}

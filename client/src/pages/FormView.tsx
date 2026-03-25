@@ -1,4 +1,3 @@
-import PageTitle from "@/components/common/PageTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -146,16 +145,20 @@ const FormViewPage = () => {
   if (isLoading) {
     return (
       <div className="overflow-y-scroll px-5">
-        <PageTitle>
-          <Skeleton className="w-[20rem] h-16" />
-        </PageTitle>
-        <main className="mx-auto max-w-[650px] min-h-[66vh] overflow-auto flex flex-col gap-6 container mb-28">
-          {[...Array(6)].map((_, index) => (
-            <Skeleton
-              key={index}
-              className="w-full h-6"
-            />
-          ))}
+        <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
+          <div className="mx-auto max-w-[650px]">
+            <div className="pt-14 pb-10">
+              <Skeleton className="w-[20rem] h-9" />
+            </div>
+            <div className="flex flex-col gap-6">
+              {[...Array(6)].map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className="w-full h-6"
+                />
+              ))}
+            </div>
+          </div>
         </main>
       </div>
     );
@@ -163,10 +166,10 @@ const FormViewPage = () => {
 
   return (
     <div>
-      <div className="overflow-y-scroll px-5">
-        <PageTitle>{data?.title}</PageTitle>
+      <div className="overflow-y-scroll px-5 pt-16">
         <main className="mx-auto max-w-[1100px] min-h-[66vh] overflow-auto flex-grow container mb-28">
           <div className="mx-auto max-w-[650px]">
+            <h1 className="text-4xl font-bold pt-14 pb-10">{data?.title}</h1>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-3">
                 {formState?.map(block => {

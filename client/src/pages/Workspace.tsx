@@ -21,6 +21,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const WorkspacePage = () => {
   const [searchParams] = useSearchParams();
@@ -54,11 +55,12 @@ const WorkspacePage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[20%]">Name</TableHead>
-                {/* <TableHead className="w-[20%]">Status</TableHead> */}
-                <TableHead className="w-[20%]">Submissions</TableHead>
-                <TableHead className="w-[20%]">Created</TableHead>
-                <TableHead className="w-[20%] text-right">Actions</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Submissions</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Last Submission</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -69,7 +71,7 @@ const WorkspacePage = () => {
                     key={form._id}
                     className="group"
                   >
-                    <TableCell className="w-[20%] font-bold">
+                    <TableCell className="font-bold">
                       <Link
                         to={`/form-summary/${form.form_id}?name=${form.name}&submission=${form.submissions}&url=${form.url}&modified=${form.modified}&created=${form.created}`}
                         onClick={e => e.stopPropagation()}
@@ -78,23 +80,51 @@ const WorkspacePage = () => {
                         {form.name}
                       </Link>
                     </TableCell>
-                    {/* <TableCell className="w-[20%]">
-                      {form.published ? "Published" : "Draft"}
-                    </TableCell> */}
-                    <TableCell className="w-[20%]">{form.submissions}</TableCell>
-                    <TableCell className="w-[20%]">
-                      {new Date(form.created).toLocaleDateString("en-US")}
+                    <TableCell>
+                      {form.disabled ? (
+                        <Badge variant="secondary">Disabled</Badge>
+                      ) : form.published ? (
+                        <Badge
+                          variant="outline"
+                          className="text-green-600 border-green-400"
+                        >
+                          Published
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-yellow-600 border-yellow-400"
+                        >
+                          Draft
+                        </Badge>
+                      )}
                     </TableCell>
-                    <TableCell className="w-[20%] text-right space-x-3 font-semibold text-primary">
+                    <TableCell>{form.submissions}</TableCell>
+                    <TableCell>{new Date(form.created).toLocaleDateString("en-US")}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {form.lastSubmission
+                        ? new Date(form.lastSubmission).toLocaleString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right space-x-3 font-semibold text-primary">
                       <Link
-                        to={`/view-form/${form.form_id}`}
+                        to={
+                          form.published
+                            ? `/view-form/${form.form_id}`
+                            : `/preview-form/${form.form_id}`
+                        }
                         target="_blank"
                         onClick={e => e.stopPropagation()}
                         className="hover:underline"
                       >
-                        View
+                        {form.published ? "View" : "Preview"}
                       </Link>
-
                       <Link
                         to={`/form/${form.form_id}`}
                         onClick={e => e.stopPropagation()}

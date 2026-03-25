@@ -1,6 +1,7 @@
 import mongoose, { Types } from "mongoose";
 
 export interface DashboardForm {
+  _id: mongoose.Types.ObjectId;
   name: string;
   submissions: number;
   created: Date;
@@ -8,6 +9,8 @@ export interface DashboardForm {
   url: string;
   form_id: mongoose.Types.ObjectId;
   disabled?: boolean;
+  published?: boolean;
+  lastSubmission?: Date | null;
 }
 
 export interface Workspace {

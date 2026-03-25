@@ -57,6 +57,13 @@
   margin-bottom: 2px !important;
 }
 
+/* Heading block — match preview size (text-2xl / 1.5rem, bold) */
+.bn-block-content[data-content-type="heading"] .bn-inline-content {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  line-height: 1.75rem !important;
+}
+
 /* Override BlockNote's italic placeholder style to match app default */
 .bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before {
   font-style: normal !important;

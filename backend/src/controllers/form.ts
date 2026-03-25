@@ -10,6 +10,7 @@ import {
   viewFormData,
   deleteFormById,
   toggleFormDisabled,
+  publishForm,
 } from "../services/form";
 import { FormDataInterface } from "@shared/types";
 
@@ -121,6 +122,20 @@ export const fetchFormAnalytics = async (req: Request, res: Response): Promise<v
       return;
     }
     res.status(200).json(analytics);
+  } catch (error) {
+    errorResponse(error, res);
+  }
+};
+
+export const publishFormController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const updatedForm = await publishForm(id);
+    if (!updatedForm) {
+      res.status(404).send("Form not found");
+      return;
+    }
+    res.status(200).json(updatedForm);
   } catch (error) {
     errorResponse(error, res);
   }

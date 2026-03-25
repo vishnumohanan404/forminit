@@ -58,6 +58,10 @@ export const disableForm = async (id: string | undefined) => {
   const response = await axiosClient.put(`/api/form/disable/${id}`);
   return response.data;
 };
+export const publishFormApi = async (id: string) => {
+  const response = await axiosClient.put(`/api/form/publish/${id}`);
+  return response.data;
+};
 
 export interface SubmissionTimePoint {
   date: string;

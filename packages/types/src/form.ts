@@ -39,4 +39,9 @@ export interface FormDataInterface {
   updatedAt?: Date;
   workspaceId: string;
   disabled?: boolean;
+  published?: boolean;
+  publishedContent?: {
+    title?: string;
+    blocks?: BlockData[];
+  };
 }

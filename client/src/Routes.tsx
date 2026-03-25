@@ -11,6 +11,7 @@ const SupportPage = React.lazy(() => import("./pages/Support"));
 const FormPage = React.lazy(() => import("./pages/Form"));
 const WorkspacePage = React.lazy(() => import("./pages/Workspace"));
 const FormViewPage = React.lazy(() => import("./pages/FormView"));
+const FormPreviewPage = React.lazy(() => import("./pages/FormPreview"));
 const FormSummaryPage = React.lazy(() => import("./pages/FormSummary"));
 
 // TODO: explore Data API from
@@ -59,6 +60,14 @@ export const routes = createBrowserRouter([
   {
     path: "/view-form/:id",
     element: <FormViewPage />,
+  },
+  {
+    path: "/preview-form/:id",
+    element: (
+      <ProtectedRoute bare>
+        <FormPreviewPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/success",

@@ -10,6 +10,7 @@ import {
   viewForm,
   deleteForm,
   toggleFormDisabledStatus,
+  publishFormController,
 } from "../controllers/form";
 const router = Router();
 
@@ -22,4 +23,5 @@ router.post("/submit-form", submitForm);
 router.get("/submissions/:formId", verifyToken, fetchSubmissions);
 router.delete("/:id", verifyToken, deleteForm);
 router.put("/disable/:id", verifyToken, toggleFormDisabledStatus);
+router.put("/publish/:id", verifyToken, publishFormController);
 export default router;

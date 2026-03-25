@@ -100,12 +100,69 @@ export const updateExistingForm = async (
 };
 
 export const viewFormData = async (formId: string): Promise<FormDataInterface | null> => {
-  const fullForm = await Form.findById(formId, {
-    blocks: true,
-    title: true,
-    disabled: true,
-  });
-  return fullForm;
+  const form = await Form.findOne(
+    { _id: formId, published: true },
+    { title: true, blocks: true, publishedContent: true, disabled: true },
+  );
+  if (!form) return null;
+
+  // Legacy: published before publishedContent existed — backfill once using $set so Mongoose persists it
+  if (!form.publishedContent?.title) {
+    await Form.findByIdAndUpdate(form._id, {
+      $set: { "publishedContent.title": form.title, "publishedContent.blocks": form.blocks },
+    });
+    return {
+      title: form.title,
+      blocks: form.blocks as FormDataInterface["blocks"],
+      workspaceId: "",
+      disabled: form.disabled,
+      published: true,
+    };
+  }
+
+  return {
+    title: form.publishedContent.title ?? "",
+    blocks: (form.publishedContent.blocks ?? []) as FormDataInterface["blocks"],
+    workspaceId: "",
+    disabled: form.disabled,
+    published: true,
+  };
+};
+
+export const publishForm = async (id: string): Promise<FormDataInterface | null> => {
+  const formObjectId = new mongoose.Types.ObjectId(id);
+
+  // Read current draft first, then write its content into publishedContent atomically
+  const form = await Form.findById(formObjectId);
+  if (!form) return null;
+
+  const updatedForm = await Form.findByIdAndUpdate(
+    formObjectId,
+    {
+      $set: {
+        published: true,
+        "publishedContent.title": form.title,
+        "publishedContent.blocks": form.blocks,
+      },
+    },
+    { returnDocument: "after" },
+  );
+  if (!updatedForm) return null;
+
+  await Dashboard.findOneAndUpdate(
+    { "workspaces.forms.form_id": formObjectId },
+    {
+      $set: {
+        "workspaces.$[workspace].forms.$[form].published": true,
+        "workspaces.$[workspace].forms.$[form].name": form.title,
+      },
+    },
+    {
+      arrayFilters: [{ "workspace.forms.form_id": formObjectId }, { "form.form_id": formObjectId }],
+    },
+  );
+
+  return updatedForm;
 };
 
 export const submitFormData = async (formData: SubmitFormDataInterface) => {
@@ -123,7 +180,8 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
       "workspaces.forms.form_id": formObjectId, // Find the correct form in the nested structure
     },
     {
-      $inc: { "workspaces.$[].forms.$[form].submissions": 1 }, // Increment the submissions count in the matching form
+      $inc: { "workspaces.$[].forms.$[form].submissions": 1 },
+      $set: { "workspaces.$[].forms.$[form].lastSubmission": new Date() },
     },
     {
       returnDocument: "after", // Return the updated document

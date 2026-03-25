@@ -5,8 +5,8 @@ import { SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "@/layouts/dashboard/AppSidebar";
 import AppNavbar from "@/components/common/AppNavbar";
 
-type ProtectedRouteProps = PropsWithChildren;
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+type ProtectedRouteProps = PropsWithChildren<{ bare?: boolean }>;
+export default function ProtectedRoute({ children, bare = false }: ProtectedRouteProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -16,6 +16,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
   }, [navigate, user]);
+
+  if (bare) {
+    return user ? <>{children}</> : <Navigate to="/auth" />;
+  }
 
   return user ? (
     <SidebarProvider defaultOpen={true}>
