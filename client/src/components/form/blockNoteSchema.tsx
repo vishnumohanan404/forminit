@@ -8,42 +8,30 @@ import RatingInput from "@/components/form/ui/RatingInput";
 import type { OptionsEntry } from "./blockNoteAdapter";
 
 // ---------------------------------------------------------------------------
-// blockArrowNav — navigate out of a native input/textarea with arrow keys.
-// React's synthetic onKeyDown fires (via root capture) before KeyTrap's native
-// bubbling listener, so we can intercept here and drive BlockNote navigation.
+// navigateFromBlock — shared arrow-key navigation logic for input blocks.
+// Finds the adjacent block in editor.document order and either focuses its
+// native input or restores the ProseMirror text cursor.
 // ---------------------------------------------------------------------------
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function blockArrowNav(block: { id: string }, editor: any, isTextarea = false) {
-  return (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+function navigateFromBlock(blockId: string, key: "ArrowUp" | "ArrowDown", editor: any) {
+  const allBlocks: { id: string }[] = editor.document;
+  const idx = allBlocks.findIndex(b => b.id === blockId);
+  const delta = key === "ArrowDown" ? 1 : -1;
+  const nextBlock = allBlocks[idx + delta];
+  if (!nextBlock) return;
 
-    if (isTextarea) {
-      const ta = e.currentTarget as HTMLTextAreaElement;
-      if (e.key === "ArrowUp" && ta.selectionStart !== 0) return;
-      if (e.key === "ArrowDown" && ta.selectionEnd !== ta.value.length) return;
-    }
+  const blockEls = Array.from(document.querySelectorAll<HTMLElement>(".bn-block-content"));
+  const nextEl = blockEls[idx + delta];
+  if (!nextEl) return;
 
-    e.preventDefault();
-
-    const allBlocks: Array<{ id: string }> = editor.document;
-    const idx = allBlocks.findIndex(b => b.id === block.id);
-    const delta = e.key === "ArrowDown" ? 1 : -1;
-    const nextBlock = allBlocks[idx + delta];
-    if (!nextBlock) return;
-
-    const blockEls = Array.from(document.querySelectorAll<HTMLElement>(".bn-block-content"));
-    const nextEl = blockEls[idx + delta];
-    if (!nextEl) return;
-
-    const nextInput = nextEl.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
-    if (nextInput) {
-      nextInput.focus();
-    } else {
-      editor.setTextCursorPosition(nextBlock.id, e.key === "ArrowDown" ? "start" : "end");
-      editor._tiptapEditor.view.focus();
-    }
-  };
+  const nextInput = nextEl.querySelector<HTMLElement>("input:not([type='checkbox']), textarea");
+  if (nextInput) {
+    nextInput.focus();
+  } else {
+    editor.setTextCursorPosition(nextBlock.id, key === "ArrowDown" ? "start" : "end");
+    editor._tiptapEditor.view.focus();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -138,6 +126,47 @@ function RequiredToggle({
 // shortAnswerTool
 // ---------------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ShortAnswerBlock({ block, editor }: { block: any; editor: any }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const blockId = block.id;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+      e.preventDefault();
+      e.stopPropagation();
+      navigateFromBlock(blockId, e.key as "ArrowUp" | "ArrowDown", editorRef.current);
+    };
+    el.addEventListener("keydown", handler, true);
+    return () => el.removeEventListener("keydown", handler, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.id]);
+
+  return (
+    <KeyTrap className="py-1 w-full flex items-center gap-3">
+      <input
+        ref={inputRef}
+        type="text"
+        className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        placeholder={block.props.placeholder || "Type placeholder…"}
+        value={block.props.placeholder}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          editor.updateBlock(block, { props: { placeholder: e.target.value } })
+        }
+      />
+      <RequiredToggle
+        required={block.props.required}
+        onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
+      />
+    </KeyTrap>
+  );
+}
+
 const shortAnswerTool = createReactBlockSpec(
   {
     type: "shortAnswerTool" as const,
@@ -149,20 +178,10 @@ const shortAnswerTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <KeyTrap className="py-1 w-full flex items-center gap-3">
-        <input
-          type="text"
-          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          placeholder={block.props.placeholder || "Type placeholder…"}
-          value={block.props.placeholder}
-          onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
-          onKeyDown={blockArrowNav(block, editor)}
-        />
-        <RequiredToggle
-          required={block.props.required}
-          onChange={v => editor.updateBlock(block, { props: { required: v } })}
-        />
-      </KeyTrap>
+      <ShortAnswerBlock
+        block={block}
+        editor={editor}
+      />
     ),
   },
 );
@@ -170,6 +189,50 @@ const shortAnswerTool = createReactBlockSpec(
 // ---------------------------------------------------------------------------
 // longAnswerTool
 // ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function LongAnswerBlock({ block, editor }: { block: any; editor: any }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const blockId = block.id;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+      if (e.key === "ArrowUp" && el.selectionStart !== 0) return;
+      if (e.key === "ArrowDown" && el.selectionEnd !== el.value.length) return;
+      e.preventDefault();
+      e.stopPropagation();
+      navigateFromBlock(blockId, e.key as "ArrowUp" | "ArrowDown", editorRef.current);
+    };
+    el.addEventListener("keydown", handler, true);
+    return () => el.removeEventListener("keydown", handler, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.id]);
+
+  return (
+    <KeyTrap className="py-1 w-full flex items-start gap-3">
+      <textarea
+        ref={textareaRef}
+        className="flex-1 max-w-sm min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+        placeholder={block.props.placeholder || "Type placeholder…"}
+        value={block.props.placeholder}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          editor.updateBlock(block, { props: { placeholder: e.target.value } })
+        }
+      />
+      <div className="mt-2.5">
+        <RequiredToggle
+          required={block.props.required}
+          onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
+        />
+      </div>
+    </KeyTrap>
+  );
+}
 
 const longAnswerTool = createReactBlockSpec(
   {
@@ -182,21 +245,10 @@ const longAnswerTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <KeyTrap className="py-1 w-full flex items-start gap-3">
-        <textarea
-          className="flex-1 max-w-sm min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-          placeholder={block.props.placeholder || "Type placeholder…"}
-          value={block.props.placeholder}
-          onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
-          onKeyDown={blockArrowNav(block, editor, true)}
-        />
-        <div className="mt-2.5">
-          <RequiredToggle
-            required={block.props.required}
-            onChange={v => editor.updateBlock(block, { props: { required: v } })}
-          />
-        </div>
-      </KeyTrap>
+      <LongAnswerBlock
+        block={block}
+        editor={editor}
+      />
     ),
   },
 );
