@@ -17,6 +17,7 @@ axiosClient.interceptors.response.use(
     // Check if the response indicates an expired token
     if (response && response.status === 401 && !config.url.includes("/login")) {
       localStorage.removeItem("user");
+      window.dispatchEvent(new CustomEvent("auth:logout"));
       routes.navigate("/");
     }
 

@@ -12,7 +12,7 @@ interface UserInput {
   password: string;
 }
 
-const tokenExpiry: SignOptions = { expiresIn: "1h" };
+const tokenExpiry: SignOptions = {};
 
 // Service function for registering a new user
 export const registerNewUser = async ({ fullName, email, password }: UserInput) => {

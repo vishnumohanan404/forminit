@@ -22,6 +22,12 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
+  useEffect(() => {
+    const handler = () => setUser(null);
+    window.addEventListener("auth:logout", handler);
+    return () => window.removeEventListener("auth:logout", handler);
+  }, []);
+
   const value: AuthProviderProps = {
     user,
     setUser,

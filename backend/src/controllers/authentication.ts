@@ -17,7 +17,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
       sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
-      maxAge: 3600000, //ms = 1 hour
+      maxAge: 2592000000, // 30 days
     });
     res.status(201).json({
       message: "User registered successfully",
@@ -40,7 +40,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
       sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
-      maxAge: 3600000, //ms = 1 hour
+      maxAge: 2592000000, // 30 days
     });
     // Return the JWT token and user information
     res.status(200).json({
@@ -62,7 +62,7 @@ export const google = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: ["production", "staging"].includes(process.env.NODE_ENV || ""),
       sameSite: ["production", "staging"].includes(process.env.NODE_ENV || "") ? "none" : "strict",
-      maxAge: 3600000, //ms = 1 hour
+      maxAge: 2592000000, // 30 days
     });
     res.status(200).json({
       message: "Login successful",
