@@ -34,7 +34,13 @@ const AppNavbar = () => {
 
       <span className="text-sm text-muted-foreground capitalize">{section}</span>
 
-      <div className="ml-auto flex items-center gap-1">
+      {/* Pages can portal action buttons here via id="navbar-actions" */}
+      <div
+        id="navbar-actions"
+        className="ml-auto flex items-center gap-2"
+      />
+
+      <div className="flex items-center gap-1">
         <DarkModeToggle />
 
         <DropdownMenu modal={false}>

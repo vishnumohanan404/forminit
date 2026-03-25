@@ -12,6 +12,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AxiosError } from "axios";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { EyeIcon } from "lucide-react";
+import { createPortal } from "react-dom";
 
 const FormPage = () => {
   const { id } = useParams();
@@ -93,75 +94,80 @@ const FormPage = () => {
     }
   };
   const canPublish = !!((state.editorData || title !== data?.title) && title);
+  const navbarActions = document.getElementById("navbar-actions");
 
   return (
     <div className="px-5">
-      {/* Sticky action bar — top-right */}
-      <div className="fixed top-4 right-6 z-50 flex items-center gap-2">
-        <TooltipProvider>
-          {/* Preview */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="font-bold tracking-normal gap-1.5"
-                  disabled={!id}
-                  onClick={() => window.open(`/view-form/${id}`, "_blank")}
-                >
-                  <EyeIcon size={14} />
-                  PREVIEW
-                </Button>
-              </span>
-            </TooltipTrigger>
-            {!id && (
-              <TooltipContent>
-                <p>Save the form first to preview it</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
-
-          {/* Publish */}
-          {!canPublish ? (
-            <Tooltip
-              open={publishTooltipOpen}
-              onOpenChange={setPublishTooltipOpen}
-            >
+      {/* Portal action buttons into the navbar slot */}
+      {navbarActions &&
+        createPortal(
+          <TooltipProvider>
+            {/* Preview */}
+            <Tooltip>
               <TooltipTrigger asChild>
-                <span
-                  className="flex"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setPublishTooltipOpen(v => !v)}
-                  onKeyDown={e => e.key === "Enter" && setPublishTooltipOpen(v => !v)}
-                >
+                <span>
                   <Button
                     size="sm"
-                    className="font-bold tracking-normal min-w-20 pointer-events-none"
-                    disabled
+                    variant="outline"
+                    className="font-bold tracking-normal gap-1.5 h-7 text-xs"
+                    disabled={!id}
+                    onClick={() => window.open(`/view-form/${id}`, "_blank")}
                   >
-                    PUBLISH
+                    <EyeIcon size={13} />
+                    PREVIEW
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {!title ? "Add a title to your form before publishing" : "No changes to publish"}
-                </p>
-              </TooltipContent>
+              {!id && (
+                <TooltipContent>
+                  <p>Save the form first to preview it</p>
+                </TooltipContent>
+              )}
             </Tooltip>
-          ) : (
-            <Button
-              size="sm"
-              className="font-bold tracking-normal min-w-20"
-              onClick={handleSubmit}
-            >
-              {isPendingCreate || isPendingUpdate ? <LoadingSpinner /> : "PUBLISH"}
-            </Button>
-          )}
-        </TooltipProvider>
-      </div>
+
+            {/* Publish */}
+            {!canPublish ? (
+              <Tooltip
+                open={publishTooltipOpen}
+                onOpenChange={setPublishTooltipOpen}
+              >
+                <TooltipTrigger asChild>
+                  <span
+                    className="flex"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setPublishTooltipOpen(v => !v)}
+                    onKeyDown={e => e.key === "Enter" && setPublishTooltipOpen(v => !v)}
+                  >
+                    <Button
+                      size="sm"
+                      className="font-bold tracking-normal min-w-20 h-7 text-xs pointer-events-none"
+                      disabled
+                    >
+                      PUBLISH
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {!title
+                      ? "Add a title to your form before publishing"
+                      : "No changes to publish"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button
+                size="sm"
+                className="font-bold tracking-normal min-w-20 h-7 text-xs"
+                onClick={handleSubmit}
+              >
+                {isPendingCreate || isPendingUpdate ? <LoadingSpinner /> : "PUBLISH"}
+              </Button>
+            )}
+          </TooltipProvider>,
+          navbarActions,
+        )}
 
       <PageTitle className="max-w-[760px] pt-20">
         <input
