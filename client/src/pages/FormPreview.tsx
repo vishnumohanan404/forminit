@@ -68,7 +68,7 @@ const FormPreviewPage = () => {
       {/* Preview banner */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs font-medium py-1.5">
         <EyeIcon size={13} />
-        Preview — {data.published ? "published" : "draft · not yet published"}
+        Preview — draft{data.published ? " · live form may differ" : " · not yet published"}
       </div>
 
       <main className="mx-auto max-w-[1100px] min-h-[66vh] flex-grow container mb-28">
