@@ -120,13 +120,10 @@ export const viewFormData = async (formId: string): Promise<FormDataInterface | 
     };
   }
 
-  return {
-    title: form.publishedContent.title ?? "",
-    blocks: (form.publishedContent.blocks ?? []) as FormDataInterface["blocks"],
-    workspaceId: "",
-    disabled: form.disabled,
-    published: true,
-  };
+  const doc = form.toObject() as FormDataInterface & { _id: unknown };
+  doc.title = form.publishedContent.title ?? form.title;
+  doc.blocks = (form.publishedContent.blocks ?? []) as FormDataInterface["blocks"];
+  return doc;
 };
 
 export const publishForm = async (id: string): Promise<FormDataInterface | null> => {
@@ -174,24 +171,25 @@ export const submitFormData = async (formData: SubmitFormDataInterface) => {
     formId: formObjectId,
   });
   await newSubmission.save();
-  // Step 2: Update the form's submission count
+  // Step 2: Increment submission count
   const updatedDashboard = await Dashboard.findOneAndUpdate(
+    { "workspaces.forms.form_id": formObjectId },
+    { $inc: { "workspaces.$[].forms.$[form].submissions": 1 } },
     {
-      "workspaces.forms.form_id": formObjectId, // Find the correct form in the nested structure
-    },
-    {
-      $inc: { "workspaces.$[].forms.$[form].submissions": 1 },
-      $set: { "workspaces.$[].forms.$[form].lastSubmission": new Date() },
-    },
-    {
-      returnDocument: "after", // Return the updated document
-      arrayFilters: [{ "form.form_id": formObjectId }], // Filter to target the correct form inside the workspace
+      returnDocument: "after",
+      arrayFilters: [{ "form.form_id": formObjectId }],
     },
   );
   if (!updatedDashboard) {
     console.error("Error updating form submissions: Form not found.");
     return null;
   }
+  // Step 3: Record last submission timestamp separately to avoid operator conflicts
+  await Dashboard.findOneAndUpdate(
+    { "workspaces.forms.form_id": formObjectId },
+    { $set: { "workspaces.$[].forms.$[form].lastSubmission": new Date() } },
+    { arrayFilters: [{ "form.form_id": formObjectId }] },
+  );
   return updatedDashboard; // Return the updated form with updated submissions count
 };
 

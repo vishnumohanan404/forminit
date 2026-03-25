@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function SuccessFormSubmitPage() {
@@ -15,7 +15,7 @@ export default function SuccessFormSubmitPage() {
       <h1 className="text-4xl font-bold mb-4">Form Submitted Successfully!</h1>
       <p className="text-xl mb-8 text-muted-foreground">Thank you for your submission.</p>
       <Button onClick={handleNewForm}>
-        <ArrowRight /> Go Home
+        <Home /> Go Home
       </Button>
     </div>
   );
