@@ -155,6 +155,13 @@ function ShortAnswerBlock({ block, editor }: { block: any; editor: any }) {
         insertBlockBelow(blockId, editorRef.current);
         return;
       }
+      if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateFromBlock(blockId, "ArrowUp", editorRef.current);
+        editorRef.current.removeBlocks([{ id: blockId }]);
+        return;
+      }
       if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
       e.preventDefault();
       e.stopPropagation();
@@ -223,6 +230,13 @@ function LongAnswerBlock({ block, editor }: { block: any; editor: any }) {
         e.preventDefault();
         e.stopPropagation();
         insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
+      if (e.key === "Backspace" && el.value === "" && el.selectionStart === 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateFromBlock(blockId, "ArrowUp", editorRef.current);
+        editorRef.current.removeBlocks([{ id: blockId }]);
         return;
       }
       if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
@@ -296,6 +310,13 @@ function EmailBlock({ block, editor }: { block: any; editor: any }) {
         e.preventDefault();
         e.stopPropagation();
         insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
+      if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateFromBlock(blockId, "ArrowUp", editorRef.current);
+        editorRef.current.removeBlocks([{ id: blockId }]);
         return;
       }
       if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
@@ -418,17 +439,36 @@ function MCQBlock({ block, editor }: { block: any; editor: any }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef(editor);
   editorRef.current = editor;
+  const blockRef = useRef(block);
+  blockRef.current = block;
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const blockId = block.id;
     const handler = (e: KeyboardEvent) => {
-      if (e.key !== "Enter") return;
       if (!(e.target instanceof HTMLInputElement)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      insertBlockBelow(blockId, editorRef.current);
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
+      if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
+        const opts = (() => {
+          try {
+            return JSON.parse(blockRef.current.props.optionsJson);
+          } catch {
+            return [];
+          }
+        })();
+        if (opts.length <= 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          navigateFromBlock(blockId, "ArrowUp", editorRef.current);
+          editorRef.current.removeBlocks([{ id: blockId }]);
+        }
+      }
     };
     el.addEventListener("keydown", handler, true);
     return () => el.removeEventListener("keydown", handler, true);
@@ -495,17 +535,36 @@ function DropdownBlock({ block, editor }: { block: any; editor: any }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef(editor);
   editorRef.current = editor;
+  const blockRef = useRef(block);
+  blockRef.current = block;
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const blockId = block.id;
     const handler = (e: KeyboardEvent) => {
-      if (e.key !== "Enter") return;
       if (!(e.target instanceof HTMLInputElement)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      insertBlockBelow(blockId, editorRef.current);
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
+      if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
+        const opts = (() => {
+          try {
+            return JSON.parse(blockRef.current.props.optionsJson);
+          } catch {
+            return [];
+          }
+        })();
+        if (opts.length <= 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          navigateFromBlock(blockId, "ArrowUp", editorRef.current);
+          editorRef.current.removeBlocks([{ id: blockId }]);
+        }
+      }
     };
     el.addEventListener("keydown", handler, true);
     return () => el.removeEventListener("keydown", handler, true);
