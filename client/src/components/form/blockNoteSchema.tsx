@@ -34,6 +34,18 @@ function navigateFromBlock(blockId: string, key: "ArrowUp" | "ArrowDown", editor
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function insertBlockBelow(blockId: string, editor: any) {
+  const allBlocks: { id: string }[] = editor.document;
+  const idx = allBlocks.findIndex(b => b.id === blockId);
+  editor.insertBlocks([{ type: "paragraph", content: [] }], { id: blockId }, "after");
+  const newBlock = editor.document[idx + 1];
+  if (newBlock) {
+    editor.setTextCursorPosition(newBlock.id, "start");
+    editor._tiptapEditor.view.focus();
+  }
+}
+
 // ---------------------------------------------------------------------------
 // KeyTrap — stops keyboard events from bubbling to ProseMirror
 // React's synthetic onKeyDown fires after ProseMirror's native listener,
@@ -137,6 +149,12 @@ function ShortAnswerBlock({ block, editor }: { block: any; editor: any }) {
     if (!el) return;
     const blockId = block.id;
     const handler = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
       if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
       e.preventDefault();
       e.stopPropagation();
@@ -201,6 +219,12 @@ function LongAnswerBlock({ block, editor }: { block: any; editor: any }) {
     if (!el) return;
     const blockId = block.id;
     const handler = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
       if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
       if (e.key === "ArrowUp" && el.selectionStart !== 0) return;
       if (e.key === "ArrowDown" && el.selectionEnd !== el.value.length) return;
@@ -257,6 +281,53 @@ const longAnswerTool = createReactBlockSpec(
 // emailTool
 // ---------------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function EmailBlock({ block, editor }: { block: any; editor: any }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const blockId = block.id;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        insertBlockBelow(blockId, editorRef.current);
+        return;
+      }
+      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+      e.preventDefault();
+      e.stopPropagation();
+      navigateFromBlock(blockId, e.key as "ArrowUp" | "ArrowDown", editorRef.current);
+    };
+    el.addEventListener("keydown", handler, true);
+    return () => el.removeEventListener("keydown", handler, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.id]);
+
+  return (
+    <KeyTrap className="py-1 w-full flex items-center gap-3">
+      <input
+        ref={inputRef}
+        type="text"
+        className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        placeholder={block.props.placeholder || "name@example.com"}
+        value={block.props.placeholder}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          editor.updateBlock(block, { props: { placeholder: e.target.value } })
+        }
+      />
+      <RequiredToggle
+        required={block.props.required}
+        onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
+      />
+    </KeyTrap>
+  );
+}
+
 const emailTool = createReactBlockSpec(
   {
     type: "emailTool" as const,
@@ -268,19 +339,10 @@ const emailTool = createReactBlockSpec(
   },
   {
     render: ({ block, editor }) => (
-      <KeyTrap className="py-1 w-full flex items-center gap-3">
-        <input
-          type="text"
-          className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          placeholder={block.props.placeholder || "name@example.com"}
-          value={block.props.placeholder}
-          onChange={e => editor.updateBlock(block, { props: { placeholder: e.target.value } })}
-        />
-        <RequiredToggle
-          required={block.props.required}
-          onChange={v => editor.updateBlock(block, { props: { required: v } })}
-        />
-      </KeyTrap>
+      <EmailBlock
+        block={block}
+        editor={editor}
+      />
     ),
   },
 );
@@ -351,6 +413,60 @@ const dateTool = createReactBlockSpec(
 // multipleChoiceTool
 // ---------------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function MCQBlock({ block, editor }: { block: any; editor: any }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const blockId = block.id;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Enter") return;
+      if (!(e.target instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      insertBlockBelow(blockId, editorRef.current);
+    };
+    el.addEventListener("keydown", handler, true);
+    return () => el.removeEventListener("keydown", handler, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.id]);
+
+  const options: OptionsEntry[] = (() => {
+    try {
+      return JSON.parse(block.props.optionsJson);
+    } catch {
+      return [{ optionValue: "", optionMarker: "a" }];
+    }
+  })();
+
+  const updateOptions = (newOptions: OptionsEntry[]) => {
+    editor.updateBlock(block, { props: { optionsJson: JSON.stringify(newOptions) } });
+  };
+
+  return (
+    <div ref={containerRef}>
+      <KeyTrap className="py-1 w-full">
+        <MultipleChoiceOption
+          optionsProp={options}
+          onInputChange={updateOptions}
+          onAddNewOption={updateOptions}
+          onLastOptionKeyDown={() => {}}
+        />
+        <div className="flex justify-end mt-1 max-w-sm">
+          <RequiredToggle
+            required={block.props.required}
+            onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
+          />
+        </div>
+      </KeyTrap>
+    </div>
+  );
+}
+
 const multipleChoiceTool = createReactBlockSpec(
   {
     type: "multipleChoiceTool" as const,
@@ -361,44 +477,80 @@ const multipleChoiceTool = createReactBlockSpec(
     content: "none",
   },
   {
-    render: ({ block, editor }) => {
-      const options: OptionsEntry[] = (() => {
-        try {
-          return JSON.parse(block.props.optionsJson);
-        } catch {
-          return [{ optionValue: "", optionMarker: "a" }];
-        }
-      })();
-
-      const updateOptions = (newOptions: OptionsEntry[]) => {
-        editor.updateBlock(block, {
-          props: { optionsJson: JSON.stringify(newOptions) },
-        });
-      };
-
-      return (
-        <KeyTrap className="py-1 w-full">
-          <MultipleChoiceOption
-            optionsProp={options}
-            onInputChange={updateOptions}
-            onAddNewOption={updateOptions}
-            onLastOptionKeyDown={() => {}}
-          />
-          <div className="flex justify-end mt-1 max-w-sm">
-            <RequiredToggle
-              required={block.props.required}
-              onChange={v => editor.updateBlock(block, { props: { required: v } })}
-            />
-          </div>
-        </KeyTrap>
-      );
-    },
+    render: ({ block, editor }) => (
+      <MCQBlock
+        block={block}
+        editor={editor}
+      />
+    ),
   },
 );
 
 // ---------------------------------------------------------------------------
 // dropdownTool
 // ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DropdownBlock({ block, editor }: { block: any; editor: any }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const blockId = block.id;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Enter") return;
+      if (!(e.target instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      insertBlockBelow(blockId, editorRef.current);
+    };
+    el.addEventListener("keydown", handler, true);
+    return () => el.removeEventListener("keydown", handler, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.id]);
+
+  const options: OptionsEntry[] = (() => {
+    try {
+      return JSON.parse(block.props.optionsJson);
+    } catch {
+      return [{ optionValue: "", optionMarker: "a" }];
+    }
+  })();
+
+  const updateOptions = (newOptions: OptionsEntry[]) => {
+    editor.updateBlock(block, { props: { optionsJson: JSON.stringify(newOptions) } });
+  };
+
+  return (
+    <div ref={containerRef}>
+      <KeyTrap className="py-1 w-full">
+        {/* Faux select trigger — shows dropdown shape in editor */}
+        <div className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground pointer-events-none select-none mb-2">
+          <span className="flex-1">Select an option…</span>
+          <ChevronDownIcon
+            size={14}
+            className="shrink-0 opacity-50"
+          />
+        </div>
+        <MultipleChoiceOption
+          optionsProp={options}
+          onInputChange={updateOptions}
+          onAddNewOption={updateOptions}
+          onLastOptionKeyDown={() => {}}
+        />
+        <div className="flex justify-end mt-1 max-w-sm">
+          <RequiredToggle
+            required={block.props.required}
+            onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
+          />
+        </div>
+      </KeyTrap>
+    </div>
+  );
+}
 
 const dropdownTool = createReactBlockSpec(
   {
@@ -410,46 +562,12 @@ const dropdownTool = createReactBlockSpec(
     content: "none",
   },
   {
-    render: ({ block, editor }) => {
-      const options: OptionsEntry[] = (() => {
-        try {
-          return JSON.parse(block.props.optionsJson);
-        } catch {
-          return [{ optionValue: "", optionMarker: "a" }];
-        }
-      })();
-
-      const updateOptions = (newOptions: OptionsEntry[]) => {
-        editor.updateBlock(block, {
-          props: { optionsJson: JSON.stringify(newOptions) },
-        });
-      };
-
-      return (
-        <KeyTrap className="py-1 w-full">
-          {/* Faux select trigger — shows dropdown shape in editor */}
-          <div className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground pointer-events-none select-none mb-2">
-            <span className="flex-1">Select an option…</span>
-            <ChevronDownIcon
-              size={14}
-              className="shrink-0 opacity-50"
-            />
-          </div>
-          <MultipleChoiceOption
-            optionsProp={options}
-            onInputChange={updateOptions}
-            onAddNewOption={updateOptions}
-            onLastOptionKeyDown={() => {}}
-          />
-          <div className="flex justify-end mt-1 max-w-sm">
-            <RequiredToggle
-              required={block.props.required}
-              onChange={v => editor.updateBlock(block, { props: { required: v } })}
-            />
-          </div>
-        </KeyTrap>
-      );
-    },
+    render: ({ block, editor }) => (
+      <DropdownBlock
+        block={block}
+        editor={editor}
+      />
+    ),
   },
 );
 
