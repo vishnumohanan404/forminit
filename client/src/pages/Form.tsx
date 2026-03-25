@@ -11,6 +11,7 @@ import { useEffect, useState, useRef } from "react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AxiosError } from "axios";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { EyeIcon } from "lucide-react";
 
 const FormPage = () => {
   const { id } = useParams();
@@ -91,62 +92,88 @@ const FormPage = () => {
       titleRef.current?.blur();
     }
   };
+  const canPublish = !!((state.editorData || title !== data?.title) && title);
+
   return (
     <div className="px-5">
-      <PageTitle className="max-w-[760px] pt-20">
-        <div className="flex justify-between items-center">
-          <input
-            ref={titleRef}
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            onKeyDown={handleTitleKeyDown}
-            placeholder={!id ? "Untitled" : ""}
-            className="text-4xl font-bold outline-none bg-transparent w-full placeholder:text-gray-500"
-            aria-label="Form title"
-          />
-          <TooltipProvider>
-            {(!state.editorData && title === data?.title) || !title ? (
-              <Tooltip
-                open={publishTooltipOpen}
-                onOpenChange={setPublishTooltipOpen}
-              >
-                <TooltipTrigger asChild>
-                  <span
-                    className="flex"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setPublishTooltipOpen(v => !v)}
-                    onKeyDown={e => e.key === "Enter" && setPublishTooltipOpen(v => !v)}
-                  >
-                    <Button
-                      size="sm"
-                      className="font-bold tracking-normal min-w-20 pointer-events-none"
-                      disabled
-                    >
-                      PUBLISH
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    {!title
-                      ? "Add a title to your form before publishing"
-                      : "No changes to publish"}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <Button
-                size="sm"
-                className="font-bold tracking-normal  min-w-20"
-                onClick={handleSubmit}
-              >
-                <div>{isPendingCreate || isPendingUpdate ? <LoadingSpinner /> : "PUBLISH"}</div>
-              </Button>
+      {/* Sticky action bar — top-right */}
+      <div className="fixed top-4 right-6 z-50 flex items-center gap-2">
+        <TooltipProvider>
+          {/* Preview */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="font-bold tracking-normal gap-1.5"
+                  disabled={!id}
+                  onClick={() => window.open(`/view-form/${id}`, "_blank")}
+                >
+                  <EyeIcon size={14} />
+                  PREVIEW
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {!id && (
+              <TooltipContent>
+                <p>Save the form first to preview it</p>
+              </TooltipContent>
             )}
-          </TooltipProvider>
-        </div>
+          </Tooltip>
+
+          {/* Publish */}
+          {!canPublish ? (
+            <Tooltip
+              open={publishTooltipOpen}
+              onOpenChange={setPublishTooltipOpen}
+            >
+              <TooltipTrigger asChild>
+                <span
+                  className="flex"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setPublishTooltipOpen(v => !v)}
+                  onKeyDown={e => e.key === "Enter" && setPublishTooltipOpen(v => !v)}
+                >
+                  <Button
+                    size="sm"
+                    className="font-bold tracking-normal min-w-20 pointer-events-none"
+                    disabled
+                  >
+                    PUBLISH
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {!title ? "Add a title to your form before publishing" : "No changes to publish"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              size="sm"
+              className="font-bold tracking-normal min-w-20"
+              onClick={handleSubmit}
+            >
+              {isPendingCreate || isPendingUpdate ? <LoadingSpinner /> : "PUBLISH"}
+            </Button>
+          )}
+        </TooltipProvider>
+      </div>
+
+      <PageTitle className="max-w-[760px] pt-20">
+        <input
+          ref={titleRef}
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          onKeyDown={handleTitleKeyDown}
+          placeholder={!id ? "Untitled" : ""}
+          className="text-4xl font-bold outline-none bg-transparent w-full placeholder:text-gray-500"
+          aria-label="Form title"
+        />
       </PageTitle>
       <Editor />
     </div>
