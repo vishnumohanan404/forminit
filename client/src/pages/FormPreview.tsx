@@ -111,7 +111,7 @@ const FormPreviewPage = () => {
                       <Input
                         type="text"
                         placeholder={block.data?.placeholder}
-                        className="focus-visible:ring-0 w-[60%]"
+                        className="focus-visible:ring-0 max-w-sm"
                       />
                     </div>
                   );
@@ -120,7 +120,7 @@ const FormPreviewPage = () => {
                     <div key={block._id}>
                       <Textarea
                         placeholder={block.data?.placeholder}
-                        className="focus-visible:ring-0 resize-none"
+                        className="focus-visible:ring-0 resize-none w-[80%]"
                         rows={4}
                       />
                     </div>
@@ -131,7 +131,7 @@ const FormPreviewPage = () => {
                       <Input
                         type="email"
                         placeholder="name@example.com"
-                        className="focus-visible:ring-0 w-[60%]"
+                        className="focus-visible:ring-0 max-w-sm"
                       />
                     </div>
                   );
@@ -140,7 +140,7 @@ const FormPreviewPage = () => {
                     <div key={block._id}>
                       <Input
                         type="date"
-                        className="focus-visible:ring-0 w-[60%]"
+                        className="focus-visible:ring-0 max-w-sm"
                       />
                     </div>
                   );
@@ -189,7 +189,7 @@ const FormPreviewPage = () => {
                 case "dropdownTool":
                   return (
                     <div key={block._id}>
-                      <div className="w-[60%]">
+                      <div className="max-w-sm">
                         <Select
                           value={selections[block._id] || ""}
                           onValueChange={val => setSelections(s => ({ ...s, [block._id]: val }))}

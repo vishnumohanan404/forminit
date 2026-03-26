@@ -235,6 +235,7 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (document.querySelector(".bn-suggestion-menu")) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       let currentBlock;
@@ -267,7 +268,27 @@ const BlockNoteEditor = ({ initialData, formId }: BlockNoteEditorProps) => {
 
     const domEl = editor._tiptapEditor.view.dom;
     domEl.addEventListener("keydown", onKeyDown, true);
-    return () => domEl.removeEventListener("keydown", onKeyDown, true);
+
+    // Reset suggestion menu selectedIndex to 0 when the menu closes, so it
+    // always starts at the first item on the next open. BlockNote keeps the
+    // state between opens; PageUp dispatched on close resets it while items
+    // are still present in the handler's closure.
+    let menuWasOpen = false;
+    const observer = new MutationObserver(() => {
+      const isOpen = !!document.querySelector(".bn-suggestion-menu");
+      if (!isOpen && menuWasOpen) {
+        editor.domElement.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "PageUp", bubbles: true, cancelable: true }),
+        );
+      }
+      menuWasOpen = isOpen;
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      domEl.removeEventListener("keydown", onKeyDown, true);
+      observer.disconnect();
+    };
   }, [editor]);
 
   const [submitTooltipOpen, setSubmitTooltipOpen] = useState(false);

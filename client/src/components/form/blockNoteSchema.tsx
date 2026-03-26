@@ -255,7 +255,7 @@ function LongAnswerBlock({ block, editor }: { block: any; editor: any }) {
     <KeyTrap className="py-1 w-full flex items-start gap-3">
       <textarea
         ref={textareaRef}
-        className="flex-1 max-w-sm min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+        className="w-[80%] min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
         placeholder={block.props.placeholder || "Type placeholder…"}
         value={block.props.placeholder}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -455,18 +455,38 @@ function MCQBlock({ block, editor }: { block: any; editor: any }) {
         return;
       }
       if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
-        const opts = (() => {
+        const opts: OptionsEntry[] = (() => {
           try {
             return JSON.parse(blockRef.current.props.optionsJson);
           } catch {
             return [];
           }
         })();
+        e.preventDefault();
+        e.stopPropagation();
         if (opts.length <= 1) {
-          e.preventDefault();
-          e.stopPropagation();
+          // Last option — remove the whole block and move cursor to questionTitle
           navigateFromBlock(blockId, "ArrowUp", editorRef.current);
           editorRef.current.removeBlocks([{ id: blockId }]);
+        } else {
+          // Multiple options — remove the focused option and focus the adjacent one
+          const allInputs = Array.from(
+            containerRef.current?.querySelectorAll<HTMLInputElement>("input[type='text']") ?? [],
+          );
+          const idx = allInputs.indexOf(e.target as HTMLInputElement);
+          if (idx === -1) return;
+          const newOpts = opts.filter((_, i) => i !== idx);
+          editorRef.current.updateBlock(
+            { id: blockId },
+            { props: { optionsJson: JSON.stringify(newOpts) } },
+          );
+          const focusIdx = idx > 0 ? idx - 1 : 0;
+          setTimeout(() => {
+            const inputs = Array.from(
+              containerRef.current?.querySelectorAll<HTMLInputElement>("input[type='text']") ?? [],
+            );
+            inputs[focusIdx]?.focus();
+          }, 0);
         }
       }
     };
@@ -495,13 +515,9 @@ function MCQBlock({ block, editor }: { block: any; editor: any }) {
           onInputChange={updateOptions}
           onAddNewOption={updateOptions}
           onLastOptionKeyDown={() => {}}
+          required={block.props.required}
+          onRequiredChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
         />
-        <div className="flex justify-end mt-1 max-w-sm">
-          <RequiredToggle
-            required={block.props.required}
-            onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
-          />
-        </div>
       </KeyTrap>
     </div>
   );
@@ -551,18 +567,36 @@ function DropdownBlock({ block, editor }: { block: any; editor: any }) {
         return;
       }
       if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "") {
-        const opts = (() => {
+        const opts: OptionsEntry[] = (() => {
           try {
             return JSON.parse(blockRef.current.props.optionsJson);
           } catch {
             return [];
           }
         })();
+        e.preventDefault();
+        e.stopPropagation();
         if (opts.length <= 1) {
-          e.preventDefault();
-          e.stopPropagation();
           navigateFromBlock(blockId, "ArrowUp", editorRef.current);
           editorRef.current.removeBlocks([{ id: blockId }]);
+        } else {
+          const allInputs = Array.from(
+            containerRef.current?.querySelectorAll<HTMLInputElement>("input[type='text']") ?? [],
+          );
+          const idx = allInputs.indexOf(e.target as HTMLInputElement);
+          if (idx === -1) return;
+          const newOpts = opts.filter((_, i) => i !== idx);
+          editorRef.current.updateBlock(
+            { id: blockId },
+            { props: { optionsJson: JSON.stringify(newOpts) } },
+          );
+          const focusIdx = idx > 0 ? idx - 1 : 0;
+          setTimeout(() => {
+            const inputs = Array.from(
+              containerRef.current?.querySelectorAll<HTMLInputElement>("input[type='text']") ?? [],
+            );
+            inputs[focusIdx]?.focus();
+          }, 0);
         }
       }
     };
@@ -599,13 +633,9 @@ function DropdownBlock({ block, editor }: { block: any; editor: any }) {
           onInputChange={updateOptions}
           onAddNewOption={updateOptions}
           onLastOptionKeyDown={() => {}}
+          required={block.props.required}
+          onRequiredChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
         />
-        <div className="flex justify-end mt-1 max-w-sm">
-          <RequiredToggle
-            required={block.props.required}
-            onChange={(v: boolean) => editor.updateBlock(block, { props: { required: v } })}
-          />
-        </div>
       </KeyTrap>
     </div>
   );

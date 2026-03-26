@@ -211,7 +211,7 @@ const FormViewPage = () => {
                           <Input
                             type="text"
                             placeholder={block.data?.placeholder}
-                            className="focus-visible:ring-0 w-[60%]"
+                            className="focus-visible:ring-0 max-w-sm"
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
                           />
@@ -222,7 +222,7 @@ const FormViewPage = () => {
                         <div key={block._id}>
                           <Textarea
                             placeholder={block.data?.placeholder}
-                            className="focus-visible:ring-0 resize-none"
+                            className="focus-visible:ring-0 resize-none w-[80%]"
                             rows={4}
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
@@ -267,7 +267,7 @@ const FormViewPage = () => {
                           <Input
                             type="email"
                             placeholder="name@example.com"
-                            className="focus-visible:ring-0 w-[60%]"
+                            className="focus-visible:ring-0 max-w-sm"
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
                           />
@@ -278,7 +278,7 @@ const FormViewPage = () => {
                         <div key={block._id}>
                           <Input
                             type="date"
-                            className="focus-visible:ring-0 w-[60%]"
+                            className="focus-visible:ring-0 max-w-sm"
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
                           />
@@ -297,7 +297,7 @@ const FormViewPage = () => {
                     case "dropdownTool":
                       return (
                         <div key={block._id}>
-                          <div className="w-[60%]">
+                          <div className="max-w-sm">
                             <Select
                               value={block.data?.selectedOption || ""}
                               onValueChange={val => handleChange(block._id, val, block.type)}

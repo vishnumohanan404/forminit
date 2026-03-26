@@ -9,6 +9,8 @@ interface MultipleChoiceOptionProps {
   ) => void;
   onAddNewOption: (options: Array<{ optionValue: string; optionMarker: string }>) => void;
   onInputChange: (options: Array<{ optionValue: string; optionMarker: string }>) => void;
+  required?: boolean;
+  onRequiredChange?: (v: boolean) => void;
 }
 
 const MultipleChoiceOption = ({
@@ -16,6 +18,8 @@ const MultipleChoiceOption = ({
   onLastOptionKeyDown,
   onAddNewOption,
   onInputChange,
+  required,
+  onRequiredChange,
 }: MultipleChoiceOptionProps) => {
   // Use a local state to manage the input value
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
@@ -43,15 +47,14 @@ const MultipleChoiceOption = ({
 
   const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
     if (event.key === "Backspace" && options[idx].optionValue === "" && options.length > 1) {
-      // Prevent default backspace behavior and remove the block
       event.preventDefault();
       const newOptions = options.filter((_, i) => i !== idx);
       setOptions(newOptions);
-      if (idx > 0) {
-        setTimeout(() => {
-          inputRefs.current[idx - 1]?.focus();
-        }, 0);
-      }
+      onInputChange(newOptions);
+      const focusIdx = idx > 0 ? idx - 1 : 0;
+      setTimeout(() => {
+        inputRefs.current[focusIdx]?.focus();
+      }, 0);
     } else {
       onLastOptionKeyDown(event, idx, options);
     }
@@ -66,10 +69,10 @@ const MultipleChoiceOption = ({
     <>
       {options?.map((option, idx) => (
         <div
-          className="flex flex-col"
+          className="flex items-center gap-3 mb-2"
           key={option.optionMarker}
         >
-          <div className="relative inline-flex w-full max-w-sm align-middle mb-2 items-center gap-2">
+          <div className="relative inline-flex w-[60%] align-middle items-center">
             <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
               <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
                 {option.optionMarker.toUpperCase()}
@@ -77,9 +80,7 @@ const MultipleChoiceOption = ({
             </div>
             <input
               type="text"
-              className={
-                "focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring  disabled:cursor-not-allowed disabled:opacity-50 pl-9"
-              }
+              className="focus-visible:ring-0 w-full flex h-10 rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring pl-9"
               placeholder={"OPTION " + option.optionMarker.toUpperCase()}
               value={option.optionValue}
               onChange={e => handleChange(e, idx)}
@@ -87,18 +88,27 @@ const MultipleChoiceOption = ({
               ref={el => (inputRefs.current[idx] = el)}
             />
           </div>
+          {idx === 0 && onRequiredChange !== undefined && (
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground select-none cursor-pointer whitespace-nowrap shrink-0">
+              <input
+                type="checkbox"
+                checked={required ?? false}
+                onChange={e => onRequiredChange(e.target.checked)}
+                className="accent-primary"
+              />
+              Required
+            </label>
+          )}
         </div>
       ))}
-      <div className="relative inline-flex w-full max-w-sm align-middle">
+      <div className="relative inline-flex w-[60%] align-middle">
         <div className="absolute inset-y-0 left-[4px] flex items-center justify-center w-8 pointer-events-none">
           <span className="text-sm font-medium text-muted bg-slate-600 px-[5px] py-0 rounded-sm">
             {nextOption.toUpperCase()}
           </span>
         </div>
         <button
-          className={
-            "focus-visible:ring-0  w-[60%] flex h-10  rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring cursor-pointer opacity-50 pl-9"
-          }
+          className="focus-visible:ring-0 w-full flex h-10 rounded-md border border-border bg-background px-3 py-2 text-sm cursor-pointer opacity-50 pl-9"
           onClick={handleAddNextOption}
         >
           ADD OPTION
