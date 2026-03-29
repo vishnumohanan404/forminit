@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, type ReactNode } from "react";
-import { ChevronDownIcon } from "lucide-react";
+import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import { createReactBlockSpec } from "@blocknote/react";
@@ -384,31 +384,43 @@ function DateToolBlock({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <KeyTrap className="py-1 w-full flex items-center gap-3">
-      <TooltipProvider>
-        <Tooltip
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <TooltipTrigger asChild>
-            <input
-              type="date"
-              disabled
-              onPointerEnter={() => setOpen(true)}
-              onPointerLeave={() => setOpen(false)}
-              className="flex-1 max-w-sm h-10 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground focus-visible:outline-none cursor-default"
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Date picker will be available in the published form</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <RequiredToggle
-        required={block.props.required}
-        onChange={v => editor.updateBlock(block, { props: { required: v } })}
-      />
-    </KeyTrap>
+    <div>
+      <KeyTrap className="py-1 w-full">
+        <TooltipProvider>
+          <Tooltip
+            open={open}
+            onOpenChange={setOpen}
+          >
+            <TooltipTrigger asChild>
+              <div
+                className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 gap-2 text-muted-foreground cursor-default mb-2"
+                onPointerEnter={() => setOpen(true)}
+                onPointerLeave={() => setOpen(false)}
+              >
+                <input
+                  type="date"
+                  disabled
+                  className="flex-1 bg-transparent text-sm text-muted-foreground focus:outline-none cursor-default [&::-webkit-calendar-picker-indicator]:hidden"
+                />
+                <CalendarIcon
+                  size={14}
+                  className="shrink-0"
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Date picker will be available in the published form</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="flex items-center gap-3">
+          <RequiredToggle
+            required={block.props.required}
+            onChange={v => editor.updateBlock(block, { props: { required: v } })}
+          />
+        </div>
+      </KeyTrap>
+    </div>
   );
 }
 

@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import NotFoundPage from "./NotFound";
-import { Loader2Icon } from "lucide-react";
+import { CalendarIcon, Loader2Icon } from "lucide-react";
 import { BlockData } from "@shared/types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -72,6 +72,9 @@ const FormViewPage = () => {
   });
 
   const [formState, setFormState] = useState<Array<BlockData>>([]);
+  const [emailErrors, setEmailErrors] = useState<Record<string, string>>({});
+
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
   useEffect(() => {
     if (!isLoading && data) setFormState(data.blocks);
@@ -113,6 +116,21 @@ const FormViewPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all email fields before submitting
+    const newEmailErrors: Record<string, string> = {};
+    formState.forEach(block => {
+      if (block.type === "emailTool") {
+        const val = block.data?.value || "";
+        if (val && !isValidEmail(val)) {
+          newEmailErrors[block._id] = "Please enter a valid email address.";
+        }
+      }
+    });
+    if (Object.keys(newEmailErrors).length > 0) {
+      setEmailErrors(newEmailErrors);
+      return;
+    }
 
     // Build submission: only input blocks, with title from nearest preceding content block
     const submissionBlocks = formState
@@ -267,20 +285,50 @@ const FormViewPage = () => {
                           <Input
                             type="email"
                             placeholder="name@example.com"
-                            className="focus-visible:ring-0 max-w-sm"
+                            className={`focus-visible:ring-0 max-w-sm ${emailErrors[block._id] ? "border-destructive focus-visible:ring-destructive" : ""}`}
                             value={block.data?.value || ""}
-                            onChange={e => handleChange(block._id, e.target.value, block.type)}
+                            onChange={e => {
+                              handleChange(block._id, e.target.value, block.type);
+                              if (emailErrors[block._id] && isValidEmail(e.target.value)) {
+                                setEmailErrors(prev => {
+                                  const n = { ...prev };
+                                  delete n[block._id];
+                                  return n;
+                                });
+                              }
+                            }}
+                            onBlur={e => {
+                              const val = e.target.value;
+                              if (val && !isValidEmail(val)) {
+                                setEmailErrors(prev => ({
+                                  ...prev,
+                                  [block._id]: "Please enter a valid email address.",
+                                }));
+                              }
+                            }}
                           />
+                          {emailErrors[block._id] && (
+                            <p className="mt-1 text-xs text-destructive">
+                              {emailErrors[block._id]}
+                            </p>
+                          )}
                         </div>
                       );
                     case "dateTool":
                       return (
-                        <div key={block._id}>
-                          <Input
+                        <div
+                          key={block._id}
+                          className="flex items-center w-[60%] h-10 rounded-md border border-border bg-background px-3 gap-2 focus-within:ring-1 focus-within:ring-ring"
+                        >
+                          <input
                             type="date"
-                            className="focus-visible:ring-0 max-w-sm"
+                            className="flex-1 bg-transparent text-sm focus:outline-none cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
                             value={block.data?.value || ""}
                             onChange={e => handleChange(block._id, e.target.value, block.type)}
+                          />
+                          <CalendarIcon
+                            size={14}
+                            className="shrink-0 text-muted-foreground pointer-events-none"
                           />
                         </div>
                       );
