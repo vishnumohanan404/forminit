@@ -372,20 +372,12 @@ const emailTool = createReactBlockSpec(
 // dateTool
 // ---------------------------------------------------------------------------
 
-function DateToolBlock({
-  block,
-  editor,
-}: {
-  block: Parameters<Parameters<typeof createReactBlockSpec>[1]["render"]>[0]["block"] & {
-    type: "dateTool";
-    props: { required: boolean };
-  };
-  editor: Parameters<Parameters<typeof createReactBlockSpec>[1]["render"]>[0]["editor"];
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DateToolBlock({ block, editor }: { block: any; editor: any }) {
   const [open, setOpen] = useState(false);
   return (
     <div>
-      <KeyTrap className="py-1 w-full">
+      <KeyTrap className="py-1 w-full flex items-center gap-3">
         <TooltipProvider>
           <Tooltip
             open={open}
@@ -393,7 +385,7 @@ function DateToolBlock({
           >
             <TooltipTrigger asChild>
               <div
-                className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 gap-2 text-muted-foreground cursor-default mb-2"
+                className="flex items-center max-w-sm h-10 rounded-md border border-border bg-background px-3 gap-2 text-muted-foreground cursor-default"
                 onPointerEnter={() => setOpen(true)}
                 onPointerLeave={() => setOpen(false)}
               >
@@ -413,12 +405,10 @@ function DateToolBlock({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <div className="flex items-center gap-3">
-          <RequiredToggle
-            required={block.props.required}
-            onChange={v => editor.updateBlock(block, { props: { required: v } })}
-          />
-        </div>
+        <RequiredToggle
+          required={block.props.required}
+          onChange={v => editor.updateBlock(block, { props: { required: v } })}
+        />
       </KeyTrap>
     </div>
   );
@@ -435,7 +425,7 @@ const dateTool = createReactBlockSpec(
   {
     render: ({ block, editor }) => (
       <DateToolBlock
-        block={block as never}
+        block={block}
         editor={editor}
       />
     ),
